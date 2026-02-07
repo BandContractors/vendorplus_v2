@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import static java.sql.Types.VARCHAR;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -1417,9 +1418,14 @@ public class CompanySetting implements Serializable {
                 CallableStatement cs22 = conn22.prepareCall(sql22);) {
             cs22.registerOutParameter("out_current_user_datetime", VARCHAR);
             cs22.executeQuery();
-            this.CURRENT_SERVER_DATE = new Date(cs22.getTimestamp("out_current_user_datetime").getTime());
+            Timestamp currentTs = cs22.getTimestamp("out_current_user_datetime");
+            if (currentTs != null) {
+                this.CURRENT_SERVER_DATE = new Date(currentTs.getTime());
+            } else {
+                this.CURRENT_SERVER_DATE = new Date();
+            }
         } catch (SQLException sqe) {
-            this.CURRENT_SERVER_DATE = null;
+            this.CURRENT_SERVER_DATE = new Date();
         }
         return this.CURRENT_SERVER_DATE;
     }

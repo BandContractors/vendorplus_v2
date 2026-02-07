@@ -1,0 +1,76 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "ant dist",
+			"type": "shell",
+			"command": "ant",
+			"args": [
+				"dist"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "ant dist (CopyLibs)",
+			"type": "shell",
+			"command": "ant",
+			"args": [
+				"-Dlibs.CopyLibs.classpath=C:\\Program Files\\NetBeans-12.0\\netbeans\\java\\ant\\extra\\org-netbeans-modules-java-j2seproject-copylibstask.jar",
+				"dist"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "ant dist (CopyLibs + jsf20)",
+			"type": "shell",
+			"command": "ant",
+			"args": [
+				"-Dlibs.CopyLibs.classpath=C:\\Program Files\\NetBeans-12.0\\netbeans\\java\\ant\\extra\\org-netbeans-modules-java-j2seproject-copylibstask.jar",
+				"-Dlibs.jsf20.classpath=lib\\javax.faces.jar",
+				"dist"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "ant dist (CopyLibs + jsf20 v2)",
+			"type": "shell",
+			"command": "ant",
+			"args": [
+				"-Dlibs.CopyLibs.classpath=C:\\Program Files\\NetBeans-12.0\\netbeans\\java\\ant\\extra\\org-netbeans-modules-java-j2seproject-copylibstask.jar",
+				"-Dlibs.jsf20.classpath=lib/javax.faces.jar",
+				"dist"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "ant dist (with private properties)",
+			"type": "shell",
+			"command": "ant",
+			"args": [
+				"dist"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "ant dist (with escaped paths)",
+			"type": "shell",
+			"command": "ant",
+			"args": [
+				"dist"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}
