@@ -728,6 +728,7 @@
             <h:panelGrid id="pgrdMsgs" styleClass="clsGridMainMessages" columns="1">
                 <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>
                 <h:messages id="msgsMainMessage" style="color: red"/><br/>
+                <p:commandButton id="cmdbvPrint" value="PRINT" icon="ui-icon-print" style="display:none;" type="button" onclick="window.print(); return false;"/>
             </h:panelGrid>
             <p:sidebar widgetVar="sbarItemSearch" position="bottom" baseZIndex="10000" style="height: 600px;">
                 <h:panelGrid id="pnlgItemSearch" columns="1" style="text-align: center;">

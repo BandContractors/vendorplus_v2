@@ -44,7 +44,7 @@
                             <h:outputLabel id="IolblSalesInvoiceEmail" value="#{langout['Email']}: #{companySetting.getEmail()}" rendered="#{companySetting.getEmail().length()>0}"/>
                         </h:panelGrid>
                         <h:panelGrid columns="1" style="width: 290px; margin: 0px;background-color: gray;text-align: center;-webkit-print-color-adjust: exact;">
-                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 18pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionOutputLabel)}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 18pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionOutputLabel)}</h:outputLabel>
                         </h:panelGrid>
                         <h:panelGrid style="width: 290px; margin: 0px;" columns="2" rendered="#{utilityBean.isDatesEqual(generalUserSetting.outputDetailParent.trans.transactionDate, generalUserSetting.outputDetailParent.trans.addDate)==1}">
                             <h:outputLabel style="font-size: 12px;" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionNumberLabel)}:"/>

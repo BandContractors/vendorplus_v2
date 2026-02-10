@@ -78,30 +78,30 @@
                 <h:panelGrid columns="3" style="border-style: none;-webkit-print-color-adjust: exact;width: 100%; margin: 0px;"> 
                     <h:panelGrid>
                         <h:panelGrid columns="1">
-                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 18pt;color:red;font-weight: bold;text-decoration: none;">#{companySetting.getLICENSE_CLIENT_NAME()}</h:outputLabel>
-                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 9pt;color:blue;font-weight: bold;text-decoration: none;">#{companySetting.getSloghan()}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 18pt;color:red;font-weight: bold;text-decoration: none;">#{companySetting.getLICENSE_CLIENT_NAME()}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 9pt;color:blue;font-weight: bold;text-decoration: none;">#{companySetting.getSloghan()}</h:outputLabel>
                         </h:panelGrid>
                         <h:panelGrid columns="2">
                             <p:graphicImage value="#{companySetting.getLogoUrl()}" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'Yes')}" />
                             <h:panelGrid columns="1" style="text-align: left;">
-                                <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','BOX_ADDRESS').parameter_value}</h:outputLabel>
-                                <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{companySetting.getPhysicalAddress()}</h:outputLabel>
-                                <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Telephone']}:#{companySetting.getPhone()}</h:outputLabel>
-                                <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Mobile']}:#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value}</h:outputLabel>
-                                <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">TIN:#{companySetting.getTaxIdentity()}</h:outputLabel>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','BOX_ADDRESS').parameter_value}</h:outputLabel>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{companySetting.getPhysicalAddress()}</h:outputLabel>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Telephone']}:#{companySetting.getPhone()}</h:outputLabel>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Mobile']}:#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value}</h:outputLabel>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">TIN:#{companySetting.getTaxIdentity()}</h:outputLabel>
                             </h:panelGrid>
                         </h:panelGrid>
                         <h:panelGrid columns="1">
-                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 9pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Email']}:#{companySetting.getEmail()} #{langsys['Website']}:#{companySetting.getWebsite()}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 9pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Email']}:#{companySetting.getEmail()} #{langsys['Website']}:#{companySetting.getWebsite()}</h:outputLabel>
                         </h:panelGrid>
                     </h:panelGrid>
                     <h:panelGrid>
                         <h:panelGrid columns="1">
-                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Amount']} #{langsys['Due']} (#{accCurrencyBean.localCurrency.currencyCode})</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 12pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Amount']} #{langsys['Due']} (#{accCurrencyBean.localCurrency.currencyCode})</h:outputLabel>
                             <h:outputLabel style="color: coral;font-weight: bold;font-size: 18pt;" value="#{accJournalBean.returnBalanceString(accLedgerBean.getReceivableAccBalanceTrade(transactorBean.selectedBillTransactor.transactorId))}">
                                 <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
-                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Deposit']} (#{accCurrencyBean.localCurrency.currencyCode})</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 12pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Deposit']} (#{accCurrencyBean.localCurrency.currencyCode})</h:outputLabel>
                             <h:outputLabel style="color: green;font-weight: bold;font-size: 18pt;" value="#{accJournalBean.returnBalanceString(accLedgerBean.getPrepaidIncomeAccBalanceToCur(transactorBean.selectedBillTransactor.transactorId,accCurrencyBean.localCurrency.currencyCode))}">
                                 <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputLabel>
@@ -109,86 +109,86 @@
                     </h:panelGrid>
                     <h:panelGrid style="float: right;">
                         <h:panelGrid columns="1" style="background-color: #000000">
-                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 18pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">#{langsys[utilityBean.formatCapitaliseAllCharacter(menuItemBean.menuItemObj.CUSTOMER_NAME)]} #{langsys['STATEMENT']}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 18pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">#{langsys[utilityBean.formatCapitaliseAllCharacter(menuItemBean.menuItemObj.CUSTOMER_NAME)]} #{langsys['STATEMENT']}</h:outputLabel>
                         </h:panelGrid>
                         <h:panelGrid columns="1">
-                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: normal;text-decoration: none;">#{transactorBean.selectedBillTransactor.transactorNames}</h:outputLabel>
-                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{transactorBean.selectedBillTransactor.physicalAddress.length()>0}">#{transactorBean.selectedBillTransactor.physicalAddress}</h:outputLabel>
-                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{transactorBean.selectedBillTransactor.email.length()>0}">#{transactorBean.selectedBillTransactor.email}</h:outputLabel>
-                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{transactorBean.selectedBillTransactor.phone.length()>0}">#{transactorBean.selectedBillTransactor.phone}</h:outputLabel>
-                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{transactorBean.selectedBillTransactor.taxIdentity.length()>0}">TIN:#{transactorBean.selectedBillTransactor.taxIdentity}</h:outputLabel>
-                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{transactorBean.selectedBillTransactor.transactorRef.length()>0}">#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]} #{langsys['Reference']} #{langsys['No.']}: #{transactorBean.selectedBillTransactor.transactorRef}</h:outputLabel>
-                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 12pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{transactorBean.selectedBillTransactor.cpName.length()>0}">#{langsys['Attention']}: #{transactorBean.selectedBillTransactor.cpName}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 12pt;color:#000000;font-weight: normal;text-decoration: none;">#{transactorBean.selectedBillTransactor.transactorNames}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{transactorBean.selectedBillTransactor.physicalAddress.length()>0}">#{transactorBean.selectedBillTransactor.physicalAddress}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{transactorBean.selectedBillTransactor.email.length()>0}">#{transactorBean.selectedBillTransactor.email}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{transactorBean.selectedBillTransactor.phone.length()>0}">#{transactorBean.selectedBillTransactor.phone}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{transactorBean.selectedBillTransactor.taxIdentity.length()>0}">TIN:#{transactorBean.selectedBillTransactor.taxIdentity}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 12pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{transactorBean.selectedBillTransactor.transactorRef.length()>0}">#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]} #{langsys['Reference']} #{langsys['No.']}: #{transactorBean.selectedBillTransactor.transactorRef}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 12pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{transactorBean.selectedBillTransactor.cpName.length()>0}">#{langsys['Attention']}: #{transactorBean.selectedBillTransactor.cpName}</h:outputLabel>
                         </h:panelGrid>
                     </h:panelGrid>
                 </h:panelGrid>
 
-                <table id="tblTransaction" border="1" cellspacing="0" cellpadding="2" style="-webkit-print-color-adjust: exact;width: 100%;font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                <table id="tblTransaction" border="1" cellspacing="0" cellpadding="2" style="-webkit-print-color-adjust: exact;width: 100%;font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
                     <tr style="background-color: yellow;font-weight: bold">
-                        <td colspan="4" align="center" style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                        <td colspan="4" align="center" style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
                             #{langsys['Transactions']} #{langsys['for']} #{langsys['period']}
                             <h:outputText value="#{utilityBean.formatDate(trans.transactionDate)}"/> to 
                             <h:outputText value="#{utilityBean.formatDate(trans.transactionDate2)}"/>
                         </td>
-                        <td colspan="1" style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                        <td colspan="1" style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
                             <h:outputText value="#{transBean.grandTotalLoc}">
                                 <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </td>
-                        <td colspan="1" style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                            <h:outputText value="#{transBean.grandTotalPaidLoc}" style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;color: blue">
+                        <td colspan="1" style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                            <h:outputText value="#{transBean.grandTotalPaidLoc}" style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;color: blue">
                                 <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </td>
-                        <td colspan="1" style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                            <h:outputText value="#{accJournalBean.returnBalanceString(transBean.grandTotalBalanceLoc)}" style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;color: red">
+                        <td colspan="1" style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                            <h:outputText value="#{accJournalBean.returnBalanceString(transBean.grandTotalBalanceLoc)}" style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;color: red">
                                 <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                             </h:outputText>
                         </td>
-                        <td colspan="1" style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                        <td colspan="1" style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
                             <h:outputText value="#{accCurrencyBean.localCurrency.currencyCode}"/>
                         </td>
                     </tr>
                     <tr style="background-color: #ADD8E6;font-weight: bold;">
-                        <td style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Invoice']} #{langsys['Type']}</td>
-                        <td style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Date']}</td>
-                        <td style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Item']} #{langsys['Description']}</td>
-                        <td style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Amount']}</td>
-                        <td style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Total']}</td>
-                        <td style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Total']} #{langsys['Paid']}</td>
-                        <td style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Balance']}</td>
-                        <td style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Currency']}</td>
+                        <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Invoice']} #{langsys['Type']}</td>
+                        <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Date']}</td>
+                        <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Item']} #{langsys['Description']}</td>
+                        <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Amount']}</td>
+                        <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Total']}</td>
+                        <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Total']} #{langsys['Paid']}</td>
+                        <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Balance']}</td>
+                        <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Currency']}</td>
                     </tr>
                     <ui:repeat var="t" value="#{transBean.customerCardTranss}" varStatus="status">
                         <tr style="background-color: #E5E5E5;">
-                            <td style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{t.transactionTypeName}: #{t.transactionNumber}</td>
-                            <td style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                            <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{t.transactionTypeName}: #{t.transactionNumber}</td>
+                            <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
                                 <h:outputText value="#{utilityBean.formatDate(t.transactionDate)}"/>
                             </td>
                             <td></td>
                             <td></td>
-                            <td style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                            <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
                                 <h:outputText value="#{t.grandTotal}">
                                     <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </td>
-                            <td style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                <h:outputText value="#{t.totalPaid}" style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;color: blue">
+                            <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                                <h:outputText value="#{t.totalPaid}" style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;color: blue">
                                     <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </td>
-                            <td style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
-                                <h:outputText value="#{t.grandTotal-t.totalPaid}" style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;color: red">
+                            <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                                <h:outputText value="#{t.grandTotal-t.totalPaid}" style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;color: red">
                                     <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                 </h:outputText>
                             </td>
-                            <td style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{t.currencyCode}</td>
+                            <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{t.currencyCode}</td>
                         </tr>
                         <ui:repeat var="ti" value="#{transItemBean.getTransItemsByTransactionId3(t.transactionId)}">
                             <tr>
-                                <td colspan="2" style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;"></td>
-                                <td style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{ti.description} #{ti.descSpecific}</td>
-                                <td style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                                <td colspan="2" style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;"></td>
+                                <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{ti.description} #{ti.descSpecific}</td>
+                                <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
                                     <h:outputText value="#{ti.amountIncVat}">
                                         <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputText>
@@ -199,10 +199,10 @@
                     </ui:repeat>
                 </table>
                 <h:panelGrid columns="1" style="float: left;text-align: left;">
-                    <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: bold;text-decoration: none;">#{langsys['Make']} #{langsys['all']} #{langsys['checks']} #{langsys['payable']} #{langsys['to']}</h:outputLabel>
-                    <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: bold;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','PAYEE_NAME').parameter_value}</h:outputLabel>
-                    <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','ACC_DETAIL1').parameter_value}</h:outputLabel>
-                    <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','ACC_DETAIL2').parameter_value}</h:outputLabel>
+                    <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: bold;text-decoration: none;">#{langsys['Make']} #{langsys['all']} #{langsys['checks']} #{langsys['payable']} #{langsys['to']}</h:outputLabel>
+                    <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: bold;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','PAYEE_NAME').parameter_value}</h:outputLabel>
+                    <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','ACC_DETAIL1').parameter_value}</h:outputLabel>
+                    <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','ACC_DETAIL2').parameter_value}</h:outputLabel>
                 </h:panelGrid>
             </p:panel>
         </h:form>

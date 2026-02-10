@@ -1598,6 +1598,20 @@ public class TransBean implements Serializable {
         if (PackaginTransNo.startsWith("PCG")) {
             new TransactionPackageBean().updatePackageStatus(trans.getTransactionId(), 2, trans, null);//package sold
         }
+        
+        //Add success message to confirm sale was saved
+        UtilityBean ub = new UtilityBean();
+        String BaseName = "language_en";
+        try {
+            BaseName = menuItemBean.getMenuItemObj().getLANG_BASE_NAME_SYS();
+        } catch (Exception e) {
+        }
+        String transNo = (trans != null && trans.getTransactionNumber() != null) ? trans.getTransactionNumber() : "";
+        String successMsg = ub.translateWordsInText(BaseName, "Sale Saved Successfully");
+        if (transNo.length() > 0) {
+            successMsg += " - " + transNo;
+        }
+        FacesContext.getCurrentInstance().addMessage("Save", new FacesMessage(FacesMessage.SEVERITY_INFO, successMsg, ""));
     }
 
     public void saveTransCECcallFromOpenBalance(String aLevel, int aStoreId, int aTransTypeId, int aTransReasonId, String aSaleType, Trans trans, List<TransItem> aActiveTransItems, Transactor aSelectedTransactor, Transactor aSelectedBillTransactor, UserDetail aTransUserDetail, Transactor aSelectedSchemeTransactor, UserDetail aAuthorisedByUserDetail, AccCoa aSelectedAccCoa, TransItem aTransItem) {

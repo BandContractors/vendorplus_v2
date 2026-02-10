@@ -152,22 +152,22 @@
                     <h:panelGrid id="pnlHeaderForSummary" columns="1" style="border-style: none;-webkit-print-color-adjust: exact;width: 100%; margin: 0px;"> 
                         <h:panelGrid>
                             <h:panelGrid columns="1">
-                                <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 18pt;color:red;font-weight: bold;text-decoration: none;">#{companySetting.getLICENSE_CLIENT_NAME()}</h:outputLabel>
-                                <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 9pt;color:blue;font-weight: bold;text-decoration: none;">#{companySetting.getSloghan()}</h:outputLabel>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 18pt;color:red;font-weight: bold;text-decoration: none;">#{companySetting.getLICENSE_CLIENT_NAME()}</h:outputLabel>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 9pt;color:blue;font-weight: bold;text-decoration: none;">#{companySetting.getSloghan()}</h:outputLabel>
                             </h:panelGrid>
                             <h:panelGrid columns="2">
                                 <p:graphicImage value="#{companySetting.getLogoUrl()}" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'Yes')}" />
                                 <h:panelGrid columns="1" style="text-align: left;">
-                                    <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','BOX_ADDRESS').parameter_value}</h:outputLabel>
-                                    <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{companySetting.getPhysicalAddress()}</h:outputLabel>
-                                    <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Telephone']}:#{companySetting.getPhone()}</h:outputLabel>
-                                    <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Mobile']}:#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value}</h:outputLabel>
-                                    <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">TIN:#{companySetting.getTaxIdentity()}</h:outputLabel>
+                                    <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','BOX_ADDRESS').parameter_value}</h:outputLabel>
+                                    <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{companySetting.getPhysicalAddress()}</h:outputLabel>
+                                    <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Telephone']}:#{companySetting.getPhone()}</h:outputLabel>
+                                    <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Mobile']}:#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value}</h:outputLabel>
+                                    <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">TIN:#{companySetting.getTaxIdentity()}</h:outputLabel>
                                 </h:panelGrid>
                             </h:panelGrid>
                             <h:panelGrid columns="1">
-                                <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 9pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Email']}:#{companySetting.getEmail()} #{langsys['Website']}:#{companySetting.getWebsite()}</h:outputLabel>
-                                <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 14pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Cash']} #{langsys['Payments']} #{langsys['From']} #{utilityBean.formatDateTime(payBean.date1)} #{langsys['To']} #{utilityBean.formatDateTime(payBean.date2)}</h:outputLabel>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 9pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Email']}:#{companySetting.getEmail()} #{langsys['Website']}:#{companySetting.getWebsite()}</h:outputLabel>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 14pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Cash']} #{langsys['Payments']} #{langsys['From']} #{utilityBean.formatDateTime(payBean.date1)} #{langsys['To']} #{utilityBean.formatDateTime(payBean.date2)}</h:outputLabel>
                             </h:panelGrid>
                         </h:panelGrid>
                     </h:panelGrid>

@@ -47,7 +47,7 @@
                         </h:panelGrid>
 
                         <h:panelGrid columns="1" style="width: 290px; margin: 0px;background-color: white;text-align: center;-webkit-print-color-adjust: exact;">
-                            <h:outputLabel style="font-family:'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif; font-size: 18pt;color:#000000;font-weight: bold;text-decoration: none;">#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionOutputLabel)}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 18pt;color:#000000;font-weight: bold;text-decoration: none;">#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionOutputLabel)}</h:outputLabel>
                         </h:panelGrid>
                         <h:panelGrid style="width: 290px; margin: 0px;" columns="2" rendered="#{utilityBean.isDatesEqual(generalUserSetting.outputDetailParent.trans.transactionDate, generalUserSetting.outputDetailParent.trans.addDate)==1}">
                             <h:outputLabel style="font-size: 12px;" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionNumberLabel)}:"/>
@@ -227,7 +227,7 @@
                             <h:outputLabel style="font-size: 10px;font-weight: bold;" value="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','FOOTER_MESSAGE').parameter_value}"/>
                         </h:panelGrid>
                         <h:panelGrid id="IpgrdSalesInvoiceFooter2" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getIsShowDeveloper(),'Yes')}">
-                            <h:outputLabel style="font-size: 10px;" value="#{langout['System']} #{langout['developed']} #{langout['by']} NEXUS Tech solutions Ltd"/>
+                            <h:outputLabel style="font-size: 10px;" value="#{langout['System']} #{langout['developed']} #{langout['by']} Band Contractors Ltd"/>
                             <h:outputLabel style="font-size: 10px;" value="#{companySetting.getDeveloperEmail()} | #{companySetting.getDeveloperPhone()}"/>
                         </h:panelGrid>
                     </h:panelGrid>
