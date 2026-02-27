@@ -120,12 +120,12 @@
             </h:panelGrid>
             <h:panelGrid id="pnlHeader" styleClass="clsPanelReportFilter" columns="1">
                 <h:panelGrid columns="8" rendered="#{transExtBean.showDetail}">
-                    <h:outputLabel  value="#{langsys['From']}"/>
+                    <h:outputLabel  value="#{langsys['Store']}"/>
                     <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionDateLabel)}"/>
                     <h:outputLabel  value="#{langsys['Currency']}"/>
                     <p:commandLink actionListener="#{transactorBean.openChildTransactor('CUSTOMER')}" value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}" style="text-decoration: none;"/>
                     <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionRefLabel)}"/>
-                    <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" value="Outstanding"/>
+                    <h:outputLabel id="olblDebtCredit" style="color: rgb(250, 11, 50);font-weight: bold;" value="Outstanding"/>
                     <h:outputLabel id="olblDeposit" style="color: green;font-weight: bold;" value="Deposit"/>
                     <h:outputLabel value=""/>
                     <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}" style="width: 120px;height: 24px;"/>
@@ -339,7 +339,7 @@
 
             <p:dataTable rowIndexVar="rowIndex" id="dtblTransactionItem" value="#{transItemBean.activeTransItems}" var="ati" 
                          styleClass="cls-table" tableStyle="width:auto;" 
-                         rowStyleClass="#{ati.is_tax_synced eq 0 ? 'red' : null}"
+                         rowStyleClass="#{ati.is_tax_synced eq 0 ? 'lightgreenrow' : null}"
                          >  
                 <p:column>
                     <!-- column header -->
@@ -449,7 +449,7 @@
                 <h:inputText id="itxtTotalVat" value="#{trans.totalVat}" styleClass="clsInputTransItem" style="width: 150px;height: 24px;" disabled="true">
                     <f:convertNumber pattern="###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                 </h:inputText>
-                <h:inputText id="itxtGrandTotal" value="#{trans.grandTotal}" styleClass="clsInputTransItem" style="width: 180px;height: 24px;background-color: yellow;font-weight: bold;font-size: 20px;" disabled="true">
+                <h:inputText id="itxtGrandTotal" value="#{trans.grandTotal}" styleClass="clsInputTransItem" style="width: 180px;height: 24px;background-color: #28a745;font-weight: bold;font-size: 20px;" disabled="true">
                     <f:convertNumber pattern="#{accCurrencyBean.getNumberFormatByCurrency(trans.currencyCode)}" locale="#{utilityBean.convertLocaleToString()}"/>
                     <f:ajax event="change" render="itxtChange"/>
                 </h:inputText>
@@ -565,7 +565,7 @@
                 </p:dialog>
             </h:panelGrid>
 
-            <h:panelGrid id="pgrdScheme" style="background-color: yellow;width: 100%">
+            <h:panelGrid id="pgrdScheme" style="background-color: #28a745;width: 100%">
                 <h:panelGrid id="pgrdScheme2" columns="6" rendered="#{trans.billOther}">
                     <h:outputLabel  value="#{langsys['Bill']} #{langsys['For']}"/>
                     <p:autoComplete id="autcBillTransactor" value="#{transactorBean.selectedBillTransactor}" 
@@ -633,7 +633,7 @@
                     <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Receipt']} #{langsys['Account']}"/>
                     <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionUserLabel)}"/>
 
-                    <h:inputText id="itxtAmountTendered" value="#{trans.amountTendered}" styleClass="clsInputTransItem" style="width: 220px;height: 24px;background-color: yellow;font-weight: bold;font-size: 20px;" autocomplete="off">
+                    <h:inputText id="itxtAmountTendered" value="#{trans.amountTendered}" styleClass="clsInputTransItem" style="width: 220px;height: 24px;background-color: #28a745;font-weight: bold;font-size: 20px;" autocomplete="off">
                         <f:convertNumber pattern="###,###,###,###,###.#############" locale="#{utilityBean.convertLocaleToString()}"/>
                         <f:ajax event="blur" listener="#{transBean.setTransTotalsAndUpdateCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transItemBean.activeTransItems)}" render="itxtChange"/>
                     </h:inputText>
@@ -667,7 +667,7 @@
                     </p:autoComplete>
                 </h:panelGrid>
             </h:panelGrid>
-            <h:panelGrid style="background-color: yellow;width: 100%"/>
+            <h:panelGrid style="background-color:green;width: 100%"/>
             <h:panelGrid id="pgrdApprove">
                 <h:panelGrid rendered="#{transBean.isApproveNeeded(trans)}" id="pgrdApprove2" styleClass="clsGridApprove" columns="6" style="background-color: lightsalmon">
                     <h:outputLabel  value="#{langsys['User']} #{langsys['Name']}:"/>

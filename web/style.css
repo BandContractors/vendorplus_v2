@@ -301,8 +301,10 @@ figure {
     background-image: none !important;
     color: #000000 !important;
 }
-.red{
-    background-color: #d2222d !important;
+ .lightgreenrow{
+    background-color: #b6fcb6 !important;
+    color: #222;
+}
     background-image: none !important;
     color: #000000 !important;
 }

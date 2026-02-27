@@ -7,6 +7,61 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <title>Sales Invoice</title>
+            <style>
+                .receipt-modern {
+                    background: #fff;
+                    border-radius: 16px;
+                    box-shadow: 0 2px 12px rgba(40,167,69,0.10);
+                    padding: 32px 24px;
+                    margin: 24px auto;
+                    max-width: 420px;
+                }
+                .receipt-header {
+                    background: #28a745;
+                    color: #fff;
+                    border-radius: 16px 16px 0 0;
+                    padding: 18px 24px;
+                    text-align: center;
+                    font-size: 1.5em;
+                    font-weight: bold;
+                    letter-spacing: 2px;
+                }
+                .receipt-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 18px 0;
+                    background: #f8f9fa;
+                    border-radius: 8px;
+                }
+                .receipt-table th, .receipt-table td {
+                    padding: 8px 12px;
+                    border-bottom: 1px solid #e0e0e0;
+                    text-align: left;
+                }
+                .receipt-table th {
+                    background: #e9f5ee;
+                    font-weight: bold;
+                }
+                .receipt-totals {
+                    background: #e9f5ee;
+                    border-radius: 8px;
+                    padding: 12px 16px;
+                    margin: 12px 0;
+                    font-size: 1.1em;
+                }
+                .receipt-footer {
+                    text-align: center;
+                    color: #28a745;
+                    font-weight: bold;
+                    margin-top: 18px;
+                    font-size: 1.1em;
+                }
+                .receipt-logo {
+                    width: 48px;
+                    height: 48px;
+                    margin-bottom: 8px;
+                }
+            </style>
         <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/> 
     </h:head>
@@ -19,6 +74,34 @@
                         <p:printer target="vTransactionGrid" rendered="false"/>
                     </p:commandButton>
                 </p:panel>
+                <div class="receipt-modern">
+                    <div class="receipt-header">
+                        <!-- Optional logo -->
+                        <!-- <img src="logo.png" class="receipt-logo" alt="Logo" /> -->
+                        #{companySetting.getLICENSE_CLIENT_NAME()}
+                    </div>
+                    <div style="text-align:center;margin:8px 0;color:#222;font-size:1.1em;">
+                        #{companySetting.getPhysicalAddress()}<br/>
+                        TIN:#{companySetting.getTaxIdentity()}<br/>
+                        Email: #{companySetting.getEmail()}
+                    </div>
+                    <div style="text-align:center;font-size:1.3em;font-weight:bold;margin:12px 0;">Sales Invoice</div>
+                    <div style="margin-bottom:8px;text-align:center;font-size:1.1em;">
+                        #{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionNumberLabel)}: <span style="font-weight:bold;color:#28a745;">#{generalUserSetting.outputDetailParent.trans.transactionNumber}</span><br/>
+                        #{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionDateLabel)}: #{utilityBean.formatDateTime(generalUserSetting.outputDetailParent.trans.addDate)}
+                    </div>
+                    <div class="receipt-totals">
+                        Subtotal: #{generalUserSetting.outputDetailParent.trans.subTotal}<br/>
+                        Tax: #{generalUserSetting.outputDetailParent.trans.totalVat}<br/>
+                        <span style="font-weight:bold;color:#28a745;">TOTAL (UGX): #{generalUserSetting.outputDetailParent.trans.grandTotal}</span><br/>
+                        <span style="font-weight:bold;color:#28a745;">PAID AMOUNT: #{generalUserSetting.outputDetailParent.trans.amountTendered}</span><br/>
+                        <span style="font-weight:bold;color:#28a745;">BALANCE: #{generalUserSetting.outputDetailParent.trans.changeAmount}</span>
+                    </div>
+                    <div class="receipt-footer">
+                        Thank you for your support<br/>
+                        <span style="font-size:0.9em;color:#888;">System powered by Band Contractors Ltd</span>
+                    </div>
+                </div>
                 <h:panelGrid id="vTransactionGrid"> 
                     <h:panelGrid columns="2" style="width:100%;margin: 0px;">
                         <h:outputLabel value="INV-NO"/>

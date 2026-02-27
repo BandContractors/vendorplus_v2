@@ -12,7 +12,8 @@
                 background: #7BC043;
                 -webkit-box-shadow: 0px 0px 8px #85b2cb;
                 box-shadow: 0px 0px 8px #85b2cb;
-            } .ui-menubar,.ui-menu-child,.ui-menu {background: #F0F0F0 !important;}
+            }
+            .ui-menubar,.ui-menu-child,.ui-menu {background: #fff !important; color: #1F3A5F !important; font-weight: bold !important; text-shadow: 0 1px 2px #00000033;}
         </style>
         <script  language="javascript">
             function doUpdateMenuClick() {
@@ -24,7 +25,7 @@
     </h:head>
     <h:body style="background-color: white;">
         <h:form id="frmMenu">  
-            <div style="background-color: #7BC043;width: 100%;color: white;padding: 15px 0;text-align: center;">
+            <div style="background-color: #1F3A5F;width: 100%;color: white;padding: 15px 0;text-align: center;">
                 <p:outputLabel id="olblTitle" value="VendorPlus" style="font-size: 28px;font-weight: bold;"/>
                 <br/>
                 <p:outputLabel value="#{menuItemBean.menuItemObj.LICENSE_CLIENT_NAME}  (#{menuItemBean.menuItemObj.CURRENT_STORE.storeName})" style="font-size: 12px;"/>
@@ -32,7 +33,7 @@
             <p:remoteCommand name="remoteBtnUpdateMenu" process="@this" update="mnubMain"/>
             <p:menubar id="mnubMain">  
                 <p:menuitem value="#{langsys['Home']}" action="#{navigationBean.redirectToHome()}" icon="ui-icon-home" />
-                <p:submenu label="Pos" icon="ui-icon-plus"> 
+                <p:submenu label="Transact" icon="ui-icon-plus"> 
                     <p:separator />
                     <p:submenu label="#{langsys['Purchase']} #{langsys['and']} #{langsys['Expense']}">  
                         <p:separator />
@@ -215,7 +216,7 @@
                     </p:submenu> 
                     <p:separator />
                 </p:submenu> 
-                <p:submenu label="#{langsys['Partner']}" icon="ui-icon-suitcase">  
+                <p:submenu label="#{langsys['Contacts']}" icon="ui-icon-suitcase">  
                     <p:separator />
                     <p:menuitem value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]} #{langsys['Details']}" action="#{navigationBean.redirectToTransactorCustomer()}" /> 
                     <p:separator />
@@ -225,7 +226,7 @@
                     <p:separator />
                     <p:menuitem value="#{langsys['Segments']}" action="#{navigationBean.redirectToTransactorSegment()}" /> 
                     <p:separator />
-                    <p:menuitem value="#{langsys['Merge']} #{langsys['Partner']}" action="#{navigationBean.redirectToTransactorMerge()}" /> 
+                    <p:menuitem value="#{langsys['Merge']} #{langsys['Contacts']}" action="#{navigationBean.redirectToTransactorMerge()}" /> 
                     <p:separator />
                 </p:submenu>
                 <p:submenu label="#{langsys['Accounts']}" icon="ui-icon-lightbulb">  
@@ -313,6 +314,21 @@
                 </p:submenu>
                 <p:submenu label="#{langsys['Reports']}" icon="ui-icon-document">
                     <p:separator />
+                    <p:submenu label="#{langsys['Dashboards']}" rendered="#{1==1}" icon="ui-icon-document">  
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Day']} #{langsys['Closing']}" action="DashboardDayClose?faces-redirect=true" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Sales']} #{langsys['Trend']}" action="DashboardSales?faces-redirect=true" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Top']} #{langsys['Selling']}" action="DashboardSalesItems?faces-redirect=true" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Expenses']} #{langsys['Trend']}" action="DashboardExpenses?faces-redirect=true" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Top']} #{langsys['Expenses']}" action="DashboardExpensesItems?faces-redirect=true" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Stock']} #{langsys['Trend']}" action="DashboardStock?faces-redirect=true" />
+                        <p:separator />
+                    </p:submenu>
                     <p:submenu label="#{langsys['Item']} #{langsys['Detail']}">
                         <p:separator />
                         <p:menuitem value="#{langsys['Item']} #{langsys['Detail']}" action="#{navigationBean.redirectToReportItemDetail()}" />
@@ -321,7 +337,7 @@
                         <p:separator />
                     </p:submenu>
                     <p:separator />
-                    <p:submenu label="#{langsys['Partner']} #{langsys['Reports']}">
+                    <p:submenu label="#{langsys['Contacts']} #{langsys['Reports']}">
                         <p:separator />
                         <p:menuitem value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]} #{langsys['List']}" action="#{navigationBean.redirectToReportPartnerCustomer()}" />
                         <p:separator />
@@ -502,21 +518,6 @@
                     </p:submenu>
                     <p:separator />
                 </p:submenu>  
-                <p:submenu label="#{langsys['Dashboards']}" rendered="#{1==1}" icon="ui-icon-document">  
-                    <p:separator />
-                    <p:menuitem value="#{langsys['Day']} #{langsys['Closing']}" action="DashboardDayClose?faces-redirect=true" />
-                    <p:separator />
-                    <p:menuitem value="#{langsys['Sales']} #{langsys['Trend']}" action="DashboardSales?faces-redirect=true" />
-                    <p:separator />
-                    <p:menuitem value="#{langsys['Top']} #{langsys['Selling']}" action="DashboardSalesItems?faces-redirect=true" />
-                    <p:separator />
-                    <p:menuitem value="#{langsys['Expenses']} #{langsys['Trend']}" action="DashboardExpenses?faces-redirect=true" />
-                    <p:separator />
-                    <p:menuitem value="#{langsys['Top']} #{langsys['Expenses']}" action="DashboardExpensesItems?faces-redirect=true" />
-                    <p:separator />
-                    <p:menuitem value="#{langsys['Stock']} #{langsys['Trend']}" action="DashboardStock?faces-redirect=true" />
-                    <p:separator />
-                </p:submenu>  
                 <p:menuitem id="mniAlert" value="#{generalUserSetting.userUnreadStockAlertsCount}" action="#{navigationBean.redirectToReportAlerts()}" icon="fa fa-fw fa-envelope" style="background-color:#FF0000;color: #ffffff;float: right;" rendered="#{generalUserSetting.userUnreadStockAlertsCount>0}"/>
                 <p:submenu label="#{menuItemBean.menuItemObj.CURRENT_USER.userName}" style="background-color: #F0F0F0;color: #ffffff;float: right;" icon="ui-icon-person">  
                     <p:separator />
@@ -529,4 +530,3 @@
         </h:form> 
     </h:body>
 </html>
-
