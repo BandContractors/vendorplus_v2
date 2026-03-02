@@ -8,58 +8,110 @@
     <h:head>
         <title>Sales Invoice</title>
             <style>
-                .receipt-modern {
+                body {
+                    font-family: 'Courier New', monospace;
+                    background: #f5f5f5;
+                }
+                .thermal-receipt {
                     background: #fff;
-                    border-radius: 16px;
-                    box-shadow: 0 2px 12px rgba(40,167,69,0.10);
-                    padding: 32px 24px;
-                    margin: 24px auto;
-                    max-width: 420px;
+                    width: 300px;
+                    margin: 20px auto;
+                    padding: 15px;
+                    box-shadow: 0 0 10px rgba(0,0,0,0.1);
                 }
                 .receipt-header {
-                    background: #28a745;
-                    color: #fff;
-                    border-radius: 16px 16px 0 0;
-                    padding: 18px 24px;
                     text-align: center;
-                    font-size: 1.5em;
-                    font-weight: bold;
-                    letter-spacing: 2px;
+                    margin-bottom: 10px;
                 }
-                .receipt-table {
+                .receipt-header h2 {
+                    margin: 5px 0;
+                    font-size: 16px;
+                    font-weight: bold;
+                }
+                .receipt-header p {
+                    margin: 2px 0;
+                    font-size: 11px;
+                }
+                .receipt-title {
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 13px;
+                    margin: 10px 0;
+                    border-top: 1px dashed #000;
+                    border-bottom: 1px dashed #000;
+                    padding: 5px 0;
+                }
+                .receipt-info {
+                    font-size: 11px;
+                    margin: 8px 0;
+                }
+                .receipt-info p {
+                    margin: 2px 0;
+                }
+                .dashed-line {
+                    border-top: 1px dashed #000;
+                    margin: 8px 0;
+                }
+                .items-table {
                     width: 100%;
+                    font-size: 11px;
                     border-collapse: collapse;
-                    margin: 18px 0;
-                    background: #f8f9fa;
-                    border-radius: 8px;
                 }
-                .receipt-table th, .receipt-table td {
-                    padding: 8px 12px;
-                    border-bottom: 1px solid #e0e0e0;
+                .items-table th {
                     text-align: left;
-                }
-                .receipt-table th {
-                    background: #e9f5ee;
+                    border-bottom: 1px dashed #000;
+                    padding: 3px 0;
                     font-weight: bold;
                 }
-                .receipt-totals {
-                    background: #e9f5ee;
-                    border-radius: 8px;
-                    padding: 12px 16px;
-                    margin: 12px 0;
-                    font-size: 1.1em;
+                .items-table td {
+                    padding: 3px 2px;
+                    border-bottom: 1px dotted #ccc;
+                }
+                .totals-section {
+                    font-size: 12px;
+                    margin: 10px 0;
+                }
+                .totals-section table {
+                    width: 100%;
+                }
+                .totals-section td {
+                    padding: 2px 0;
+                }
+                .totals-section .total-row {
+                    font-weight: bold;
+                    font-size: 13px;
+                }
+                .vat-table {
+                    width: 100%;
+                    font-size: 10px;
+                    border-collapse: collapse;
+                    margin: 10px 0;
+                }
+                .vat-table th, .vat-table td {
+                    padding: 3px 2px;
+                    text-align: right;
+                    border: 1px solid #ccc;
+                }
+                .vat-table th {
+                    background: #f0f0f0;
+                    font-weight: bold;
                 }
                 .receipt-footer {
                     text-align: center;
-                    color: #28a745;
-                    font-weight: bold;
-                    margin-top: 18px;
-                    font-size: 1.1em;
+                    font-size: 10px;
+                    margin-top: 10px;
                 }
-                .receipt-logo {
-                    width: 48px;
-                    height: 48px;
-                    margin-bottom: 8px;
+                .qr-code {
+                    text-align: center;
+                    margin: 10px 0;
+                }
+                @media print {
+                    body { background: #fff; }
+                    .thermal-receipt { 
+                        box-shadow: none;
+                        width: 80mm;
+                        margin: 0;
+                    }
                 }
             </style>
         <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
@@ -74,32 +126,183 @@
                         <p:printer target="vTransactionGrid" rendered="false"/>
                     </p:commandButton>
                 </p:panel>
-                <div class="receipt-modern">
+                <div class="thermal-receipt">
+                    <!-- Header -->
                     <div class="receipt-header">
-                        <!-- Optional logo -->
-                        <!-- <img src="logo.png" class="receipt-logo" alt="Logo" /> -->
-                        #{companySetting.getLICENSE_CLIENT_NAME()}
+                        <h2>#{companySetting.getLICENSE_CLIENT_NAME()}</h2>
+                        <p>#{companySetting.getPhysicalAddress()}</p>
+                        <p>Email: #{companySetting.getEmail()}</p>
+                        <p>TIN: #{companySetting.getTaxIdentity()}</p>
                     </div>
-                    <div style="text-align:center;margin:8px 0;color:#222;font-size:1.1em;">
-                        #{companySetting.getPhysicalAddress()}<br/>
-                        TIN:#{companySetting.getTaxIdentity()}<br/>
-                        Email: #{companySetting.getEmail()}
+                    
+                    <!-- Title -->
+                    <div class="receipt-title">
+                        CASH SALE / TAX INVOICE
                     </div>
-                    <div style="text-align:center;font-size:1.3em;font-weight:bold;margin:12px 0;">Sales Invoice</div>
-                    <div style="margin-bottom:8px;text-align:center;font-size:1.1em;">
-                        #{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionNumberLabel)}: <span style="font-weight:bold;color:#28a745;">#{generalUserSetting.outputDetailParent.trans.transactionNumber}</span><br/>
-                        #{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionDateLabel)}: #{utilityBean.formatDateTime(generalUserSetting.outputDetailParent.trans.addDate)}
+                    
+                    <!-- Barcode placeholder -->
+                    <div style="text-align: center; margin: 10px 0;">
+                        <svg width="200" height="50">
+                            <rect width="2" height="50" x="0" fill="#000"/>
+                            <rect width="1" height="50" x="3" fill="#000"/>
+                            <rect width="3" height="50" x="6" fill="#000"/>
+                            <rect width="1" height="50" x="10" fill="#000"/>
+                            <rect width="2" height="50" x="13" fill="#000"/>
+                            <rect width="1" height="50" x="17" fill="#000"/>
+                            <rect width="3" height="50" x="20" fill="#000"/>
+                            <rect width="2" height="50" x="25" fill="#000"/>
+                        </svg>
+                        <p style="font-size: 10px; margin: 2px 0;">#{generalUserSetting.outputDetailParent.trans.transactionNumber}</p>
                     </div>
-                    <div class="receipt-totals">
-                        Subtotal: #{generalUserSetting.outputDetailParent.trans.subTotal}<br/>
-                        Tax: #{generalUserSetting.outputDetailParent.trans.totalVat}<br/>
-                        <span style="font-weight:bold;color:#28a745;">TOTAL (UGX): #{generalUserSetting.outputDetailParent.trans.grandTotal}</span><br/>
-                        <span style="font-weight:bold;color:#28a745;">PAID AMOUNT: #{generalUserSetting.outputDetailParent.trans.amountTendered}</span><br/>
-                        <span style="font-weight:bold;color:#28a745;">BALANCE: #{generalUserSetting.outputDetailParent.trans.changeAmount}</span>
+                    
+                    <!-- Transaction Info -->
+                    <div class="receipt-info">
+                        <p>Date: #{utilityBean.formatDateTime(generalUserSetting.outputDetailParent.trans.transactionDate)}</p>
+                        <p>Run Date: #{utilityBean.formatDateTime(generalUserSetting.outputDetailParent.trans.addDate)}</p>
+                        <p>Customer Name: #{generalUserSetting.outputDetailParent.trans.client != null ? generalUserSetting.outputDetailParent.trans.client.clientName : 'Cash Customer'}</p>
+                        <p>Till: MAIN</p>
                     </div>
+                    
+                    <div class="dashed-line"></div>
+                    
+                    <!-- Items Table -->
+                    <table class="items-table">
+                        <tr>
+                            <th>Item</th>
+                            <th style="text-align: right;">Qty</th>
+                            <th style="text-align: right;">Unit</th>
+                            <th style="text-align: right;">Price</th>
+                            <th style="text-align: right;">Amount</th>
+                        </tr>
+                        <ui:repeat var="ti" value="#{generalUserSetting.outputDetailParent.trans_items}">
+                            <tr>
+                                <td style="max-width: 120px; overflow: hidden; text-overflow: ellipsis;">#{transItemBean.showItemDescriptionCEC(ti)}</td>
+                                <td style="text-align: right;">
+                                    <h:outputText value="#{ti.itemQty}">
+                                        <f:convertNumber pattern="###,###,###.##" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    </h:outputText>
+                                </td>
+                                <td style="text-align: right;">PCS</td>
+                                <td style="text-align: right;">
+                                    <h:outputText value="#{ti.unitPriceExcVat}">
+                                        <f:convertNumber pattern="###,###,###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    </h:outputText>
+                                </td>
+                                <td style="text-align: right;">
+                                    <h:outputText value="#{ti.amountIncVat}">
+                                        <f:convertNumber pattern="###,###,###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    </h:outputText>
+                                </td>
+                            </tr>
+                        </ui:repeat>
+                    </table>
+                    
+                    <div class="dashed-line"></div>
+                    
+                    <!-- Totals -->
+                    <div class="totals-section">
+                        <table>
+                            <tr class="total-row">
+                                <td>Total:</td>
+                                <td style="text-align: right;">
+                                    <h:outputText value="#{generalUserSetting.outputDetailParent.trans.grandTotal}">
+                                        <f:convertNumber pattern="###,###,###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    </h:outputText>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Cash:</td>
+                                <td style="text-align: right;">
+                                    <h:outputText value="#{generalUserSetting.outputDetailParent.trans.amountTendered}">
+                                        <f:convertNumber pattern="###,###,###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    </h:outputText>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Change:</td>
+                                <td style="text-align: right;">
+                                    <h:outputText value="#{generalUserSetting.outputDetailParent.trans.changeAmount}">
+                                        <f:convertNumber pattern="###,###,###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    </h:outputText>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Total Items:</td>
+                                <td style="text-align: right;">#{generalUserSetting.outputDetailParent.trans_items.size()}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="dashed-line"></div>
+                    
+                    <!-- VAT Breakdown -->
+                    <table class="vat-table">
+                        <tr>
+                            <th>VAT</th>
+                            <th>Amt W/o VAT</th>
+                            <th>VAT Amt</th>
+                            <th>Net Amt</th>
+                        </tr>
+                        <tr>
+                            <td>Standard</td>
+                            <td>
+                                <h:outputText value="#{generalUserSetting.outputDetailParent.trans.subTotal}">
+                                    <f:convertNumber pattern="###,###,###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputText>
+                            </td>
+                            <td>
+                                <h:outputText value="#{generalUserSetting.outputDetailParent.trans.totalVat}">
+                                    <f:convertNumber pattern="###,###,###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputText>
+                            </td>
+                            <td>
+                                <h:outputText value="#{generalUserSetting.outputDetailParent.trans.grandTotal}">
+                                    <f:convertNumber pattern="###,###,###" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputText>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Zero Rated</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>0</td>
+                        </tr>
+                    </table>
+                    
+                    <!-- Fiscal Info -->
+                    <div class="receipt-info">
+                        <p>Fiscal Doc No.: #{generalUserSetting.outputDetailParent.trans.transactionNumber}</p>
+                        <p>Verification Code: #{generalUserSetting.outputDetailParent.trans.id}</p>
+                    </div>
+                    
+                    <!-- QR Code Placeholder -->
+                    <div class="qr-code">
+                        <svg width="100" height="100">
+                            <rect width="100" height="100" fill="#fff" stroke="#000" stroke-width="1"/>
+                            <rect width="10" height="10" x="10" y="10" fill="#000"/>
+                            <rect width="10" height="10" x="30" y="10" fill="#000"/>
+                            <rect width="10" height="10" x="50" y="10" fill="#000"/>
+                            <rect width="10" height="10" x="70" y="10" fill="#000"/>
+                            <rect width="10" height="10" x="10" y="30" fill="#000"/>
+                            <rect width="10" height="10" x="70" y="30" fill="#000"/>
+                            <rect width="10" height="10" x="10" y="50" fill="#000"/>
+                            <rect width="10" height="10" x="30" y="50" fill="#000"/>
+                            <rect width="10" height="10" x="50" y="50" fill="#000"/>
+                            <rect width="10" height="10" x="70" y="50" fill="#000"/>
+                            <rect width="10" height="10" x="10" y="70" fill="#000"/>
+                            <rect width="10" height="10" x="30" y="70" fill="#000"/>
+                            <rect width="10" height="10" x="50" y="70" fill="#000"/>
+                            <rect width="10" height="10" x="70" y="70" fill="#000"/>
+                        </svg>
+                    </div>
+                    
+                    <!-- Footer -->
                     <div class="receipt-footer">
-                        Thank you for your support<br/>
-                        <span style="font-size:0.9em;color:#888;">System powered by Band Contractors Ltd</span>
+                        <p>Received By: _________________</p>
+                        <p>You Were Served By: #{generalUserSetting.outputDetailParent.trans.addUserName != null ? generalUserSetting.outputDetailParent.trans.addUserName : 'Immaculate'}</p>
+                        <p><strong>Thank You!!! Please Come Again</strong></p>
+                        <p>Powered by BandContractors (www.bandcontractors.com)</p>
+                        <p>Email: info@bandcontractors.com</p>
                     </div>
                 </div>
                 <h:panelGrid id="vTransactionGrid"> 
