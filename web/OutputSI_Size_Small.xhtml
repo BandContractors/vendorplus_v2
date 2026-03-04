@@ -87,25 +87,38 @@
                 text-align: left;
             }
             .totals-section {
-                font-size: 9px;
-                margin: 5px 0;
+                font-size: 11px;
+                margin: 8px 0;
+                text-align: center;
             }
             .totals-section table {
-                width: 100%;
+                width: 80%;
                 border-collapse: collapse;
+                margin: 0 auto;
             }
             .totals-section td {
-                padding: 1px 0;
+                padding: 3px 5px;
             }
             .totals-section td:first-child {
                 text-align: left;
+                font-weight: bold;
             }
             .totals-section td:last-child {
                 text-align: right;
+                font-weight: bold;
             }
             .totals-section .total-row {
-                font-weight: normal;
-                font-size: 9px;
+                font-weight: bold;
+                font-size: 13px;
+                border: 2px solid #000;
+                background: #f0f0f0;
+            }
+            .totals-section .total-row td {
+                padding: 5px;
+            }
+            .totals-section .cash-row,
+            .totals-section .change-row {
+                font-size: 11px;
             }
             .vat-section {
                 margin: 5px 0;
@@ -114,6 +127,22 @@
                 margin: 2px 0;
                 font-size: 9px;
                 text-align: left;
+            }
+            .vat-section.hidden {
+                display: none;
+            }
+            .section-divider {
+                border-top: 2px solid #000;
+                margin: 5px 0;
+            }
+            .paid-stamp {
+                text-align: center;
+                font-weight: bold;
+                font-size: 14px;
+                margin: 5px 0;
+                padding: 3px;
+                border: 2px solid #000;
+                background: #f0f0f0;
             }
             .vat-table {
                 width: 100%;
@@ -224,9 +253,11 @@
                     <!-- Transaction Info -->
                     <div class="receipt-info">
                         <p>Date: #{utilityBean.formatDateTime(generalUserSetting.outputDetailParent.trans.addDate)}</p>
-                        <p>Run Date: #{utilityBean.formatDate(generalUserSetting.outputDetailParent.trans.transactionDate)}</p>
                         <p>Customer Name: #{generalUserSetting.outputDetailParent.transactor.transactorId gt 0 ? generalUserSetting.outputDetailParent.transactor.transactorNames : 'Cash Customer'}</p>
                     </div>
+                    
+                    <!-- PAID Stamp -->
+                    <div class="paid-stamp">PAID</div>
                     
                     <div class="dashed-line"></div>
                     
@@ -266,20 +297,20 @@
                         </tbody>
                     </table>
                     
-                    <div class="dashed-line"></div>
+                    <div class="section-divider"></div>
                     
                     <!-- Totals -->
                     <div class="totals-section">
                         <table>
                             <tr class="total-row">
-                                <td>Total:</td>
+                                <td>TOTAL:</td>
                                 <td>
                                     <h:outputText value="#{generalUserSetting.outputDetailParent.trans.grandTotal}">
                                         <f:convertNumber pattern="###,###,###" locale="#{utilityBean.convertLocaleToString()}"/>
                                     </h:outputText>
                                 </td>
                             </tr>
-                            <tr>
+                            <tr class="cash-row">
                                 <td>Cash:</td>
                                 <td>
                                     <h:outputText value="#{generalUserSetting.outputDetailParent.trans.amountTendered}">
@@ -287,7 +318,7 @@
                                     </h:outputText>
                                 </td>
                             </tr>
-                            <tr>
+                            <tr class="change-row">
                                 <td>Change:</td>
                                 <td>
                                     <h:outputText value="#{generalUserSetting.outputDetailParent.trans.changeAmount}">
@@ -298,10 +329,15 @@
                         </table>
                     </div>
                     
+                    <div class="section-divider"></div>
+                    
                     <!-- Total Items -->
                     <p style="font-size: 9px; margin: 3px 0; text-align: left;">Total Items: #{generalUserSetting.outputDetailParent.trans_items.size()}</p>
                     
+                    <div class="dashed-line"></div>
+                    
                     <!-- VAT Breakdown -->
+                    <c:if test="#{generalUserSetting.outputDetailParent.transTaxList.size() > 0}">
                     <div class="vat-section">
                         <p style="font-weight: bold;">VAT</p>
                         <table class="vat-table">
@@ -337,12 +373,15 @@
                             </tbody>
                         </table>
                     </div>
+                    </c:if>
                     
-                    <!-- Fiscal Info -->
+                    <div class="dashed-line"></div>
+                    
+                    <!-- Fiscal Info
                     <div class="fiscal-info">
                         <p>Fiscal Doc No.: #{generalUserSetting.outputDetailParent.trans.transaction_number_tax}</p>
                         <p>Verification Code: #{generalUserSetting.outputDetailParent.trans.verification_code_tax}</p>
-                    </div>
+                    </div>-->
                     
                     <!-- QR Code -->
                     <div class="qr-code" rendered="#{generalUserSetting.outputDetailParent.trans.qr_code_tax.length() gt 0}">
