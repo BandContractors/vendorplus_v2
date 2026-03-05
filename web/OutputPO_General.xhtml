@@ -6,6 +6,8 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
+        <meta charset="UTF-8"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <title>Purchase Order</title>
         <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/> 
     </h:head>
@@ -37,8 +39,8 @@
                     </h:panelGrid>
 
                     <h:panelGrid columns="1" style="text-align: center; width:100%;margin: 0px;background-color: gray;color: white;-webkit-print-color-adjust: exact;">
-                        <h:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionOutputLabel)}" style="font-size:30px;font-weight: bold;"/>
-                        <h:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionNumberLabel)}:#{generalUserSetting.outputDetailParent.trans.transactionNumber}" style="font-weight: bold;"/>
+                        <h:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionOutputLabel)}" style="font-size:30px;font-weight: bold;" escape="false"/>
+                        <h:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionNumberLabel)}:#{generalUserSetting.outputDetailParent.trans.transactionNumber}" style="font-weight: bold;" escape="false"/>
                     </h:panelGrid>
 
                     <h:panelGrid columns="4" style="width:100%;margin: 0px;">
