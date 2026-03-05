@@ -59,12 +59,12 @@
                     </h:panelGrid>
                 </h:panelGrid>
                 <h:panelGrid id="pnlCol1" columns="2">
-                    <h:outputLabel  value="#{langsys['Type']}:"/>
-                    <h:selectOneMenu styleClass="clsMenu" id="menuTransactorType" value="#{transactorBean.transactorObj.transactorType}" style="width: 210px;">
+                    <h:outputLabel  value="#{langsys['Type']}:" style="font-weight: 500;"><span style="color: red; font-weight: bold;"> *</span></h:outputLabel>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuTransactorType" value="#{transactorBean.transactorObj.transactorType}" style="width: 210px;" required="true">
                         <f:selectItem itemLabel="#{transactorBean.getDisplayName(menuItemBean.menuItemObj,transactorBean.transactorObj)}" itemValue="#{transactorBean.transactorObj.transactorType}"/>
                     </h:selectOneMenu>
-                    <h:outputLabel  value="#{langsys['Category']}:" id="lblCategory"/>
-                    <h:selectOneMenu styleClass="clsMenu" id="menuTransactorCategory" value="#{transactorBean.transactorObj.category}" style="width: 210px;">
+                    <h:outputLabel  value="#{langsys['Category']}:" id="lblCategory" style="font-weight: 500;"><span style="color: red; font-weight: bold;"> *</span></h:outputLabel>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuTransactorCategory" value="#{transactorBean.transactorObj.category}" style="width: 210px;" required="true">
                         <f:selectItem itemLabel="" />
                         <f:selectItem itemLabel="#{langsys['Consumer']}" itemValue="Consumer"/>
                         <f:selectItem itemLabel="#{langsys['Business']}" itemValue="Business"/>
@@ -78,16 +78,16 @@
                     <h:outputLabel  value="#{langsys['Reference']} #{langsys['No.']}:"/>
                     <h:inputText styleClass="clsInput" id="itxtRef" value="#{transactorBean.transactorObj.transactorRef}" autocomplete="off" style="width: 203px;" disabled="#{transactorBean.transactorObj.trans_number_format.length()>0}">
                     </h:inputText>
-                    <p:commandLink id="cmdbValidateTIN" value="Tax Identity No(TIN)" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" title="Click here to validate TIN detail">
+                    <h:outputLabel style="font-weight: 500;"><p:commandLink id="cmdbValidateTIN" value="Tax Identity No(TIN)" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" title="Click here to validate TIN detail">
                         <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                             <p:graphicImage name="/images/ajax-loader.gif"/>
                         </p:dialog>
                         <f:ajax listener="#{transactorBean.updateTaxpayer(transactorBean.transactorObj)}" execute="pnlCol1 pnlCol2" render="pnlCol1 pnlCol2" />
-                    </p:commandLink>
-                    <h:inputText styleClass="clsInput" id="itxtTaxIdentity" value="#{transactorBean.transactorObj.taxIdentity}" autocomplete="off" style="width: 203px;">
+                    </p:commandLink><span style="color: red; font-weight: bold;"> *</span></h:outputLabel>
+                    <h:inputText styleClass="clsInput" id="itxtTaxIdentity" value="#{transactorBean.transactorObj.taxIdentity}" autocomplete="off" style="width: 203px;" required="true">
                     </h:inputText>
-                    <h:outputLabel  value="#{langsys['Business']} #{langsys['Name']}:" title="#{langsys['Legal']} #{langsys['Business']} #{langsys['Name']}"/>
-                    <h:inputText styleClass="clsInput" id="itxtTransactorNames" value="#{transactorBean.transactorObj.transactorNames}" autocomplete="off" style="width: 203px;">
+                    <h:outputLabel  value="#{langsys['Business']} #{langsys['Name']}:" title="#{langsys['Legal']} #{langsys['Business']} #{langsys['Name']}" style="font-weight: 500;"><span style="color: red; font-weight: bold;"> *</span></h:outputLabel>
+                    <h:inputText styleClass="clsInput" id="itxtTransactorNames" value="#{transactorBean.transactorObj.transactorNames}" autocomplete="off" style="width: 203px;" required="true">
                     </h:inputText>
                     <h:outputLabel  value="#{langsys['Trade']} #{langsys['Name']}:" title="#{langsys['Publicity']} #{langsys['Name']}, #{langsys['Nickname']}"/>
                     <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.trade_name}" autocomplete="off" style="width: 203px;">

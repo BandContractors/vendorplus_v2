@@ -44,25 +44,25 @@
             <div class="ui-fluid">
                 <h:panelGrid id="pnlgItemDetail" columns="2">
                     <h:panelGrid styleClass="clsGridMainInput" columns="4">
-                        <h:outputLabel value="#{langsys['Description']}:"/>
-                        <h:inputText id="itxtDescription" value="#{itemBean.itemObj.description}" autocomplete="off" style="width: 233px"/>
-                        <p:commandLink value="#{langsys['Unit']}:" action="#{itemBean.displayItemOtherUnits()}" oncomplete="PF('sbarItemUnit').show()" update="formMain:pnlgItemUnit1 formMain:pnlgItemUnit2" style="color: blue;text-decoration: none;"/>
-                        <h:selectOneMenu id="menuUnit" value="#{itemBean.itemObj.unitId}" style="width: 240px">
+                        <h:outputLabel value="#{langsys['Description']}:" style="font-weight: 500;"><span style="color: red; font-weight: bold;"> *</span></h:outputLabel>
+                        <h:inputText id="itxtDescription" value="#{itemBean.itemObj.description}" autocomplete="off" style="width: 233px" required="true"/>
+                        <p:commandLink value="#{langsys['Unit']}:" action="#{itemBean.displayItemOtherUnits()}" oncomplete="PF('sbarItemUnit').show()" update="formMain:pnlgItemUnit1 formMain:pnlgItemUnit2" style="color: blue;text-decoration: none;font-weight: 500;"><span style="color: red; font-weight: bold;"> *</span></p:commandLink>
+                        <h:selectOneMenu id="menuUnit" value="#{itemBean.itemObj.unitId}" style="width: 240px" required="true">
                             <f:selectItem itemLabel="" itemValue="0"/>
                             <f:selectItems value="#{unitBean.units}" var="u" itemLabel="#{u.unitName}" itemValue="#{u.unitId}"/>
                         </h:selectOneMenu>
 
                         <p:commandLink value="#{langsys['Item']} #{langsys['Code']}:" action="#{itemBean.displayItemCodes()}" oncomplete="PF('sbarItemCode').show()" update="formMain:pnlgItemCode1 formMain:pnlgItemCode2" disabled="#{itemBean.itemObj.itemId eq 0}" style="color: blue;text-decoration: none;"/>
                         <h:inputText id="itxtCode" value="#{itemBean.itemObj.itemCode}" autocomplete="off" style="width: 233px"/>
-                        <h:outputLabel value="#{langsys['Item']} #{langsys['Type']}:"/>
-                        <h:selectOneMenu id="menuItemType" value="#{itemBean.itemObj.itemType}" style="width: 240px">
+                        <h:outputLabel value="#{langsys['Item']} #{langsys['Type']}:" style="font-weight: 500;"><span style="color: red; font-weight: bold;"> *</span></h:outputLabel>
+                        <h:selectOneMenu id="menuItemType" value="#{itemBean.itemObj.itemType}" style="width: 240px" required="true">
                             <f:selectItem itemLabel="" itemValue=""/>
                             <f:selectItem itemLabel="#{langsys['PRODUCT']}" itemValue="PRODUCT"/>
                             <f:selectItem itemLabel="#{langsys['SERVICE']}" itemValue="SERVICE"/>
                         </h:selectOneMenu>
 
-                        <h:outputLabel value="#{langsys['Category']}:"/>
-                        <h:selectOneMenu id="menuCategory" value="#{itemBean.itemObj.categoryId}" style="width: 240px">
+                        <h:outputLabel value="#{langsys['Category']}:" style="font-weight: 500;"><span style="color: red; font-weight: bold;"> *</span></h:outputLabel>
+                        <h:selectOneMenu id="menuCategory" value="#{itemBean.itemObj.categoryId}" style="width: 240px" required="true">
                             <f:selectItem itemLabel="" itemValue="0"/>
                             <f:selectItems value="#{categoryBean.categories}" var="c" itemLabel="#{c.categoryName}" itemValue="#{c.categoryId}"/>
                             <f:ajax event="change" render="menuSubCategory"/>
