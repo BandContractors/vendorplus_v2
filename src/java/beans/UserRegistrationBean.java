@@ -84,26 +84,16 @@ public class UserRegistrationBean implements Serializable {
             // Generate unique company code from company name
             String companyCode = generateCompanyCode(this.CompanyName);
             
-            // Check if tax ID exists (if provided)
-            CompanyBean companyBean = new CompanyBean();
-            if (this.TaxId != null && !this.TaxId.trim().isEmpty()) {
-                if (companyBean.isTaxIdExists(this.TaxId)) {
-                    this.ActionMessageFailure = "Tax ID already registered. Please contact support@vendorplus.com if your company is already registered.";
-                    FacesContext.getCurrentInstance().addMessage(null, 
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", this.ActionMessageFailure));
-                    return;
-                }
-            }
-            
             // Create company first
+            CompanyBean companyBean = new CompanyBean();
             Company company = new Company();
             company.setCompanyCode(companyCode);
             company.setCompanyName(this.CompanyName != null ? this.CompanyName : "");
-            company.setTaxId(this.TaxId != null ? this.TaxId : "");
-            company.setAddress(this.Address != null ? this.Address : "");
-            company.setCity(this.City != null ? this.City : "");
-            company.setCountry(this.Country != null ? this.Country : "");
-            company.setContactPerson(this.FirstName + " " + (this.SecondName != null ? this.SecondName : ""));
+            company.setTaxId(""); // Tax ID not collected during registration
+            company.setAddress(""); // Address not collected during registration
+            company.setCity(""); // City not collected during registration
+            company.setCountry(""); // Country not collected during registration
+            company.setContactPerson(this.FirstName); // Use full name as contact person
             company.setContactEmail(this.EmailAddress);
             company.setContactPhone(this.PhoneNo != null ? this.PhoneNo : "");
             company.setIsActive("Yes");
@@ -119,15 +109,15 @@ public class UserRegistrationBean implements Serializable {
             
             // Create user
             String encryptedPassword = Security.Encrypt(this.Password);
-            String encryptedTransCode = Security.Encrypt(this.TransCode != null ? this.TransCode : "0000");
+            String encryptedTransCode = Security.Encrypt("0000"); // Default transaction code
             
             int userId = insertUserWithCompany(
                 companyId,
                 this.UserName,
                 encryptedPassword,
                 this.FirstName,
-                this.SecondName != null ? this.SecondName : "",
-                this.ThirdName != null ? this.ThirdName : "",
+                "", // No second name collected
+                "", // No third name collected
                 this.EmailAddress,
                 this.PhoneNo != null ? this.PhoneNo : "",
                 encryptedTransCode,

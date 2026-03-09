@@ -11,6 +11,34 @@
     <h:head>
         <title>User Management CRM - VendorPlus</title>
         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <style type="text/css">
+            .badge-success {
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-weight: bold;
+                background-color: #28a745;
+                color: white;
+            }
+            .badge-danger {
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-weight: bold;
+                background-color: #dc3545;
+                color: white;
+            }
+            .badge-secondary {
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-weight: bold;
+                background-color: #6c757d;
+                color: white;
+            }
+            .stats-bar {
+                background-color: #7BC043;
+                height: 20px;
+                display: inline-block;
+            }
+        </style>
     </h:head>
     <f:metadata>
         <f:viewAction action="#{userManagementCRMBean.initializeDashboard()}"/>
@@ -88,7 +116,7 @@
                         <p:dataTable id="userTable" value="#{userManagementCRMBean.userList}" var="user" 
                                      paginator="true" rows="20" paginatorPosition="both"
                                      emptyMessage="No users found"
-                                     style="mar gin-top: 1rem;">
+                                     style="margin-top: 1rem;">
                             <f:facet name="header">
                                 User List (#{userManagementCRMBean.userList.size()} users)
                             </f:facet>
@@ -115,9 +143,7 @@
                             
                             <p:column headerText="Status" style="width: 100px; text-align: center;">
                                 <h:outputLabel value="#{user.statusBadge}" 
-                                              style="padding: 4px 8px; border-radius: 4px; font-weight: bold; 
-                                                     background-color: #{user.isLocked eq 'Yes' ? '#dc3545' : '#28a745'}; 
-                                                     color: white;"/>
+                                              styleClass="#{user.isLocked eq 'Yes' ? 'badge-danger' : 'badge-success'}"/>
                             </p:column>
                             
                             <p:column headerText="Admin" style="width: 80px; text-align: center;">
@@ -198,9 +224,7 @@
                             
                             <p:column headerText="Status" style="width: 100px; text-align: center;">
                                 <h:outputLabel value="#{activity.status}" 
-                                              style="padding: 4px 8px; border-radius: 4px; font-weight: bold; 
-                                                     background-color: #{activity.logoutTime == null ? '#28a745' : '#6c757d'}; 
-                                                     color: white;"/>
+                                              styleClass="#{activity.logoutTime == null ? 'badge-success' : 'badge-secondary'}"/>
                             </p:column>
                             
                             <p:column headerText="IP Address" sortBy="#{activity.ipAddress}" style="width: 150px;">
@@ -235,9 +259,8 @@
                                 </p:column>
                                 
                                 <p:column headerText="Graph">
-                                    <h:panelGroup>
-                                        <div style="background-color: #7BC043; height: 20px; width: #{stat.registrationsCount * 20}px;"></div>
-                                    </h:panelGroup>
+                                    <h:panelGroup layout="block" styleClass="stats-bar" 
+                                                  style="#{stat.barWidthStyle}"/>
                                 </p:column>
                             </p:dataTable>
                         </p:panel>

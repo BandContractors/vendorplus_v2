@@ -35,6 +35,7 @@
         <listener-class>sessions.SessionListener</listener-class>
     </listener>
     <welcome-file-list>
+        <welcome-file>faces/index.xhtml</welcome-file>
         <welcome-file>faces/Login.xhtml</welcome-file>
     </welcome-file-list>
     <context-param>

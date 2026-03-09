@@ -42,6 +42,13 @@
                optimize="false">
             <classpath refid="compile.classpath"/>
         </javac>
+        
+        <!-- Copy non-Java resources (properties files, etc.) -->
+        <copy todir="${build.classes.dir}">
+            <fileset dir="${src.dir}">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
     </target>
     
     <target name="copy-resources" depends="compile">

@@ -35,7 +35,7 @@
     <h:body style="background-color: white;">
         <h:form id="form">  
             <div class="card">
-                <h:panelGrid id="pnlgLoginHeader" columns="1" style="background-color: #7BC043;width: 100%;color: white; height: 3rem;text-align: center;">
+                <h:panelGrid id="pnlgLoginHeader" columns="1" style="background: linear-gradient(135deg, #1F3A5F 0%, #2a4a73 50%, #7BC043 100%);width: 100%;color: white; height: 3rem;text-align: center;">
                     <h:outputLabel styleClass="clsLabelTop" value="VendorPlus" style="font-size: 24px;"/>
                 </h:panelGrid>
 
@@ -60,7 +60,7 @@
                                 <f:ajax event="keyup" listener="#{login.setLoggedInUserDetail(null)}" render="menuStore pnlgLoginHeader"/>
                             </p:password>
                             <p:outputLabel  value=""/>
-                            <p:commandButton styleClass="clsButtonMedium" value="Verify" accesskey="c" style="width: 225px;color: white;background-color: #7BC043; border-radius: 20px" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                            <p:commandButton styleClass="clsButtonMedium" value="Verify" accesskey="c" style="width: 225px;color: white;background-color: #1F3A5F; border-radius: 20px" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                                 <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                     <p:graphicImage name="/images/ajax-loader.gif"/>
                                 </p:dialog>
@@ -83,7 +83,7 @@
                             <p:spacer height="10"/>
                             <h:outputLabel value="Don't have an account?" style="font-size: 14px;"/>
                             <p:button value="Register Now" outcome="Registration.xhtml" 
-                                      style="color: #7BC043;background-color: white; border: 2px solid #7BC043; border-radius: 20px; width: 225px; margin-top: 10px;"/>
+                                      style="color: #1F3A5F;background-color: white; border: 2px solid #1F3A5F; border-radius: 20px; width: 225px; margin-top: 10px;"/>
                         </h:panelGrid>
                     </h:panelGrid>
                     <h:panelGrid>

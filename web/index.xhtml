@@ -1,29 +1,973 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
     <h:head>
-        <title>Index Title</title>
+        <title>VendorPlus - Complete Inventory &amp; POS Management System</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/png" />
+        <style type="text/css">
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                line-height: 1.6;
+                color: #333;
+            }
+            
+            /* Header/Navigation */
+            .header {
+                background: #1F3A5F;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                position: fixed;
+                width: 100%;
+                top: 0;
+                z-index: 1000;
+            }
+            
+            .navbar {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 1rem 2rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .logo {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .logo img {
+                height: 40px;
+            }
+            
+            .logo-text {
+                font-size: 24px;
+                font-weight: bold;
+                color: #fff;
+            }
+            
+            .logo-text span {
+                color: #7BC043;
+            }
+            
+            .nav-buttons {
+                display: flex;
+                gap: 15px;
+            }
+            
+            /* Hero Section */
+            .hero {
+                background: linear-gradient(135deg, #1F3A5F 0%, #2a4a73 50%, #7BC043 100%);
+                color: white;
+                padding: 120px 2rem 80px;
+                text-align: center;
+                margin-top: 70px;
+            }
+            
+            .hero h1 {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+                font-weight: 700;
+            }
+            
+            .hero p {
+                font-size: 1.3rem;
+                margin-bottom: 2rem;
+                opacity: 0.95;
+            }
+            
+            .hero-buttons {
+                display: flex;
+                gap: 20px;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            /* Buttons */
+            .btn {
+                padding: 14px 35px;
+                border-radius: 30px;
+                font-size: 16px;
+                font-weight: 600;
+                text-decoration: none;
+                display: inline-block;
+                transition: all 0.3s;
+                border: none;
+                cursor: pointer;
+            }
+            
+            .btn-primary {
+                background: white;
+                color: #7BC043;
+            }
+            
+            .btn-primary:hover {
+                background: #f0f0f0;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            }
+            
+            .btn-outline {
+                background: transparent;
+                color: white;
+                border: 2px solid white;
+            }
+            
+            .btn-outline:hover {
+                background: white;
+                color: #1F3A5F;
+            }
+            
+            .btn-blue {
+                background: #1F3A5F;
+                color: white;
+            }
+            
+            .btn-blue:hover {
+                background: #2a4a73;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            }
+            
+            .btn-secondary {
+                background: #7BC043;
+                color: white;
+            }
+            
+            .btn-secondary:hover {
+                background: #5a9033;
+            }
+            
+            /* Features Section */
+            .features {
+                padding: 80px 2rem;
+                background: #f9f9f9;
+            }
+            
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            
+            .section-title {
+                text-align: center;
+                font-size: 2.5rem;
+                color: #333;
+                margin-bottom: 3rem;
+            }
+            
+            .features-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 40px;
+            }
+            
+            .feature-card {
+                background: white;
+                padding: 30px;
+                border-radius: 10px;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+                transition: transform 0.3s;
+            }
+            
+            .feature-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            }
+            
+            .feature-icon {
+                font-size: 3rem;
+                color: #7BC043;
+                margin-bottom: 1rem;
+            }
+            
+            .feature-card h3 {
+                font-size: 1.5rem;
+                color: #333;
+                margin-bottom: 1rem;
+            }
+            
+            .feature-card p {
+                color: #666;
+                line-height: 1.8;
+            }
+            
+            /* Benefits Section */
+            .benefits {
+                padding: 80px 2rem;
+                background: white;
+            }
+            
+            .benefits-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 30px;
+                margin-top: 3rem;
+            }
+            
+            .benefit-item {
+                text-align: center;
+            }
+            
+            .benefit-number {
+                font-size: 3rem;
+                font-weight: bold;
+                color: #7BC043;
+                margin-bottom: 0.5rem;
+            }
+            
+            .benefit-label {
+                font-size: 1.1rem;
+                color: #666;
+            }
+            
+            /* How It Works */
+            .how-it-works {
+                padding: 80px 2rem;
+                background: linear-gradient(135deg, #1F3A5F 0%, #2a4a73 100%);
+                color: white;
+            }
+            
+            .how-it-works .section-title {
+                color: white;
+            }
+            
+            .steps-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 40px;
+                margin-top: 3rem;
+            }
+            
+            .step-item {
+                text-align: center;
+                padding: 30px;
+                background: rgba(255,255,255,0.95);
+                border-radius: 10px;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            }
+            
+            .step-number {
+                width: 60px;
+                height: 60px;
+                background: #7BC043;
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.8rem;
+                font-weight: bold;
+                margin: 0 auto 1.5rem;
+                border: 3px solid rgba(255,255,255,0.3);
+            }
+            
+            .step-item h3 {
+                font-size: 1.3rem;
+                color: #333;
+                margin-bottom: 1rem;
+            }
+            
+            .step-item p {
+                color: #666;
+                line-height: 1.7;
+            }
+            
+            /* Business Solutions */
+            .solutions {
+                padding: 80px 2rem;
+                background: white;
+            }
+            
+            .solutions-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 40px;
+                margin-top: 3rem;
+            }
+            
+            .solution-card {
+                padding: 40px 30px;
+                background: #f9f9f9;
+                border-radius: 10px;
+                border-left: 4px solid #1F3A5F;
+                transition: transform 0.3s;
+            }
+            
+            .solution-card:nth-child(even) {
+                border-left-color: #7BC043;
+            }
+            
+            .solution-card:hover {
+                transform: translateX(5px);
+                box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            }
+            
+            .solution-card h3 {
+                font-size: 1.5rem;
+                color: #333;
+                margin-bottom: 1rem;
+            }
+            
+            .solution-card ul {
+                list-style: none;
+                padding: 0;
+            }
+            
+            .solution-card ul li {
+                padding: 0.5rem 0;
+                color: #666;
+                position: relative;
+                padding-left: 25px;
+            }
+            
+            .solution-card ul li:before {
+                content: "✓";
+                position: absolute;
+                left: 0;
+                color: #7BC043;
+                font-weight: bold;
+            }
+            
+            /* Testimonials */
+            .testimonials {
+                padding: 80px 2rem;
+                background: linear-gradient(135deg, #1F3A5F 0%, #2a4a73 50%, #7BC043 100%);
+                color: white;
+            }
+            
+            .testimonials .section-title {
+                color: white;
+            }
+            
+            .testimonials-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 30px;
+                margin-top: 3rem;
+            }
+            
+            .testimonial-card {
+                background: rgba(255,255,255,0.1);
+                padding: 30px;
+                border-radius: 10px;
+                backdrop-filter: blur(10px);
+            }
+            
+            .testimonial-text {
+                font-size: 1.1rem;
+                line-height: 1.8;
+                margin-bottom: 1.5rem;
+                font-style: italic;
+            }
+            
+            .testimonial-author {
+                font-weight: bold;
+                font-size: 1rem;
+            }
+            
+            .testimonial-role {
+                font-size: 0.9rem;
+                opacity: 0.9;
+                margin-top: 0.3rem;
+            }
+            
+            /* Pricing */
+            .pricing {
+                padding: 80px 2rem;
+                background: white;
+            }
+            
+            .pricing-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 30px;
+                margin-top: 3rem;
+                max-width: 900px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            
+            .pricing-card {
+                background: #f9f9f9;
+                padding: 40px 30px;
+                border-radius: 10px;
+                text-align: center;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+                transition: transform 0.3s;
+            }
+            
+            .pricing-card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            }
+            
+            .pricing-card.featured {
+                background: linear-gradient(135deg, #1F3A5F 0%, #2a4a73 100%);
+                color: white;
+                transform: scale(1.05);
+                border: 3px solid #7BC043;
+            }
+            
+            .pricing-card.featured h3,
+            .pricing-card.featured .price {
+                color: white;
+            }
+            
+            .pricing-card h3 {
+                font-size: 1.8rem;
+                color: #333;
+                margin-bottom: 1rem;
+            }
+            
+            .price {
+                font-size: 2.5rem;
+                font-weight: bold;
+                color: #7BC043;
+                margin: 1.5rem 0;
+            }
+            
+            .price-period {
+                font-size: 1rem;
+                font-weight: normal;
+            }
+            
+            .pricing-features {
+                list-style: none;
+                padding: 0;
+                margin: 2rem 0;
+                text-align: left;
+            }
+            
+            .pricing-features li {
+                padding: 0.7rem 0;
+                border-bottom: 1px solid rgba(0,0,0,0.1);
+            }
+            
+            .pricing-card.featured .pricing-features li {
+                border-bottom-color: rgba(255,255,255,0.2);
+            }
+            
+            /* Stats Section */
+            .stats {
+                padding: 60px 2rem;
+                background: #f9f9f9;
+            }
+            
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 40px;
+                max-width: 1000px;
+                margin: 0 auto;
+            }
+            
+            .stat-item {
+                text-align: center;
+            }
+            
+            .stat-number {
+                font-size: 3.5rem;
+                font-weight: bold;
+                color: #7BC043;
+                margin-bottom: 0.5rem;
+            }
+            
+            .stat-label {
+                font-size: 1.1rem;
+                color: #666;
+                font-weight: 500;
+            }
+            
+            /* CTA Section */
+            .cta {
+                background: linear-gradient(135deg, #1F3A5F 0%, #2a4a73 50%, #7BC043 100%);
+                color: white;
+                padding: 80px 2rem;
+                text-align: center;
+            }
+            
+            .cta h2 {
+                font-size: 2.5rem;
+                margin-bottom: 1rem;
+            }
+            
+            .cta p {
+                font-size: 1.2rem;
+                margin-bottom: 2rem;
+            }
+            
+            /* Footer */
+            .footer {
+                background: #1F3A5F;
+                color: white;
+                padding: 40px 2rem 20px;
+            }
+            
+            .footer-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 40px;
+                margin-bottom: 2rem;
+            }
+            
+            .footer h4 {
+                color: #7BC043;
+                margin-bottom: 1rem;
+            }
+            
+            .footer ul {
+                list-style: none;
+            }
+            
+            .footer ul li {
+                margin-bottom: 0.5rem;
+            }
+            
+            .footer a {
+                color: #ccc;
+                text-decoration: none;
+            }
+            
+            .footer a:hover {
+                color: #7BC043;
+            }
+            
+            .footer-bottom {
+                text-align: center;
+                padding-top: 2rem;
+                border-top: 1px solid #555;
+                color: #999;
+            }
+            
+            /* Responsive */
+            @media (max-width: 768px) {
+                .hero h1 {
+                    font-size: 2rem;
+                }
+                
+                .hero p {
+                    font-size: 1.1rem;
+                }
+                
+                .section-title {
+                    font-size: 2rem;
+                }
+            }
+        </style>
     </h:head>
     
     <h:body>
-      <h:form>
-          <h:inputText id="in1" value="#{security.enc}">
-          </h:inputText>
-          <h:outputLabel id="out1" value="#{security.Encrypt(security.enc)}" />
-          <h:commandButton value="Encrypt">
-              <f:ajax execute="in1" render="out1"/>
-          </h:commandButton>
-          
-          <h:inputText id="in2" value="#{security.decr}">
-          </h:inputText>
-          <h:outputLabel id="out2" value="#{security.Decrypt(security.decr)}" />
-          <h:commandButton value="Decrypt">
-              <f:ajax execute="in2" render="out2"/>
-          </h:commandButton>
-          
-      </h:form>
+        <!-- Header -->
+        <div class="header">
+            <div class="navbar">
+                <div class="logo">
+                    <h:graphicImage value="resources/images/vendorplus.jpeg" style="height: 40px;" alt="VendorPlus"/>
+                    <span class="logo-text">Vendor<span>Plus</span></span>
+                </div>
+                <div class="nav-buttons">
+                    <h:link outcome="Login.xhtml" styleClass="btn btn-outline" value="Login"/>
+                    <h:link outcome="Registration.xhtml" styleClass="btn btn-primary" value="Get Started" style="background: #7BC043; color: white;"/>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Hero Section -->
+        <div class="hero">
+            <div class="container">
+                <h1>Transform Your Business with Smart Inventory &amp; POS Management</h1>
+                <p>VendorPlus is the complete business management solution trusted by businesses across Uganda. Manage inventory, process sales, track expenses, and grow your business with powerful analytics - all in one platform.</p>
+                <div class="hero-buttons">
+                    <h:link outcome="Registration.xhtml" styleClass="btn btn-primary" value="Get Started Free"/>
+                    <h:link outcome="Login.xhtml" styleClass="btn btn-outline" value="Sign In"/>
+                </div>
+                <p style="margin-top: 1.5rem; opacity: 0.9; font-size: 0.95rem;">✓ No credit card required  ✓ Free setup &amp; training  ✓ 24/7 support</p>
+            </div>
+        </div>
+        
+        <!-- Features Section -->
+        <div class="features">
+            <div class="container">
+                <h2 class="section-title">Everything You Need to Run Your Business</h2>
+                <p style="text-align: center; color: #666; max-width: 800px; margin: 0 auto 3rem; font-size: 1.1rem;">
+                    VendorPlus combines powerful inventory management, point of sale, accounting, and analytics in one easy-to-use platform
+                </p>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📦</div>
+                        <h3>Smart Inventory Management</h3>
+                        <p>Track stock levels in real-time across multiple warehouses. Automated low-stock alerts, batch tracking, expiry date management, and intelligent reorder points keep you always in stock.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">💰</div>
+                        <h3>Lightning-Fast POS</h3>
+                        <p>Process sales in seconds with our intuitive touch-friendly POS. Support for multiple payment methods, split bills, discounts, barcode scanning, and instant receipt printing.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3>Business Intelligence &amp; Reports</h3>
+                        <p>Make data-driven decisions with comprehensive reports. Sales trends, profit margins, best-selling products, customer analytics, and custom dashboards give you complete visibility.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">👥</div>
+                        <h3>Complete CRM</h3>
+                        <p>Build lasting customer relationships with detailed purchase history, loyalty programs, automated reminders, customer segmentation, and targeted marketing campaigns.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">🔐</div>
+                        <h3>Team Collaboration &amp; Security</h3>
+                        <p>Add unlimited team members with role-based permissions. Company data segregation ensures security. Track user activities and manage access with precision control.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">☁️</div>
+                        <h3>Cloud-Based &amp; Mobile</h3>
+                        <p>Access your business from anywhere on any device. Automatic cloud backups, offline mode support, real-time synchronization, and enterprise-grade security keep your data safe.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">💳</div>
+                        <h3>Accounting Integration</h3>
+                        <p>Full accounting features including invoicing, expense tracking, profit &amp; loss statements, balance sheets, cash flow management, and tax calculations.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">📱</div>
+                        <h3>Mobile Money Integration</h3>
+                        <p>Accept payments via MTN Mobile Money, Airtel Money, and other platforms. Automatic reconciliation and instant payment notifications streamline your cash flow.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">🔔</div>
+                        <h3>Smart Notifications</h3>
+                        <p>Stay informed with real-time alerts for low stock, new orders, payment receipts, end-of-day reports, and important business events via email and SMS.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Benefits Section -->
+        <div class="benefits">
+            <div class="container">
+                <h2 class="section-title">Why Choose VendorPlus?</h2>
+                <div class="benefits-grid">
+                    <div class="benefit-item">
+                        <div class="benefit-number">24/7</div>
+                        <div class="benefit-label">Access Anywhere</div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-number">100%</div>
+                        <div class="benefit-label">Data Security</div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-number">∞</div>
+                        <div class="benefit-label">Unlimited Users</div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-number">⚡</div>
+                        <div class="benefit-label">Fast Performance</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats Section -->
+        <div class="stats">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">500+</div>
+                        <div class="stat-label">Active Businesses</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">50K+</div>
+                        <div class="stat-label">Daily Transactions</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">99.9%</div>
+                        <div class="stat-label">Uptime</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">1M+</div>
+                        <div class="stat-label">Products Managed</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- How It Works Section -->
+        <div class="how-it-works">
+            <div class="container">
+                <h2 class="section-title">How It Works - Get Started in Minutes</h2>
+                <div class="steps-grid">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <h3>Sign Up Free</h3>
+                        <p>Create your account in less than 2 minutes. No credit card required, no hidden fees.</p>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <h3>Setup Your Business</h3>
+                        <p>Add your products, suppliers, and team members. Our intuitive interface makes setup a breeze.</p>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <h3>Start Selling</h3>
+                        <p>Process sales, manage inventory, and track profits - all from one powerful dashboard.</p>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <h3>Grow Your Business</h3>
+                        <p>Use detailed analytics and reports to make data-driven decisions and scale your operations.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Business Solutions Section -->
+        <div class="solutions">
+            <div class="container">
+                <h2 class="section-title">Perfect for Every Business Type</h2>
+                <div class="solutions-grid">
+                    <div class="solution-card">
+                        <h3>🏪 Retail Stores</h3>
+                        <ul>
+                            <li>Fast POS checkout</li>
+                            <li>Barcode scanning</li>
+                            <li>Customer loyalty programs</li>
+                            <li>Multiple payment methods</li>
+                            <li>Receipt printing</li>
+                        </ul>
+                    </div>
+                    <div class="solution-card">
+                        <h3>📦 Wholesalers</h3>
+                        <ul>
+                            <li>Bulk inventory management</li>
+                            <li>Supplier tracking</li>
+                            <li>Purchase order management</li>
+                            <li>Multi-warehouse support</li>
+                            <li>Quotation generation</li>
+                        </ul>
+                    </div>
+                    <div class="solution-card">
+                        <h3>🍕 Restaurants &amp; Cafes</h3>
+                        <ul>
+                            <li>Table management</li>
+                            <li>Kitchen order tracking</li>
+                            <li>Menu management</li>
+                            <li>Recipe costing</li>
+                            <li>Delivery integration</li>
+                        </ul>
+                    </div>
+                    <div class="solution-card">
+                        <h3>🏭 Manufacturers</h3>
+                        <ul>
+                            <li>Production tracking</li>
+                            <li>Raw material management</li>
+                            <li>Bill of materials (BOM)</li>
+                            <li>Work order management</li>
+                            <li>Quality control</li>
+                        </ul>
+                    </div>
+                    <div class="solution-card">
+                        <h3>💊 Pharmacies</h3>
+                        <ul>
+                            <li>Expiry date tracking</li>
+                            <li>Batch number management</li>
+                            <li>Prescription management</li>
+                            <li>Regulatory compliance</li>
+                            <li>Insurance billing</li>
+                        </ul>
+                    </div>
+                    <div class="solution-card">
+                        <h3>🛠️ Service Businesses</h3>
+                        <ul>
+                            <li>Job/project tracking</li>
+                            <li>Service package management</li>
+                            <li>Appointment scheduling</li>
+                            <li>Equipment inventory</li>
+                            <li>Customer history</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Testimonials Section -->
+        <div class="testimonials">
+            <div class="container">
+                <h2 class="section-title">What Our Customers Say</h2>
+                <div class="testimonials-grid">
+                    <div class="testimonial-card">
+                        <div class="testimonial-text">
+                            "VendorPlus transformed how we manage our retail chain. We can now track inventory across 5 locations in real-time. Sales have increased by 30% since implementation!"
+                        </div>
+                        <div class="testimonial-author">Sarah Nakato</div>
+                        <div class="testimonial-role">Owner, Nakato Fashion Stores</div>
+                    </div>
+                    <div class="testimonial-card">
+                        <div class="testimonial-text">
+                            "The POS system is incredibly fast and easy to use. Our cashiers were trained in just 1 hour. The reporting features give us insights we never had before."
+                        </div>
+                        <div class="testimonial-author">James Okello</div>
+                        <div class="testimonial-role">Manager, Okello Supermarket</div>
+                    </div>
+                    <div class="testimonial-card">
+                        <div class="testimonial-text">
+                            "Best investment we've made! The multi-user access means our entire team can collaborate efficiently. Customer support is outstanding - always responsive."
+                        </div>
+                        <div class="testimonial-author">Patricia Nambi</div>
+                        <div class="testimonial-role">Director, Nambi Pharmaceuticals</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pricing Section -->
+        <div class="pricing">
+            <div class="container">
+                <h2 class="section-title">Simple, Transparent Pricing</h2>
+                <p style="text-align: center; color: #666; font-size: 1.1rem; margin-bottom: 1rem;">Choose the plan that fits your business needs</p>
+                <div class="pricing-grid">
+                    <div class="pricing-card">
+                        <h3>Starter</h3>
+                        <div class="price">Free</div>
+                        <ul class="pricing-features">
+                            <li>✓ Up to 100 products</li>
+                            <li>✓ 1 user account</li>
+                            <li>✓ Basic POS</li>
+                            <li>✓ Sales reports</li>
+                            <li>✓ Email support</li>
+                        </ul>
+                        <h:link outcome="Registration.xhtml" styleClass="btn btn-secondary" value="Get Started" style="display: block; text-align: center;"/>
+                    </div>
+                    <div class="pricing-card featured">
+                        <h3>Professional</h3>
+                        <div class="price">Contact Us</div>
+                        <ul class="pricing-features">
+                            <li>✓ Unlimited products</li>
+                            <li>✓ Unlimited users</li>
+                            <li>✓ Advanced POS &amp; Inventory</li>
+                            <li>✓ All reports &amp; analytics</li>
+                            <li>✓ Multi-location support</li>
+                            <li>✓ Priority support</li>
+                            <li>✓ Custom integrations</li>
+                        </ul>
+                        <h:link outcome="Registration.xhtml" styleClass="btn btn-primary" value="Start Free Trial" style="display: block; text-align: center;"/>
+                    </div>
+                    <div class="pricing-card">
+                        <h3>Enterprise</h3>
+                        <div class="price">Custom</div>
+                        <ul class="pricing-features">
+                            <li>✓ Everything in Professional</li>
+                            <li>✓ Dedicated account manager</li>
+                            <li>✓ Custom features</li>
+                            <li>✓ On-premise deployment</li>
+                            <li>✓ SLA guarantee</li>
+                            <li>✓ 24/7 phone support</li>
+                        </ul>
+                        <a href="#" class="btn btn-secondary" style="display: block; text-align: center; text-decoration: none;">Contact Sales</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CTA Section -->
+        <div class="cta">
+            <div class="container">
+                <h2>Ready to Transform Your Business Operations?</h2>
+                <p>Join hundreds of successful businesses using VendorPlus to streamline operations and boost profits</p>
+                <h:link outcome="Registration.xhtml" styleClass="btn btn-primary" value="Start Your Free Account Now" style="font-size: 18px; padding: 18px 45px;"/>
+                <p style="margin-top: 1.5rem; font-size: 1rem;">No credit card required • Free forever starter plan • Full access to all features during trial</p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-content">
+                <div>
+                    <h4>VendorPlus</h4>
+                    <p>The leading inventory and POS management solution for businesses across Uganda. Trusted by retailers, wholesalers, manufacturers, and service providers.</p>
+                    <p style="margin-top: 1rem; font-size: 0.9rem;">Made with ❤️ in Uganda</p>
+                </div>
+                <div>
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="#">Features</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Integrations</a></li>
+                        <li><a href="#">Desktop App</a></li>
+                        <li><a href="#">API Documentation</a></li>
+                        <li><a href="#">Roadmap</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Solutions</h4>
+                    <ul>
+                        <li><a href="#">Retail Stores</a></li>
+                        <li><a href="#">Wholesalers</a></li>
+                        <li><a href="#">Restaurants</a></li>
+                        <li><a href="#">Pharmacies</a></li>
+                        <li><a href="#">Manufacturers</a></li>
+                        <li><a href="#">Service Businesses</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Video Tutorials</a></li>
+                        <li><a href="#">User Guide</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Case Studies</a></li>
+                        <li><a href="#">Webinars</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Partners</a></li>
+                        <li><a href="#">Press Kit</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Contact Us</h4>
+                    <ul>
+                        <li>📧 support@vendorplus.com</li>
+                        <li>📞 +256 700 123 456</li>
+                        <li>📍 Kampala, Uganda</li>
+                        <li style="margin-top: 1rem;"><strong>Business Hours:</strong></li>
+                        <li>Mon-Fri: 8am - 6pm</li>
+                        <li>Sat: 9am - 3pm</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 VendorPlus. All rights reserved. | Empowering Ugandan Businesses Since 2020</p>
+            </div>
+        </div>
     </h:body>
 </html>
 
