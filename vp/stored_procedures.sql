@@ -2160,8 +2160,8 @@ CREATE PROCEDURE sp_update_transaction_item
 ) 
 BEGIN 
 	SET @item_expiry_date=NULL;
-	if (in_item_expiry_date is not null) then
-		set @item_expiry_date=in_item_expiry_date;
+	if (in_item_expry_date is not null) then
+		set @item_expiry_date=in_item_expry_date;
 	end if;
 
 	SET @item_mnf_date=NULL;
@@ -13719,8 +13719,8 @@ CREATE PROCEDURE sp_update_transaction_item_cr_dr_note
 ) 
 BEGIN 
 	SET @item_expiry_date=NULL;
-	if (in_item_expiry_date is not null) then
-		set @item_expiry_date=in_item_expiry_date;
+	if (in_item_expry_date is not null) then
+		set @item_expiry_date=in_item_expry_date;
 	end if;
 
 	SET @item_mnf_date=NULL;
