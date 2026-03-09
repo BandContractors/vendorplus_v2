@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>#{companySetting.getStoreEquivName()}</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:event listener="#{navigationBean.checkAccessDenied('88', 'View')}" type="preRenderView" />
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="form" styleClass="clsMainFrom">
+
+            <h:panelGrid styleClass="clsGridMainHeader" columns="1">
+                <h:outputLabel styleClass="clsLabelTop" id="olblStoreHeader" value="#{langsys['Branch']} - #{companySetting.getStoreEquivName()}"/>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainInput" columns="2">
+                <h:outputLabel  value="#{langsys[companySetting.getStoreEquivName()]} #{langsys['Id']} :"/>
+                <h:inputText styleClass="clsInput" id="itxtStoreId" value="#{store.storeId}" disabled="true"/>
+                <h:outputLabel  value="#{langsys[companySetting.getStoreEquivName()]} #{langsys['Name']}:"/>
+                <h:inputText styleClass="clsInput" id="itxtStoreName" value="#{store.storeName}"/>
+                <h:outputLabel  value="#{langsys[companySetting.getStoreEquivName()]} #{langsys['Code']} (Max 10 #{langsys['Characters']}):"/>
+                <h:inputText styleClass="clsInput" id="itxtStoreCode" value="#{store.store_code}"/> 
+                <h:outputLabel  value="#{langsys['Work']} #{langsys['Shift']} #{langsys['Mode']}:"/>
+                <h:selectOneMenu styleClass="clsMenu" style="width: 222px;" id="menuShiftMode" value="#{store.shift_mode}">
+                    <f:selectItem itemLabel="None" itemValue="0"/>
+                    <f:selectItem itemLabel="Auto Selected" itemValue="1"/>
+                    <f:selectItem itemLabel="Manually Selected" itemValue="2"/>
+                </h:selectOneMenu>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainCommands" columns="1">
+                <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
+                    <p:commandButton styleClass="clsButton" id="cmdbSave" value="#{langsys['Save']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{storeBean.saveStore(store)}" process="@form" update="@form" />
+                    </p:commandButton>
+                    <p:commandButton styleClass="clsButton" id="cmdbClear" value="#{langsys['Clear']}">
+                        <p:ajax listener="#{storeBean.clearStore(store)}" process="@form" update="@form" />
+                    </p:commandButton>
+                    <p:commandButton styleClass="clsButton" id="cmdbDelete" value="#{langsys['Delete']}" onclick="return confirmDelete();">
+                        <p:ajax listener="#{storeBean.deleteStoreByObject(store)}" process="@form" update="@form" />
+                    </p:commandButton>
+                </h:panelGrid>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainMessages" columns="1">
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{storeBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainSearch" columns="1">
+                <h:outputLabel id="olblMainSearch" value="#{langsys['Search']} #{companySetting.getStoreEquivName()}"/>
+                <h:inputText id="itxtMainSearch" value="#{storeBean.searchStoreName}" autocomplete="off">
+                    <f:ajax event="keyup" render="dtblStore"/>
+                </h:inputText>
+            </h:panelGrid>
+
+            <p:dataTable id="dtblStore" value="#{storeBean.getStoresByName(storeBean.searchStoreName)}" var="s" 
+                         > 
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys[companySetting.getStoreEquivName()]} #{langsys['ID']}</f:facet>
+                    <!-- row record -->
+                    #{s.storeId}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys[companySetting.getStoreEquivName()]} #{langsys['Name']}</f:facet>
+                    <!-- row record -->
+                    #{s.storeName}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys[companySetting.getStoreEquivName()]} #{langsys['Code']}</f:facet>
+                    <!-- row record -->
+                    #{s.store_code}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Work']} #{langsys['Shift']} #{langsys['Mode']}</f:facet>
+                    <!-- row record -->
+                    #{s.shift_mode eq 1 ? 'Auto Selected':s.shift_mode eq 2 ? 'Manually Selected':'None'}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Action']}</f:facet>
+                    <!-- row record -->
+                    <h:commandLink value="#{langsys['Edit']}" action="#{storeBean.displayStore(s,store)}" />
+                    &nbsp;
+                </p:column>
+            </p:dataTable>
+
+        </h:form>
+    </h:body>
+</html>
+

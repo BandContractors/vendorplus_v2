@@ -1,0 +1,343 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Report Item Transactions</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:event listener="#{navigationBean.checkAccessDenied('72', 'View')}" type="preRenderView" />
+    <f:event listener="#{transBean.initResetTransItemDetail(trans,transBean,itemBean.selectedItem,transactorBean.selectedTransactor,item.categoryId)}" type="preRenderView" />
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="formReport">
+            <h:panelGrid id="pnlgHeader" columns="3" styleClass="clsPanelReportFilterTitle">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys['Item']} #{langsys['Transaction']} #{langsys['Detail']} #{langsys['Report']}"/>
+                <p:commandLink id="cmdbToday" value="#{langsys['Today']}" style="color: white;">
+                    <p:ajax listener="#{transBean.setDateToToday()}" process="@this" update="pnlgFilter"/>
+                </p:commandLink>
+                <p:commandLink id="cmdbYesturday" value="#{langsys['Yesterday']}" style="color: white;">
+                    <p:ajax listener="#{transBean.setDateToYesturday()}" process="@this" update="pnlgFilter"/>
+                </p:commandLink>
+            </h:panelGrid>
+
+            <h:panelGrid id="pnlgFilter" columns="3" styleClass="clsPanelReportFilter">
+                <h:panelGrid columns="2">
+                    <p:outputLabel value="#{companySetting.getStoreEquivName()}:"/>
+                    <p:selectOneMenu id="menuFromStore" value="#{trans.storeId}" style="width: 200px;">
+                        <f:selectItem itemLabel="#{langsys['Select']}" itemValue="0"/>
+                        <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
+                    </p:selectOneMenu>
+                    <p:outputLabel value="#{langsys['Date']} #{langsys['Type']}:"/>
+                    <p:selectOneMenu id="menuDateType" value="#{transBean.dateType}" style="width: 200px;">
+                        <f:selectItem itemLabel="#{langsys['Select']}" itemValue=""/>
+                        <f:selectItem itemValue="Add Date" itemLabel="#{langsys['Add']} #{langsys['Date']}"/>
+                        <f:selectItem itemValue="Trans Date" itemLabel="#{langsys['Transaction']} #{langsys['Date']}"/>
+                        <f:ajax event="change" execute="@this" render="lblDate1 lblDate2"/>
+                    </p:selectOneMenu>
+                    <p:outputLabel value="#{langsys['From']} #{transBean.dateType}:" id="lblDate1"/>
+                    <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{transBean.date1}" size="18"/>
+                    <p:outputLabel value="#{langsys['To']} #{transBean.dateType}:" id="lblDate2"/>
+                    <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{transBean.date2}" size="18"/>
+                </h:panelGrid>
+                <h:panelGrid columns="2">
+                    <p:outputLabel value="#{langsys['Transaction']} #{langsys['Type']}:"/>
+                    <p:selectOneMenu id="menuTransactionType" value="#{trans.transactionTypeId}" style="width: 200px;">
+                        <f:selectItem itemLabel="" itemValue="0"/>
+                        <f:selectItems value="#{transactionTypeBean.getTransTypesWithItems()}" var="tt" itemLabel="#{tt.transactionTypeName}" itemValue="#{tt.transactionTypeId}"/>
+                    </p:selectOneMenu>
+                    <p:outputLabel value="#{langsys['Added']} #{langsys['By']}:"/>
+                    <p:selectOneMenu id="menuAddUser" value="#{trans.addUserDetailId}" style="width: 200px;">
+                        <f:selectItem itemLabel="#{langsys['Select']}"/>
+                        <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ua" itemLabel="#{ua.firstName} #{ua.secondName} #{ua.thirdName}" itemValue="#{ua.userDetailId}"/>
+                    </p:selectOneMenu>
+                    <h:outputLabel value="#{langsys['Transacted']} #{langsys['By']}:"/>
+                    <p:selectOneMenu id="menuTransUser" value="#{trans.transactionUserDetailId}" style="width: 200px;">
+                        <f:selectItem itemLabel="#{langsys['Select']}" itemValue="0"/>
+                        <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ut" itemLabel="#{ut.firstName} #{ut.secondName} #{ut.thirdName}" itemValue="#{ut.userDetailId}"/>
+                    </p:selectOneMenu>
+                    <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{transBean.reportTransItemDetail(trans,transBean,itemBean.selectedItem,transactorBean.selectedTransactor,item.categoryId)}" process="pnlgFilter" update="menuDateType pnlgFilter pnlgMessage tabvReport growl1"/>
+                    </p:commandButton>
+                    <p:commandButton id="cmdbReset" value="#{langsys['RESET']} (ALT+R)" accesskey="r">
+                        <p:ajax listener="#{transBean.resetTransItemDetail(trans,transBean,itemBean.selectedItem,transactorBean.selectedTransactor,item.categoryId)}" process="pnlgFilter" update="pnlgFilter pnlgMessage tabvReport growl1"/>
+                    </p:commandButton>
+                </h:panelGrid>
+                <h:panelGrid columns="2">
+                    <p:outputLabel value="#{langsys['Item']} #{langsys['Description']}:"/>
+                    <p:autoComplete id="autcItem" widgetVar="WautcItem" value="#{itemBean.selectedItem}"  
+                                    completeMethod="#{itemBean.getItemObjectListActive}" 
+                                    var="itm" 
+                                    itemLabel="#{itm.description}" 
+                                    itemValue="#{itm}" 
+                                    converter="ItemConverter" style="text-align: left" 
+                                    forceSelection="true" queryDelay="0" 
+                                    onkeypress="if (event.keyCode == 13)
+                                                return false;" >
+                        <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="text-align: left" >  
+                            #{itm.description} 
+                        </p:column>
+                        <p:column headerText="#{langsys['Alias']}" style="text-align: left" >  
+                            #{itm.alias_name} 
+                        </p:column>
+                        <p:column headerText="#{langsys['Item']} #{langsys['Code']}" style="text-align: left" >  
+                            #{itm.itemCode} 
+                        </p:column>
+                        <p:column headerText="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Price']}" style="text-align: left">  
+                            <h:outputText value="#{itm.unitRetailsalePrice}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{langsys['Wholesale']} #{langsys['Price']}" style="text-align: left">
+                            <h:outputText value="#{itm.unitWholesalePrice}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{langsys['Currency']}" style="text-align: left">
+                            <h:outputText value="#{itm.currencyCode}">
+                            </h:outputText>
+                        </p:column>
+                    </p:autoComplete>
+                    <p:outputLabel value="#{langsys['Partner']}/#{langsys['Client']}:"/> 
+                    <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
+                                    completeMethod="#{transactorBean.getTransactorObjectList}" 
+                                    var="trct2" 
+                                    itemLabel="#{trct2.transactorNames}" 
+                                    itemValue="#{trct2}" 
+                                    converter="TransactorConverter" style="text-align: left" 
+                                    forceSelection="true" 
+                                    >
+                        <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
+                            #{trct2.transactorNames} 
+                        </p:column> 
+                        <p:column headerText="#{langsys['Contact']} #{langsys['Person']}" style="text-align: left">  
+                            #{trct2.cpName} 
+                        </p:column> 
+                    </p:autoComplete>
+                    <h:outputLabel value="#{langsys['Item']} #{langsys['Category']}:"/>
+                    <p:selectOneMenu id="menuCategory" value="#{item.categoryId}" style="width: 215px;">
+                        <f:selectItem itemLabel="" itemValue="0"/>
+                        <f:selectItems value="#{categoryBean.categories}" var="c" itemLabel="#{c.categoryName}" itemValue="#{c.categoryId}"/>
+                    </p:selectOneMenu>
+                    <h:outputLabel value=""/>
+                    <h:outputLabel value=""/>
+                </h:panelGrid>
+            </h:panelGrid>
+
+            <h:panelGrid id="pnlgMessage">
+                <p:outputLabel value="#{transBean.actionMessage}" style="color: red;"/>
+            </h:panelGrid>
+            <p:growl id="growl1"/>
+            <p:tabView id="tabvReport">
+                <p:tab title="#{langsys['Detail']}">
+                    <p:dataTable id="tblDetail" tableStyle="table-layout: auto;" var="itm" value="#{transBean.transItemList}" 
+                                 paginator="true" rows="50" 
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
+                                 rowsPerPageTemplate="50,100,200,400">
+                        <f:facet name="header">
+                            #{transBean.transItemList.size()} #{langsys['Records']} #{langsys['Found']}
+                            <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
+                            <p:columnToggler datasource="tblDetail" trigger="toggler" />
+                        </f:facet>
+                        <f:facet name="{Exporters}">
+                            <h:commandLink>
+                                <p:graphicImage name="images/excel.png" width="24"/>
+                                <p:dataExporter type="xls" target="tblDetail" fileName="Item_Trans_Detail" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <p:graphicImage name="images/pdf.png" width="24"/>
+                                <p:dataExporter type="pdf" target="tblDetail" fileName="Item_Trans_Detail"/>
+                            </h:commandLink>
+                            <h:commandLink>
+                                <p:graphicImage name="images/csv.png" width="24"/>
+                                <p:dataExporter type="csv" target="tblDetail" fileName="Item_Trans_Detail" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <p:graphicImage name="images/xml.png" width="24"/>
+                                <p:dataExporter type="xml" target="tblDetail" fileName="Item_Trans_Detail" />
+                            </h:commandLink>
+                        </f:facet>
+                        <p:column headerText="#{langsys['From']} #{companySetting.getStoreEquivName()}">
+                            <h:outputLabel value="#{itm.storeName}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Transaction']} #{langsys['Type']}">
+                            <h:outputLabel value="#{itm.transactionTypeName} "/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Transaction']} #{langsys['Number']}">
+                            <h:outputLabel value="#{itm.transaction_number}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Partner']}/#{langsys['Client']}">
+                            <h:outputLabel value="#{itm.transactorNames}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Item']} #{langsys['Description']}">
+                            <h:outputLabel value="#{itm.description}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Specific']} #{langsys['Details']}">
+                            <h:outputLabel value="#{itm.codeSpecific} "/>
+                            <h:outputLabel value="#{itm.descSpecific}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Unit']}">
+                            <h:outputLabel value="#{itm.unitSymbol}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['QTY']}" style="text-align: right;">
+                            <h:outputText value="#{itm.itemQty}">
+                                <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{langsys['Unit']} #{langsys['Price']}" style="text-align: right;">
+                            <h:outputText value="#{itm.unitPriceIncVat}">
+                                <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
+                            <h:outputText value="#{itm.amountIncVat}">
+                                <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{langsys['Currency']}">
+                            <h:outputLabel value="#{itm.currency_code}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Add']} #{langsys['Date']}" visible="false">
+                            <h:outputText value="#{utilityBean.formatDate(itm.addDate)}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Added']} #{langsys['By']}" visible="false">
+                            <h:outputText value="#{itm.addUserDetailName}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="#{langsys['Category']} #{langsys['Summary']}">
+                    <p:dataTable sortBy="#{itm.currency_code}" expandableRowGroups="true" id="tblSummary" tableStyle="table-layout: auto;" var="itm" value="#{transBean.transItemSummary}" 
+                                 paginator="true" rows="50" 
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
+                                 rowsPerPageTemplate="50,100,200,400">
+                        <f:facet name="header">
+                            #{transBean.transItemSummary.size()} #{langsys['Records']} #{langsys['Found']}
+                            <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
+                            <p:columnToggler datasource="tblSummary" trigger="toggler" />
+                        </f:facet>
+                        <f:facet name="{Exporters}">
+                            <h:commandLink>
+                                <p:graphicImage name="images/excel.png" width="24"/>
+                                <p:dataExporter type="xls" target="tblSummary" fileName="Category_Summary" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <p:graphicImage name="images/pdf.png" width="24"/>
+                                <p:dataExporter type="pdf" target="tblSummary" fileName="Category_Summary"/>
+                            </h:commandLink>
+                            <h:commandLink>
+                                <p:graphicImage name="images/csv.png" width="24"/>
+                                <p:dataExporter type="csv" target="tblSummary" fileName="Category_Summary" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <p:graphicImage name="images/xml.png" width="24"/>
+                                <p:dataExporter type="xml" target="tblSummary" fileName="Category_Summary" />
+                            </h:commandLink>
+                        </f:facet>
+                        <p:column headerText="#{langsys['Category']}">
+                            <h:outputLabel value="#{itm.categoryName}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Transaction']} #{langsys['Type']}">
+                            <h:outputLabel value="#{itm.transactionTypeName} "/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Currency']}">
+                            <h:outputLabel value="#{itm.currency_code}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Amount']}" style="text-align: right;">
+                            <h:outputText value="#{itm.amountIncVat}">
+                                <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:summaryRow>
+                            <p:column colspan="3" style="text-align:right">
+                                <h:outputText value="#{langsys['Total']}" />
+                            </p:column>
+                            <p:column style="text-align:right">
+                                <h:outputText value="#{transItemBean.getTotalAmount(transBean.transItemSummary,itm.currency_code)}">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputText>
+                            </p:column>
+                        </p:summaryRow>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="#{langsys['Item']} #{langsys['Summary']}">
+                    <p:dataTable sortBy="#{itm2.currency_code}" expandableRowGroups="true" id="tblSummary2" tableStyle="table-layout: auto;" var="itm2" value="#{transBean.transItemSummary2}" 
+                                 paginator="true" rows="50" 
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
+                                 rowsPerPageTemplate="50,100,200,400">
+                        <f:facet name="header">
+                            #{transBean.transItemSummary2.size()} #{langsys['Records']} #{langsys['Found']}
+                            <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
+                            <p:columnToggler datasource="tblSummary2" trigger="toggler" />
+                        </f:facet>
+                        <f:facet name="{Exporters}">
+                            <h:commandLink>
+                                <p:graphicImage name="images/excel.png" width="24"/>
+                                <p:dataExporter type="xls" target="tblSummary2" fileName="Item_Summary" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <p:graphicImage name="images/pdf.png" width="24"/>
+                                <p:dataExporter type="pdf" target="tblSummary2" fileName="Item_Summary"/>
+                            </h:commandLink>
+                            <h:commandLink>
+                                <p:graphicImage name="images/csv.png" width="24"/>
+                                <p:dataExporter type="csv" target="tblSummary2" fileName="Item_Summary" />
+                            </h:commandLink>
+                            <h:commandLink>
+                                <p:graphicImage name="images/xml.png" width="24"/>
+                                <p:dataExporter type="xml" target="tblSummary2" fileName="Item_Summary" />
+                            </h:commandLink>
+                        </f:facet>
+                        <p:column headerText="#{langsys['Item']} #{langsys['Description']}">
+                            <h:outputLabel value="#{itm2.description}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Transaction']}">
+                            <h:outputLabel value="#{itm2.transactionTypeName} "/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Total']} #{langsys['Qty']}" style="text-align: right;">
+                            <h:outputText value="#{itm2.itemQty}">
+                                <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{langsys['Currency']}">
+                            <h:outputLabel value="#{itm2.currency_code}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Total']} #{langsys['Amount']}" style="text-align: right;">
+                            <h:outputText value="#{itm2.amountIncVat}">
+                                <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:summaryRow>
+                            <p:column colspan="4" style="text-align:right">
+                                <h:outputText value="#{langsys['Total']}" />
+                            </p:column>
+                            <p:column style="text-align:right">
+                                <h:outputText value="#{transItemBean.getTotalAmount(transBean.transItemSummary2,itm2.currency_code)}">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputText>
+                            </p:column>
+                        </p:summaryRow>
+                    </p:dataTable>
+                </p:tab>
+            </p:tabView>
+        </h:form>
+    </h:body>
+
+</html>
+

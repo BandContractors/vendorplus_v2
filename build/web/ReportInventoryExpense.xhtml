@@ -1,0 +1,134 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Expense Inventory</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:event listener="#{navigationBean.checkAccessDenied('63', 'View')}" type="preRenderView" />
+    <f:event listener="#{stockBean.initClearStock(stock,stockBean.stocksList,stockBean.stocksSummary)}" type="preRenderView" />
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="formReport">
+            <h:panelGrid id="pnlgHeader" columns="1" styleClass="clsPanelReportFilterTitle">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Expenses Inventory Report"/>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgFilter" columns="5" styleClass="clsPanelReportFilter">
+                <p:outputLabel value="#{companySetting.getStoreEquivName()}"/>
+                <p:outputLabel value="Category"/>
+                <p:outputLabel value="From Expiry Date" id="lblDate1"/>
+                <p:outputLabel value="To Expiry Date" id="lblDate2"/>
+                <p:outputLabel value=""/>
+
+                <h:selectOneMenu id="menuFromStore" value="#{stock.storeId}" >
+                    <f:selectItem itemLabel="" itemValue="0"/>
+                    <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
+                </h:selectOneMenu>
+                <h:selectOneMenu id="menuCategory" value="#{category.categoryId}">
+                    <f:selectItem itemLabel="" itemValue="0"/>
+                    <f:selectItems value="#{categoryBean.categories}" var="c" itemLabel="#{c.categoryName}" itemValue="#{c.categoryId}"/>
+                </h:selectOneMenu>
+                <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{accJournalBean.date1}" size="12"/>
+                <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{accJournalBean.date2}" size="12"/>
+
+                <p:commandButton id="cmdbSearch" value="SEARCH EXPENSES (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{stockBean.reportInventoryExpense(stock.storeId,category.categoryId,accJournalBean.date1,accJournalBean.date2)}" process="pnlgFilter" update="pnlgMessage tblDetail"/>
+                </p:commandButton>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgMessage">
+                <p:outputLabel value="#{stockBean.actionMessage}" style="color: red;"/>
+            </h:panelGrid>
+            <p:dataTable id="tblDetail" tableStyle="width:auto;" var="itm" value="#{stockBean.stocksList}" 
+                         paginator="true" rows="50" 
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
+                         rowsPerPageTemplate="100,400,800,1000,2000">
+                <f:facet name="header">
+                    <p:dataTable id="tblSummary" var="sm" value="#{stockBean.stocksSummary}">
+                        <p:column headerText="Currency">
+                            <h:outputText value="#{sm.currencyCode}"/>
+                        </p:column>
+                        <p:column headerText="Cost" style="text-align: right;">
+                            <h:outputText value="#{sm.costValue}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                    </p:dataTable>
+                    #{stockBean.stocksList.size()} #{langsys['Records']} #{langsys['Found']}
+                    <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
+                    <p:columnToggler datasource="tblDetail" trigger="toggler" />
+                </f:facet>
+                <f:facet name="{Exporters}">
+                    <h:commandLink>
+                        <p:graphicImage name="images/excel.png" width="24"/>
+                        <p:dataExporter type="xls" target="tblDetail" fileName="Expense_Inventory" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/pdf.png" width="24"/>
+                        <p:dataExporter type="pdf" target="tblDetail" fileName="Expense_Inventory"/>
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/csv.png" width="24"/>
+                        <p:dataExporter type="csv" target="tblDetail" fileName="Expense_Inventory" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/xml.png" width="24"/>
+                        <p:dataExporter type="xml" target="tblDetail" fileName="Expense_Inventory" />
+                    </h:commandLink>
+                </f:facet>
+                <p:column headerText="#{companySetting.getStoreEquivName()}">
+                    <h:outputLabel value="#{itm.storeName} "/>
+                </p:column>
+                <p:column headerText="Description">
+                    <p:outputLabel id="lblItemDescInner" value="#{itm.description}"/>
+                    #{itm.descSpecific}
+                    <p:tooltip id="toolTipTrackItemDesc" for="lblItemDescInner" value="#{transItemBean.displayItemDesc(itm.codeSpecific, itm.descSpecific, itm.descMore, itm.warrantyDesc)}" trackMouse="true" />
+                </p:column>
+                <p:column headerText="Unit">
+                    <h:outputText value="#{itm.unitSymbol}"/>
+                </p:column>
+                <p:column headerText="Reorder Level">
+                    <h:outputText value="#{itm.reorderLevel}"/>
+                </p:column>
+                <p:column headerText="Batch">
+                    <h:outputText value="#{itm.batchno}"/>
+                </p:column>
+                <p:column headerText="Qty">
+                    <h:outputText value="#{itm.currentqty}"/>
+                </p:column>
+                <p:column headerText="Unit Cost">
+                    <h:outputText value="#{itm.unitCost}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Currency">
+                    <h:outputText value="#{itm.currencyCode}"/>
+                </p:column>
+                <p:column headerText="Mnf Date">
+                    <h:outputText value="#{utilityBean.formatDate(itm.itemMnfDate)}"/>
+                </p:column>
+                <p:column headerText="Exp Date">
+                    <h:outputText value="#{utilityBean.formatDate(itm.itemExpDate)}"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </h:body>
+</html>
+

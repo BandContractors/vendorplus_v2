@@ -1,0 +1,183 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Risk of Expiry</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{navigationBean.checkAccessDenied('61', 'View')}"/>
+        <f:viewAction action="#{itemBean.clearItem(item)}"/>
+        <f:viewAction action="#{stockBean.initClearStock(null, stockBean.stocksList, stockBean.stocksSummary)}"/>
+        <f:viewAction action="#{utilityBean.clearList(alert_generalBean.alertList)}"/>
+    </f:metadata>
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="formReport">
+            <h:panelGrid id="pnlgHeader" columns="1" styleClass="clsPanelReportFilterTitle">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys['Risk']} #{langsys['of']} #{langsys['Expiry']} #{langsys['Status']} #{langsys['Report']}"/>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgFilter" columns="2" styleClass="clsPanelReportFilter">
+                <h:panelGrid columns="4">
+                    <p:outputLabel value="#{langsys['Stock']} #{langsys['Type']}:"/>
+                    <h:selectOneMenu id="menuStockType" value="#{item.stock_type}" style="width: 200px;" >
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItem itemLabel="#{langsys['Merchandise']}" itemValue="Merchandise"/>
+                        <f:selectItem itemLabel="#{langsys['Finished']} #{langsys['Goods']}" itemValue="Finished Goods"/>
+                        <f:selectItem itemLabel="#{langsys['Raw Material']}" itemValue="Raw Material"/>
+                        <f:selectItem itemLabel="#{langsys['Consumption']}" itemValue="Consumption"/>
+                        <f:selectItem itemLabel="#{langsys['Services']}" itemValue="Services"/>
+                    </h:selectOneMenu>
+                    <p:outputLabel value="#{langsys['Item']} #{langsys['Type']}:"/>
+                    <h:selectOneMenu id="menuItemType" value="#{item.itemType}" style="width: 200px;">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItem itemLabel="#{langsys['PRODUCT']}" itemValue="PRODUCT"/>
+                        <f:selectItem itemLabel="#{langsys['SERVICE']}" itemValue="SERVICE"/>
+                    </h:selectOneMenu>
+
+                    <p:outputLabel value="#{langsys['Category']}:"/>
+                    <h:selectOneMenu id="menuCategory" value="#{item.categoryId}" style="width: 200px;">
+                        <f:selectItem itemLabel="" itemValue="0"/>
+                        <f:selectItems value="#{categoryBean.categories}" var="c" itemLabel="#{c.categoryName}" itemValue="#{c.categoryId}"/>
+                        <f:ajax event="change" render="menuSubCategory"/>
+                    </h:selectOneMenu>
+                    <p:outputLabel value="#{langsys['Subcategory']}:"/>
+                    <h:selectOneMenu id="menuSubCategory" value="#{item.subCategoryId}" style="width: 200px;">
+                        <f:selectItem itemLabel="" itemValue="0"/>
+                        <f:selectItems value="#{subCategoryBean.getSubCategoriesByCategoryId(item.categoryId)}" var="s" itemLabel="#{s.subCategoryName}" itemValue="#{s.subCategoryId}"/>
+                    </h:selectOneMenu>
+
+                    <p:outputLabel value="#{langsys['Risk']} #{langsys['of']} #{langsys['Expiry']}"/>
+                    <h:selectOneMenu id="menuStockStatus" value="#{item.stock_status}" style="width: 200px;">
+                        <f:selectItem itemLabel=""/>
+                        <f:selectItem itemLabel="#{langsys['Expired']}" itemValue="Expired"/>
+                        <f:selectItem itemLabel="#{langsys['Unusable']}" itemValue="Unusable"/>
+                        <f:selectItem itemLabel="#{langsys['High']}" itemValue="High"/>
+                        <f:selectItem itemLabel="#{langsys['Medium']}" itemValue="Medium"/>
+                        <f:selectItem itemLabel="#{langsys['Low']}" itemValue="Low"/>
+                        <f:selectItem itemLabel="#{langsys['No']} #{langsys['Risk']}" itemValue="NoRisk"/>
+                        <f:selectItem itemLabel="N/A" itemValue="N/A"/>
+                    </h:selectOneMenu>
+                    <p:outputLabel value="#{langsys['General']}:"/>
+                    <h:selectOneMenu id="menuIsGeneral" value="#{item.isGeneral}" style="width: 200px;">
+                        <f:selectItem itemLabel=""/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="11"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="10"/>
+                    </h:selectOneMenu>
+
+                    <p:outputLabel value=""/>
+                    <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{stockBean.reportStockExpiryStatus(item.itemType,item.categoryId,item.subCategoryId,item.isGeneral,item.stock_type,item.stock_status)}" process="pnlgFilter" update="pnlgMessage tblDetail tblSummary"/>
+                    </p:commandButton>
+                </h:panelGrid>
+                <p:dataTable id="tblSummary" tableStyle="width:auto;" var="sl" value="#{stockBean.stocksSummary}" 
+                             rowStyleClass="#{sl.status eq 'Expired' ? 'red' :sl.status eq 'Unusable' ? 'red' :sl.status eq 'High' ? 'amber' :sl.status eq 'Medium' ? 'amber' : sl.status eq 'Low' ? 'green' : sl.status eq 'NoRisk' ? 'green' : sl.status eq 'N/A' ? 'white' : 'white'}">
+                    <p:column headerText="#{langsys['Risk']} #{langsys['of']} #{langsys['Expiry']}">
+                        <h:outputLabel value="#{sl.status} "/>
+                    </p:column>
+                    <p:column headerText="#{langsys['Items']}" style="text-align: right;">
+                        <h:outputText value="#{sl.status_qty}">
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="%" style="text-align: right;">
+                        <h:outputText value="#{sl.status_perc}">
+                            <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgMessage">
+                <p:outputLabel value="#{itemBean.actionMessage}" style="color: red;" rendered="false"/>
+            </h:panelGrid>
+            <p:dataTable id="tblDetail" tableStyle="width:auto;" var="sl" value="#{stockBean.stocksList}" 
+                         paginator="true" rows="50" 
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
+                         rowsPerPageTemplate="50,100,400,800,1000,2000" 
+                         rowStyleClass="#{sl.status eq 'Expired' ? 'red' :sl.status eq 'Unusable' ? 'red' :sl.status eq 'High' ? 'amber' :sl.status eq 'Medium' ? 'amber' : sl.status eq 'Low' ? 'green' : sl.status eq 'NoRisk' ? 'green' : sl.status eq 'N/A' ? 'white' : 'white'}">
+                <f:facet name="header">
+                    #{stockBean.stocksList.size()} #{langsys['Records']} #{langsys['Found']}
+                    <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
+                    <p:columnToggler datasource="tblDetail" trigger="toggler" />
+                </f:facet>
+                <f:facet name="{Exporters}">
+                    <h:commandLink>
+                        <p:graphicImage name="images/excel.png" width="24"/>
+                        <p:dataExporter type="xls" target="tblDetail" fileName="Risk_of_Expiry" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/pdf.png" width="24"/>
+                        <p:dataExporter type="pdf" target="tblDetail" fileName="Risk_of_Expiry"/>
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/csv.png" width="24"/>
+                        <p:dataExporter type="csv" target="tblDetail" fileName="Risk_of_Expiry" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/xml.png" width="24"/>
+                        <p:dataExporter type="xml" target="tblDetail" fileName="Risk_of_Expiry" />
+                    </h:commandLink>
+                </f:facet>
+                <p:column headerText="#{langsys['Stock']} #{langsys['Type']}">
+                    <h:outputLabel value="#{sl.stock_type} "/>
+                </p:column>
+                <p:column headerText="#{langsys['Description']}">
+                    <p:outputLabel value="#{sl.description}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Batch']}">
+                    <h:outputText value="#{sl.batchno}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Specific']} #{langsys['Name']}">
+                    <p:outputLabel value="#{sl.descSpecific}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Specific']} #{langsys['Code']}">
+                    <p:outputLabel value="#{sl.codeSpecific}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Unit']}">
+                    <h:outputText value="#{sl.unitSymbol}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Qty']}" style="text-align: right;">
+                    <h:outputText value="#{sl.currentqty}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Expiry']} #{langsys['Date']}">
+                    <h:outputText value="#{utilityBean.formatDate(sl.itemExpDate)}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Days']} #{langsys['to']} #{langsys['Expiry']}" style="text-align: right;">
+                    <h:outputText value="#{sl.days_to_expiry}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Risk']} #{langsys['of']} #{langsys['Expiry']}">
+                    <h:outputText value="#{sl.status}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Category']}">
+                    <h:outputText value="#{sl.categoryName}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Subcategory']}">
+                    <h:outputText value="#{sl.subCategoryName}"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </h:body>
+</html>
+

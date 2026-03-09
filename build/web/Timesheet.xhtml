@@ -1,0 +1,437 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Time Sheet</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script>
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{navigationBean.checkAccessDenied(utilityBean.convertIntAsString(134), 'View')}"/>
+        <f:viewAction action="#{timesheetBean.clearFilter()}"/>
+    </f:metadata> 
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="form">
+            <h:panelGrid styleClass="clsPanelReportFilterTitle" columns="6">
+                <p:commandButton actionListener="#{timesheetBean.clearTimesheet(timesheet)}" value="#{langsys['Time']} #{langsys['Sheet']}" onsuccess="PF('dlgTimesheet').show();" icon="ui-icon-circle-plus" style="float: none; height: 50px; width: 190px">
+                    <p:ajax update="form:modalTimesheet"/>
+                </p:commandButton>
+                <p:commandButton value="#{langsys['Activity']} #{langsys['Category']}" action="#{navigationBean.redirectToCategoryActivity('Timesheet')}" style="background-color: yellow !important; height: 50px; float: none; width: 190px" />
+                <p:commandButton value="#{langsys['Activity']} #{langsys['Subcategory']}" action="#{navigationBean.redirectToSubActivityCategory('Timesheet')}" style="background-color: red !important; height: 50px; float: none; width: 190px" />
+                <p:commandButton value="#{langsys['Staff']}" action="#{navigationBean.redirectToStaff('Timesheet')}" style="background-color: yellow !important; float: none; height: 50px; width: 190px" />
+                <p:commandButton value="#{langsys['Project']}" action="#{navigationBean.redirectToProject('Timesheet')}" style="background-color: red !important; float: none; height: 50px; width: 190px;" />
+                <p:commandButton value="#{langsys['Activity']} #{langsys['Mode']}" action="#{navigationBean.redirectToMode_activity('Timesheet')}" style="background-color: yellow !important; float: none; height: 50px; width: 190px" />
+            </h:panelGrid>
+
+            <!--Filter-->
+            <h:panelGrid id="pnlgFilter" columns="1" styleClass="clsPanelReportFilter">
+                <h:panelGrid id="filter" columns="10">
+                    <p:outputLabel value="#{langsys['From']} #{langsys['Date']}"/>
+                    <p:calendar id="fromDate" value="#{timesheetBean.filterFromActivityDate}" style="width: 150px;height: 28px; background-color: white" pattern="#{companySetting.getDateFormat()}"/>
+                    <p:outputLabel value="#{langsys['To']} #{langsys['Date']}"/>
+                    <p:calendar id="toDate" value="#{timesheetBean.filterToActivityDate}" style="width: 150px;height: 28px; background-color: white" pattern="#{companySetting.getDateFormat()}"/>
+                    <h:outputLabel  value="#{langsys['Activity']} #{langsys['Category']}:"/>
+                    <p:selectOneMenu value="#{timesheetBean.filterCategoryActivityId}" style="width: 150px">
+                        <f:selectItem itemLabel="" itemValue="0"/>
+                        <f:selectItems value="#{category_activityBean.getCategory_activities()}" var="ca" itemLabel="#{ca.category_name}" itemValue="#{ca.category_activity_id}"/>
+                    </p:selectOneMenu>
+                    <p:outputLabel value="#{langsys['Staff']}"/>
+                    <p:selectOneMenu value="#{timesheetBean.filterStaffId}" style="width: 150px">
+                        <f:selectItem itemLabel="" itemValue="0"/>
+                        <f:selectItems value="#{staffBean.getStaffAll()}" var="s" itemLabel="#{s.first_name} #{s.second_name} #{s.third_name}" itemValue="#{s.staff_id}"/>
+                    </p:selectOneMenu>
+                    <p:commandButton value="#{langsys['OK']}" style="color: white; background-color: #7BC043; width: 120px">
+                        <p:ajax listener="#{timesheetBean.getFilteredTimesheets()}" process="@form" update="@form"/>
+                    </p:commandButton>
+                    <p:commandButton value="#{langsys['Clear']}" style="color: white; background-color: #FF0000; width: 120px" >
+                        <p:ajax listener="#{timesheetBean.clearFilter()}" process="@form" update="@form"/>
+                    </p:commandButton>
+                </h:panelGrid>
+            </h:panelGrid>
+
+            <!--Summary Tables-->
+            <h:panelGrid id="pnlgSummary" columns="3" styleClass="clsPanelSummary">
+                <p:dataTable id="tblSummaryTimesheetTotalTime" tableStyle="table-layout: auto;" var="sum" value="#{timesheetBean.timesheetSummary_totalTime}">
+                    <p:column headerText="#{langsys['Staff']}">
+                        <h:outputText value="#{sum.first_name}">
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="#{langsys['Time']} #{langsys['Quantity']}" style="text-align: right;">
+                        <h:outputText value="#{sum.time_taken}">
+                            <f:convertNumber/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="#{langsys['Time']} #{langsys['Unit']}">
+                        <h:outputText value="#{sum.unit_of_time}">
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+                <p:dataTable id="tblSummaryARH" tableStyle="table-layout: auto;" var="su" value="#{timesheetBean.timesheetSummary_ARH}">
+                    <p:column headerText="#{langsys['Staff']}">
+                        <h:outputLabel value="#{su.first_name}"/>
+                    </p:column>
+                    <p:column headerText="#{langsys['Average']} #{langsys['Submission']} #{langsys['Time']}">
+                        <h:outputLabel value="#{su.arh}">
+                            <f:convertNumber/>
+                        </h:outputLabel>
+                        <h:outputLabel value=":00 Hrs" />
+                    </p:column>
+                </p:dataTable>
+                <p:dataTable id="tblSummaryTimesheetLastSevenDays" tableStyle="table-layout: auto;" var="lsd" value="#{timesheetBean.timesheetSummary_lastSevenDays}">
+                    <p:column headerText="#{langsys['Staff']}">
+                        <h:outputText value="#{staffBean.getStaff(lsd.staff_id).getFirst_name()}" />
+                        <f:facet name="footer">
+                            <h:outputText value="Total" />
+                        </f:facet>
+                    </p:column>
+                    <p:column headerText="#{langsys[timesheetBean.getDay(6)]}" >
+                        <h:outputText value="#{lsd.day7}">
+                            <f:convertNumber/>
+                        </h:outputText>
+                        <f:facet name="footer">
+                            <h:outputText value="#{timesheetBean.getTotalTime(timesheetBean.timesheetSummary_lastSevenDays, 'day7')}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </f:facet>
+                    </p:column>
+                    <p:column headerText="#{langsys[timesheetBean.getDay(5)]}">
+                        <h:outputText value="#{lsd.day6}">
+                            <f:convertNumber/>
+                        </h:outputText>
+                        <f:facet name="footer">
+                            <h:outputText value="#{timesheetBean.getTotalTime(timesheetBean.timesheetSummary_lastSevenDays, 'day6')}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </f:facet>
+                    </p:column>
+                    <p:column headerText="#{langsys[timesheetBean.getDay(4)]}">
+                        <h:outputText value="#{lsd.day5}">
+                            <f:convertNumber/>
+                        </h:outputText>
+                        <f:facet name="footer">
+                            <h:outputText value="#{timesheetBean.getTotalTime(timesheetBean.timesheetSummary_lastSevenDays, 'day5')}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </f:facet>
+                    </p:column>
+                    <p:column headerText="#{langsys[timesheetBean.getDay(3)]}">
+                        <h:outputText value="#{lsd.day4}">
+                            <f:convertNumber/>
+                        </h:outputText>
+                        <f:facet name="footer">
+                            <h:outputText value="#{timesheetBean.getTotalTime(timesheetBean.timesheetSummary_lastSevenDays, 'day4')}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </f:facet>
+                    </p:column>
+                    <p:column headerText="#{langsys[timesheetBean.getDay(2)]}">
+                        <h:outputText value="#{lsd.day3}">
+                            <f:convertNumber/>
+                        </h:outputText>
+                        <f:facet name="footer">
+                            <h:outputText value="#{timesheetBean.getTotalTime(timesheetBean.timesheetSummary_lastSevenDays, 'day3')}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </f:facet>
+                    </p:column>
+                    <p:column headerText="#{langsys[timesheetBean.getDay(1)]}">
+                        <h:outputText value="#{lsd.day2}">
+                            <f:convertNumber/>
+                        </h:outputText>
+                        <f:facet name="footer">
+                            <h:outputText value="#{timesheetBean.getTotalTime(timesheetBean.timesheetSummary_lastSevenDays, 'day2')}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </f:facet>
+                    </p:column>
+                    <p:column headerText="#{langsys[timesheetBean.getDay(0)]}">
+                        <h:outputText value="#{lsd.day1}">
+                            <f:convertNumber/>
+                        </h:outputText>
+                        <f:facet name="footer">
+                            <h:outputText value="#{timesheetBean.getTotalTime(timesheetBean.timesheetSummary_lastSevenDays, 'day1')}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </f:facet>
+                    </p:column>
+                    <p:column headerText="#{langsys['Total']}">
+                        <h:outputText value="#{lsd.total}">
+                            <f:convertNumber/>
+                        </h:outputText>
+                        <f:facet name="footer">
+                            <h:outputText value="#{timesheetBean.getTotalTime(timesheetBean.timesheetSummary_lastSevenDays, 'total')}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </f:facet>
+                    </p:column>
+                </p:dataTable>
+            </h:panelGrid>
+
+            <p:dataTable id="dtblTimesheet" tableStyle="table-layout: auto;" value="#{timesheetBean.filteredTimesheetList}" var="ts"                           
+                         paginator="true" rows="50" 
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
+                         rowsPerPageTemplate="50,100,400,800,1000,2000">
+                <f:facet name="header">
+                    #{itemBean.itemsList.size()} #{langsys['Records']} #{langsys['Found']}
+                    <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
+                    <p:columnToggler datasource="dtblTimesheet" trigger="toggler" />
+                </f:facet>
+                <f:facet name="{Exporters}">
+                    <h:commandLink>
+                        <p:graphicImage name="images/excel.png" width="24"/>
+                        <p:dataExporter type="xls" target="dtblTimesheet" fileName="Timesheet" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/pdf.png" width="24"/>
+                        <p:dataExporter type="pdf" target="dtblTimesheet" fileName="Timesheet"/>
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/csv.png" width="24"/>
+                        <p:dataExporter type="csv" target="dtblTimesheet" fileName="Timesheet" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/xml.png" width="24"/>
+                        <p:dataExporter type="xml" target="dtblTimesheet" fileName="Timesheet" />
+                    </h:commandLink>
+                </f:facet>
+
+                <p:column headerText="#{langsys['Client']}">
+                    <h:outputText value="#{transactorBean.findTransactor(ts.transactor_id).getTransactorNames()}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Activity']} #{langsys['Category']}">
+                    <h:outputText value="#{category_activityBean.getCategory_activity(ts.category_activity_id).getCategory_name()}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Activity']} #{langsys['Subcategory']}">
+                    <h:outputText value="#{subcategory_activityBean.getSubcategory_activity(ts.subcategory_activity_id).getSubcategory_name()}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Staff']}">
+                    <h:outputText value="#{staffBean.getStaff(ts.staff_id).getFirst_name()}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Mode']} #{langsys['Activity']}">
+                    <h:outputText value="#{mode_activityBean.getMode_activity(ts.mode_activity_id).getMode_name()}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Activity']} #{langsys['Name']}">
+                    <h:outputText value="#{ts.activity_name}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Time']} #{langsys['Unit']}" style="text-align: right;" visible="false">
+                    <h:outputText value="#{ts.unit_of_time}" />
+                </p:column>
+                <p:column headerText="#{langsys['Activity']} #{langsys['Date']}">
+                    <h:outputText value="#{utilityBean.formatDate(ts.activity_date)}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Time']} #{langsys['Quantity']}">
+                    <h:outputText value="#{ts.time_taken}">                    
+                        <f:convertNumber />
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Action']}" exportable="false" style="min-width: 125px">
+                    <p:commandButton update="form:popupDetail" actionListener="#{timesheetBean.displayTimesheet(ts,timesheet)}" oncomplete="PF('dlgTimesheetDetail').show();"
+                                     icon="ui-icon-note" title="#{langsys['View']}" style="color: white;" >
+                    </p:commandButton>
+                    &nbsp;
+                    <p:commandButton update="form:modalTimesheet" actionListener="#{timesheetBean.displayTimesheet(ts, timesheet)}" 
+                                     oncomplete="PF('dlgTimesheet').show();" icon="ui-icon-pencil" title="#{langsys['Edit']}" style="color: white; background-color: #7BC043" >
+                    </p:commandButton>
+                    &nbsp;
+                    <p:commandButton update="form:modalTimesheetLog" actionListener="#{timesheetBean.getTimesheetLogByTimesheetId(ts.timesheet_id)}"
+                                     oncomplete="PF('dlgTimesheetLog').show();" icon="ui-icon-info" title="#{langsys['View']} #{langsys['Log']}" style="color: white; background-color: yellow !important" >
+                    </p:commandButton>
+                    &nbsp;
+                </p:column>  
+            </p:dataTable>
+
+            <!--this is the form-->
+            <p:dialog rendered="true" dynamic="true" header="#{langsys['Time']} #{langsys['Sheet']} #{langsys['Detail']}" widgetVar="dlgTimesheet" id="modalTimesheet" modal="true" height="530px">
+                <h:panelGroup id="popup">
+                    <h:panelGrid columns="2">
+                        <h:outputLabel  value="#{langsys['Staff']}:"/>
+                        <p:selectOneMenu value="#{timesheet.staff_id}" style="width: 305px">
+                            <f:selectItem itemLabel="" itemValue="0"/>
+                            <f:selectItems value="#{staffBean.getStaffAll()}" var="s" itemLabel="#{s.first_name} #{s.second_name} #{s.third_name}" itemValue="#{s.staff_id}"/>
+                        </p:selectOneMenu>
+                        <h:outputLabel  value="#{langsys['Activity']} #{langsys['Category']}:"/>
+                        <p:selectOneMenu value="#{timesheet.category_activity_id}" style="width: 305px">
+                            <f:selectItem itemLabel="" itemValue="0"/>
+                            <f:selectItems value="#{category_activityBean.getCategory_activities()}" var="ca" itemLabel="#{ca.category_name}" itemValue="#{ca.category_activity_id}"/>
+                            <f:ajax event="change" render="subCategoryActivity"/>
+                        </p:selectOneMenu>
+                        <h:outputLabel  value="#{langsys['Activity']} #{langsys['Subcategory']}:"/>
+                        <p:selectOneMenu id="subCategoryActivity" value="#{timesheet.subcategory_activity_id}" style="width: 305px">
+                            <f:selectItem itemLabel="" itemValue="0"/>
+                            <f:selectItems value="#{subcategory_activityBean.getSubcategory_activityByCategoryActivityId(timesheet.category_activity_id)}" var="sca" itemLabel="#{sca.subcategory_name}" itemValue="#{sca.subcategory_activity_id}"/>
+                        </p:selectOneMenu>
+                        <h:outputLabel  value="#{langsys['Activity']} #{langsys['Name']}:"/>
+                        <p:inputText id="activityname" style="width: 320px" value="#{timesheet.activity_name}" autocomplete="off"/>
+                        <h:outputLabel  value="#{langsys['Time']} #{langsys['Unit']}:"/>
+                        <p:selectOneMenu value="#{timesheet.unit_of_time}" style="width: 305px">
+                            <f:selectItem itemLabel="" itemValue=""/>
+                            <f:selectItem itemLabel="#{parameter_listBean.getParameter_listByContextNameMemory('TIME_SHEET','TIME_UNIT').parameter_value}" itemValue="#{parameter_listBean.getParameter_listByContextNameMemory('TIME_SHEET','TIME_UNIT').parameter_value}"/>
+                        </p:selectOneMenu>
+                        <h:outputLabel value="#{langsys['Time']} #{langsys['Quantity']}:"/>
+                        <p:inputNumber id="itemAmount" inputStyle="width:320px" style="width: 80000px" value="#{timesheet.time_taken}" decimalPlaces="3" autocomplete="off" required="true" requiredMessage="Time taken Cannot be empty" />
+                        <h:outputLabel  value="#{langsys['Activity']} #{langsys['Status']}:"/>
+                        <p:selectOneMenu value="#{timesheet.activity_status}" style="width: 305px">
+                            <f:selectItem itemLabel="" itemValue=""/>
+                            <f:selectItem itemLabel="Ongoing" itemValue="Ongoing"/>
+                            <f:selectItem itemLabel="Completed" itemValue="Completed"/>
+                            <f:selectItem itemLabel="Pending" itemValue="Pending"/>
+                        </p:selectOneMenu>
+                        <h:outputLabel  value="#{langsys['Mode']} #{langsys['Activity']}:"/>
+                        <p:selectOneMenu value="#{timesheet.mode_activity_id}" style="width: 305px">
+                            <f:selectItem itemLabel="" itemValue="0"/>
+                            <f:selectItems value="#{mode_activityBean.getMode_activityAll()}" var="ma" itemLabel="#{ma.mode_name}" itemValue="#{ma.mode_activity_id}"/>
+                        </p:selectOneMenu>
+                        <h:outputLabel  value="#{langsys['Client']}:"/>
+                        <p:autoComplete id="autcTransactor" value="#{timesheet.transactor}" 
+                                        completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
+                                        var="trct" 
+                                        itemLabel="#{trct.transactorNames}" 
+                                        itemValue="#{trct}" 
+                                        converter="TransactorConverter" style="text-align: left;" 
+                                        forceSelection="true" queryDelay="0" inputStyle="width: 320px" 
+                                        >
+                            <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
+                                <h:outputText value="#{trct.transactorNames}"/> <h:outputText value=" (#{trct.trade_name})" rendered="#{trct.trade_name.length() gt 0}"/>
+                            </p:column>
+                        </p:autoComplete>
+                        <h:outputLabel  value="#{langsys['Project']}:"/>
+                        <p:selectOneMenu value="#{timesheet.project_id}" style="width: 305px">
+                            <f:selectItem itemLabel="" itemValue="0"/>
+                            <f:selectItems value="#{projectBean.getProjectAll()}" var="pn" itemLabel="#{pn.project_name}" itemValue="#{pn.project_id}"/>
+                        </p:selectOneMenu>
+                        <h:outputLabel  value="#{langsys['Activity']} #{langsys['Date']}:"/>
+                        <p:calendar value="#{timesheet.activity_date}" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" autocomplete="off" inputStyle="width: 320px" style="width: 350px" disabled="#{generalUserSetting.isAllowedToBackDate==0}">
+                        </p:calendar>
+                    </h:panelGrid>
+
+                    <h:panelGrid style="background-color: #7BC043" width="100%" columns="1">
+                        <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
+                            <p:commandButton update="pnlgFilter pnlgSummary form:popup form:dtblTimesheet form:growl1" actionListener="#{timesheetBean.saveTimesheet(timesheet)}" styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']}" style="color: white; background-color: #7BC043" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                                <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                    <p:graphicImage name="/images/ajax-loader.gif"/>
+                                </p:dialog>
+                            </p:commandButton>
+                            <p:commandButton update="form:popup" actionListener="#{timesheetBean.clearTimesheet(timesheet)}" styleClass="clsButtonBig" id="cmdbClear" value="#{langsys['CLEAR']}" style="color: white; background-color: #FF0000">
+                            </p:commandButton>
+                        </h:panelGrid>
+                    </h:panelGrid>
+
+                    <h:panelGrid styleClass="clsGridMainMessages" columns="1">
+                        <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{timesheetBean.actionMessage}"/>
+                        <h:messages id="msgsMainMessage" style="color: green"/><br/>
+                    </h:panelGrid>
+                    <p:growl id="growl1"/>
+                </h:panelGroup>
+            </p:dialog>
+            
+            <!--this is the Timesheet detail-->
+            <p:dialog rendered="true" dynamic="true" header="#{langsys['Time']} #{langsys['Sheet']} #{langsys['Detail']}" widgetVar="dlgTimesheetDetail" id="modalTimesheetDetail" modal="true">
+                <h:panelGroup id="popupDetail">
+                    <!--<h:outputText value="This is a Modal Dialog." />-->
+                    <h:panelGrid columns="2">
+                        <h:outputLabel value="#{langsys['Client']}:" rendered="#{timesheet.transactor.transactorNames.length() gt 0}"/>
+                        <h:outputLabel value="#{timesheet.transactor.transactorNames}" rendered="#{timesheet.transactor.transactorNames.length() gt 0}"/>
+                        <h:outputLabel value="#{langsys['Activity']} #{langsys['Category']}:" rendered="#{timesheet.category_activity_id gt 0}"/>
+                        <h:outputText value="#{category_activityBean.getCategory_activity(timesheet.category_activity_id).getCategory_name()}" rendered="#{timesheet.category_activity_id gt 0}"/>
+                        <h:outputLabel value="#{langsys['Activity']} #{langsys['Subcategory']}:" rendered="#{timesheet.subcategory_activity_id gt 0}"/>
+                        <h:outputText value="#{subcategory_activityBean.getSubcategory_activity(timesheet.subcategory_activity_id).getSubcategory_name()}" rendered="#{timesheet.subcategory_activity_id gt 0}"/>
+                        <h:outputLabel value="#{langsys['Staff']}:" rendered="#{timesheet.staff_id gt 0}"/>
+                        <h:outputText value="#{staffBean.getStaff(timesheet.staff_id).getFirst_name()}" rendered="#{timesheet.staff_id gt 0}"/>
+                        <h:outputLabel value="#{langsys['Mode']} #{langsys['Activity']}:" rendered="#{timesheet.mode_activity_id gt 0}"/>
+                        <h:outputText value="#{mode_activityBean.getMode_activity(timesheet.mode_activity_id).getMode_name()}" rendered="#{timesheet.mode_activity_id gt 0}"/>
+                        <h:outputLabel value="#{langsys['Activity']} #{langsys['Name']}:" rendered="#{timesheet.activity_name.length() gt 0}"/>
+                        <h:outputText value="#{timesheet.activity_name}" rendered="#{timesheet.activity_name.length() gt 0}"/>
+                        <h:outputLabel value="#{langsys['Time']} #{langsys['Unit']}:" rendered="#{timesheet.unit_of_time.length() gt 0}"/>
+                        <h:outputText value="#{timesheet.unit_of_time}" rendered="#{timesheet.unit_of_time.length() gt 0}"/>
+                        <h:outputLabel value="#{langsys['Time']} #{langsys['Quantity']}:"/>
+                        <h:outputText value="#{utilityBean.formatDoubleToString(timesheet.time_taken)}"/>
+                        <h:outputLabel value="#{langsys['Activity']} #{langsys['Date']}:"/>
+                        <h:outputText value="#{utilityBean.formatDate(timesheet.activity_date)}"/>
+                        <h:outputLabel value="#{langsys['Submission']} #{langsys['Date']}:"/>
+                        <h:outputText value="#{utilityBean.formatDateTime(timesheet.submission_date)}"/>
+                        <h:outputLabel value="#{langsys['Submission']} #{langsys['By']}:"/>
+                        <h:outputText value="#{timesheet.submission_by}"/>
+                        <h:outputLabel value="#{langsys['Last']} #{langsys['Edit']} #{langsys['Date']}:" rendered="#{timesheet.last_edit_date != null}"/>
+                        <h:outputText value="#{utilityBean.formatDateTime(timesheet.last_edit_date)}" rendered="#{timesheet.last_edit_date != null}"/>
+                        <h:outputLabel value="#{langsys['Last']} #{langsys['Edit']} #{langsys['By']}:" rendered="#{timesheet.last_edit_by.length() gt 0}"/>
+                        <h:outputText value="#{timesheet.last_edit_by}" rendered="#{timesheet.last_edit_by.length() gt 0}"/>
+                    </h:panelGrid>
+                </h:panelGroup>
+            </p:dialog>
+            
+            <!--this is the Timesheet Log-->
+            <p:dialog header="#{langsys['Time']} #{langsys['Sheet']} #{langsys['Log']}" widgetVar="dlgTimesheetLog" id="modalTimesheetLog" modal="true">
+                <h:panelGroup id="logPopup">
+
+                    <h:dataTable id="dtblSubscriptionLog" value="#{timesheetBean.timesheetLogList}" var="tl" styleClass="cls-table" 
+                                 headerClass="cls-table-header" 
+                                 rowClasses="cls-table-odd-row,cls-table-even-row" 
+                                 columnClasses="cls-table-col1,cls-table-col2,cls-table-col3,cls-table-col4,cls-table-col5,cls-table-col6"                         
+                                 > 
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Submission']} #{langsys['Date']}</f:facet>
+                            <!-- row record -->
+                            #{utilityBean.formatDate(tl.submission_date)}
+                        </p:column>
+
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Submission']} #{langsys['By']}</f:facet>
+                            <!-- row record -->
+                            #{tl.submission_by}
+                        </p:column>
+
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Action']}</f:facet>
+                            <!-- row record -->
+                            #{tl.action}
+                        </p:column>
+
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Time']} #{langsys['Unit']}</f:facet>
+                            <!-- row record -->
+                            #{tl.unit_of_time}
+                        </p:column>
+
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Time']} #{langsys['Quantity']}</f:facet>
+                            <!-- row record -->
+                            <h:outputText value="#{tl.time_taken}">
+                                <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Staff']}</f:facet>
+                            <!-- row record -->
+                            #{staffBean.getStaff(tl.staff_id).getFirst_name()}
+                        </p:column>
+
+                    </h:dataTable>
+
+                </h:panelGroup>
+            </p:dialog>
+        </h:form>
+    </h:body>
+</html>
+

@@ -1,0 +1,155 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <f:loadBundle basename="#{menuItemBean.menuItemObj.LANG_BASE_NAME_SYS}" var="langsys" />
+    <f:loadBundle basename="#{menuItemBean.menuItemObj.LANG_BASE_NAME_OUT}" var="langout" />
+    <p:panel id="pnlChild">
+        <h:panelGrid columns="2">
+            <h:panelGrid columns="1">
+                <h:panelGrid id="pnlgHeaderChild" columns="4">
+                    <h:outputLabel value="#{langsys['Location']}"/>
+                    <h:outputLabel value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}"/>
+                    <h:outputLabel id="olblDebtCredit" style="color: coral;font-weight: bold;" value="#{langsys['Receivable']} (#{generalUserSetting.LOCAL_CURRENCY.currencyCode})"/>
+                    <h:outputLabel id="olblDeposit" style="color: green;font-weight: bold;" value="#{langsys['Deposit']} (#{transBean.transChild.currencyCode})"/>
+                    <h:inputText value="#{transBean.transChild.location_name}" disabled="true" style="width: 150px"/>
+                    <h:inputText value="#{transBean.transChild.transactorName}" disabled="true" style="width: 150px"/>
+                    <h:inputText disabled="true" style="color: coral;font-weight: bold;width: 160px;" styleClass="clsInput" id="itxtDebtCredit" value="#{accJournalBean.returnBalanceString(transBean.transChild.balance_receivable)}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
+                    <h:inputText disabled="true" style="color: green;font-weight: bold;width: 150px;" styleClass="clsInput" id="itxtPrepaidAcc" value="#{accJournalBean.returnBalanceString(transBean.transChild.deposit_customer)}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
+
+                    <h:outputLabel value="#{langsys['Currency']}"/>
+                    <h:outputLabel value="#{langsys['TOTAL']}"/>
+                    <h:outputLabel value="#{langsys['Amount']} #{langsys['Tendered']}"/>
+                    <h:outputLabel value="#{langsys['Change']} #{langsys['Amount']}"/>
+                    <h:inputText value="#{transBean.transChild.currencyCode}" disabled="true" style="width: 150px"/>
+                    <h:inputText id="itxtGrandTotalChild" value="#{transBean.transChild.grandTotal}" style="width: 150px;background-color: yellow;font-weight: bold;font-size: 20px;" disabled="true">
+                        <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
+                    <h:inputText id="itxtAmountTenderedChild" value="#{transBean.transChild.amountTendered}" style="width: 160px;background-color: yellow;font-weight: bold;font-size: 20px;" autocomplete="off">
+                        <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:ajax event="change" listener="#{transBean.setTransTotalsAndUpdateCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,transBean.transChild, transBean.activeTransItemsChild)}" render="itxtChangeChild"/>
+                        <f:ajax event="keyup" listener="#{transBean.setTransTotalsAndUpdateCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,transBean.transChild, transBean.activeTransItemsChild)}" render="itxtChangeChild"/>
+                    </h:inputText>
+                    <h:inputText id="itxtChangeChild" value="#{transBean.transChild.changeAmount}" style="width: 150px;background-color: red;color: white" disabled="true">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
+                </h:panelGrid>
+                <h:panelGrid id="pgrdPaymentChild" columns="1">
+                    <h:panelGrid columns="3">
+                        <h:outputLabel value="#{langsys['Payment']} #{langsys['Method']}"/>
+                        <h:outputLabel value="#{langsys['Receipt']} #{langsys['Account']}"/>
+                        <h:outputLabel value="#{langsys['Loyalty']}"/>
+                        <h:selectOneMenu id="menuPayMethodChild" value="#{transBean.transChild.payMethod}">
+                            <f:selectItems value="#{payMethodBean.getPayMethodsActiveIn('1,2,3,4,5,6')}" var="pm" itemLabel="#{pm.payMethodName}" itemValue="#{pm.payMethodId}"/>
+                            <f:ajax event="change" execute="@this" render="menuAccountChild"/>
+                        </h:selectOneMenu>
+                        <h:selectOneMenu id="menuAccountChild" value="#{transBean.transChild.accChildAccountId}">
+                            <f:selectItems value="#{accChildAccountBean.getAccChildAccountsForCashReceipt(transBean.transChild.currencyCode, transBean.transChild.payMethod,generalUserSetting.getCurrentStore().storeId,generalUserSetting.getCurrentUser().userDetailId)}" var="ca" itemLabel="#{ca.childAccountCode} (#{ca.childAccountName})" itemValue="#{ca.accChildAccountId}"/>
+                        </h:selectOneMenu>
+                        <h:selectBooleanCheckbox label="" value="#{transBean.transChild.displayLoyalty}">
+                            <f:ajax render="pgrdLoyaltyChild"/>
+                        </h:selectBooleanCheckbox>
+                    </h:panelGrid>
+                    <h:panelGrid id="pgrdLoyaltyChild">
+                        <h:panelGrid columns="5" rendered="#{transBean.transChild.displayLoyalty}">
+                            <h:outputLabel value="#{langsys['Loyalty']} #{langsys['Card']} #{langsys['No.']}"/>
+                            <h:outputLabel value="#{langsys['Card']} #{langsys['Holder']}"/>
+                            <h:outputLabel value="#{langsys['Balance']} #{langsys['Points']} #{langsys['Amount']}"/>
+                            <h:outputLabel value="#{langsys['Spend']} #{langsys['Points']} #{langsys['Amount']}"/>
+                            <h:outputLabel value=""/>
+
+                            <h:inputText id="itxtCardNumberChild" value="#{transBean.transChild.cardNumber}" style="width: 150px; background-color: aquamarine" autocomplete="off" onkeypress="if (event.keyCode == 13) {
+                                        onblur();
+                                        return false;
+                                    }">                           
+                                <f:ajax event="blur" listener="#{transBean.updatePointsCard(transBean.transChild)}" execute="itxtCardNumberChild" render="itxtCardNumberChild itxtCardHolderChild itxtBalPointsAmountChild itxtSpendPointsAmountChild"/>
+                            </h:inputText>
+                            <h:inputText id="itxtCardHolderChild" value="#{transBean.transChild.cardHolder}" style="width: 150px;background-color: aquamarine" autocomplete="off" disabled="true">
+                            </h:inputText>
+                            <h:inputText id="itxtBalPointsAmountChild" value="#{transBean.transChild.balancePointsAmount}" style="width: 150px;background-color: aquamarine" disabled="true">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:inputText>
+                            <h:inputText id="itxtSpendPointsAmountChild" value="#{transBean.transChild.spendPointsAmount}" style="width: 150px;background-color: aquamarine" disabled="false" autocomplete="off">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:ajax event="change" listener="#{transBean.setTransTotalsAndUpdateCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,transBean.transChild, transBean.activeTransItemsChild)}" render="itxtChangeChild"/>
+                                <f:ajax event="keyup" listener="#{transBean.setTransTotalsAndUpdateCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,transBean.transChild, transBean.activeTransItemsChild)}" render="itxtChangeChild"/>
+                            </h:inputText>
+                            <h:outputLabel value=""/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </h:panelGrid>
+                <h:panelGrid id="pnlgButtonsChild" columns="3">
+                    <p:commandButton icon="fa fa-fw fa-save" title="#{langsys['Save']} #{langsys['Invoice']}" value="#{langsys['SAVE']}" style="width: 120px;height: 55px;float: left;" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" actionListener="#{transBean.saveTransCallOrderInvoice('PARENT',transBean.transChild.storeId,2,2,'',transBean.transChild,transBean.activeTransItemsChild,null,null,null,null,null,null)}" process="@form" update="pnlgHeaderChild pgrdPaymentChild pnlItemsChild pgrdMsgsChild gwowl1Child pnlgOutputChild">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                    </p:commandButton>
+                    <p:commandButton id="cmdbCloseChild" icon="fa fa-fw fa-remove" title="Close" value="#{langsys['CLOSE']}" style="width: 120px;height: 55px;float: left;" oncomplete="PF('dlgInvoice').hide()" actionListener="#{transBean.closeSalesOrderParentInvoice()}"/>
+                    <p:commandButton id="cmdbPrintChild" icon="fa fa-fw fa-print" title="Print" value="#{langsys['PRINT']}" style="width: 120px;height: 55px;float: left;" onclick="doPrintHiddenClick()"/>
+                </h:panelGrid>
+            </h:panelGrid>
+            <h:panelGrid id="pnlItemsChild" columns="1">
+                <p:dataTable rowIndexVar="rowIndex" id="dtblTransactionItemChild" value="#{transBean.activeTransItemsChild}" var="ati" 
+                             styleClass="cls-table" tableStyle="width:auto;" 
+                             rowStyleClass="#{ati.is_tax_synced eq 0 ? 'red' : null}"
+                             >  
+                    <p:column style="width: 20px;">
+                        <!-- column header -->
+                        <f:facet name="header">
+                            #
+                        </f:facet>
+                        <!-- row record -->
+                        #{rowIndex+1}
+                    </p:column>
+                    <p:column style="width: 200px;">
+                        <!-- column header -->
+                        <f:facet name="header">#{langsys['Item']} #{langsys['Description']}</f:facet>
+                        <!-- row record -->
+                        <p:outputLabel value="#{transItemBean.showItemDescriptionCEC(ati)}" escape="false"/>
+                    </p:column>
+                    <p:column style="width: 30px;">
+                        <!-- column header -->
+                        <f:facet name="header">#{langsys['Unit']}</f:facet>
+                        <!-- row record -->
+                        #{ati.unitSymbol}
+                    </p:column>
+                    <p:column style="width: 100px;">
+                        <!-- column header -->
+                        <f:facet name="header">#{langsys['Qty']}</f:facet>
+                        <!-- row record -->
+                        <h:outputLabel value="#{ati.itemQty}">
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputLabel>
+                    </p:column>
+                    <p:column style="width: 100px;text-align: right;">
+                        <!-- column header -->
+                        <f:facet name="header">#{langsys['Amount']}</f:facet>
+                        <!-- row record -->
+                        <h:outputLabel value="#{ati.amountIncVat}">
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputLabel>
+                    </p:column>
+                </p:dataTable>
+            </h:panelGrid>
+        </h:panelGrid>
+        <h:panelGrid id="pgrdMsgsChild" styleClass="clsGridMainMessages" columns="1">
+            <h:outputLabel styleClass="clsActionMessage" id="olblActionMessageChild" value="#{transBean.actionMessage}"/>
+            <h:messages id="msgsMainMessageChild" style="color: red"/><br/>
+        </h:panelGrid>
+        <p:growl id="gwowl1Child"/>
+        <h:panelGrid id="pnlgOutputChild">
+            <c:if test="#{transBean.outputNumber==1}">
+                <ui:include src="#{transBean.getPrintFileName('PARENT',transactionTypeBean.getTransactionType(2),0)}"/>
+            </c:if>
+        </h:panelGrid>
+    </p:panel>
+</html>
+

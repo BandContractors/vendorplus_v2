@@ -1,0 +1,238 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Account Period</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  type="text/javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:event listener="#{navigationBean.checkAccessDenied('53', 'View')}" type="preRenderView" />
+    <f:metadata>
+        <f:viewAction action="#{accPeriodBean.initClearAccPeriod(accPeriod)}"/>
+        <f:viewAction action="#{accPeriodBean.setActionMessage('')}"/>
+        <f:viewAction action="#{utilityBean.clearList(accLedgerBean.accLedgerListOpenBal)}"/>
+        <f:viewAction action="#{accLedgerBean.setOpenBalanceHeader('')}"/>
+    </f:metadata>
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="frmMain" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
+                    return false;">
+            <h:panelGrid styleClass="clsGridMainHeader" columns="1">
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="#{langsys['Accounting']} #{langsys['Period']}"/>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgInput">
+                <h:panelGrid styleClass="clsGridMainInput" columns="4" rendered="#{accPeriod.action_mode>0}">
+                    <h:outputLabel  value="#{langsys['Account']} #{langsys['Period']}:"/>
+                    <h:inputText styleClass="clsInput" id="itxtAccPeriodName" value="#{accPeriod.accPeriodName}" autocomplete="on" style="width: 150px;"/>
+                    <h:outputLabel  value="#{langsys['Current']}?"/>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuIsCurrent" value="#{accPeriod.isCurrent}" disabled="true">
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                    </h:selectOneMenu>
+
+                    <h:outputLabel  value="#{langsys['Start']} #{langsys['Date']}:"/>
+                    <p:calendar styleClass="clsInput" id="calStartDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{accPeriod.startDate}" pattern="#{companySetting.getDateFormat()}" size="11"/>
+                    <h:outputLabel  value="#{langsys['Open']}?"/>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuIsOpen" value="#{accPeriod.isOpen}" disabled="true">
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                    </h:selectOneMenu>
+
+                    <h:outputLabel  value="#{langsys['End']} #{langsys['Date']}:"/>
+                    <p:calendar styleClass="clsInput" id="calEndDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{accPeriod.endDate}" pattern="#{companySetting.getDateFormat()}" size="11"/>
+                    <h:outputLabel  value="#{langsys['Closed']}?"/>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuIsClosed" value="#{accPeriod.isClosed}" disabled="true">
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                    </h:selectOneMenu>
+
+                    <h:outputLabel  value="#{langsys['Order']}:"/>
+                    <h:inputText styleClass="clsInput" id="itxtOrder" value="#{accPeriod.orderNo}" autocomplete="off" style="width: 150px;"/>
+                    <h:outputLabel  value=""/>
+                    <h:outputLabel  value=""/>
+                </h:panelGrid>
+                <h:panelGrid styleClass="clsGridMainCommands" columns="1" rendered="#{accPeriod.action_mode>0}">
+                    <h:panelGrid styleClass="clsGridMainCommands1" columns="2">
+                        <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                            <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                <p:graphicImage name="/images/ajax-loader.gif"/>
+                            </p:dialog>
+                            <f:ajax listener="#{accPeriodBean.saveAccPeriod2(accPeriod)}" execute="@form" render="frmMain:pnlgInput frmMain:pnlgAddNew frmMain:pgrdMsgs frmMain:growl1 frmMain:dtblAccountPeriod" />
+                        </p:commandButton>
+                        <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="#{langsys['CLEAR']}">
+                            <f:ajax listener="#{accPeriodBean.clearAccPeriod(accPeriod)}" execute="@form" render="frmMain:pnlgInput frmMain:pnlgAddNew frmMain:pgrdMsgs frmMain:growl1 frmMain:dtblAccountPeriod" />
+                        </p:commandButton>
+                    </h:panelGrid>
+                </h:panelGrid>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgAddNew" styleClass="clsGridMainInput" style="text-align: center !important;">
+                <p:commandButton id="cmdbNew" value="#{langsys['Add']} #{langsys['New']} #{langsys['Accounting']} #{langsys['Period']}" icon="ui-icon-pencil" rendered="#{accPeriod.action_mode==0}">
+                    <p:ajax listener="#{accPeriodBean.initAddNewAccPeriod(accPeriod)}" process="@form" update="frmMain:pnlgInput frmMain:pgrdMsgs frmMain:growl1 frmMain:pnlgAddNew"/>
+                </p:commandButton>
+            </h:panelGrid>
+
+            <h:panelGrid id="pgrdMsgs" styleClass="clsGridMainMessages" columns="1">
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{accPeriodBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
+            <p:growl id="growl1"/>
+
+            <p:dataTable id="dtblAccountPeriod" value="#{accPeriodBean.returnAccPeriodObjectListAll()}" var="itm" 
+                         tableStyle="width:auto;">
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Order']}</f:facet>
+                    <!-- row record -->
+                    #{itm.orderNo}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Account']} #{langsys['Period']}</f:facet>
+                    <!-- row record -->
+                    #{itm.accPeriodName}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Start']} #{langsys['Date']}</f:facet>
+                    <!-- row record -->
+                    <h:outputLabel value="#{utilityBean.formatDate(itm.startDate)}"/>
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['End']} #{langsys['Date']}</f:facet>
+                    <!-- row record -->
+                    <h:outputLabel value="#{utilityBean.formatDate(itm.endDate)}"/>
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Current']}</f:facet>
+                    <!-- row record -->
+                    <h:selectOneMenu value="#{itm.isCurrent}" disabled="true">
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                    </h:selectOneMenu>
+                </p:column>
+
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Open']}</f:facet>
+                    <!-- row record -->
+                    <h:selectOneMenu value="#{itm.isOpen}" disabled="true">
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                    </h:selectOneMenu>
+
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Closed']}</f:facet>
+                    <!-- row record -->
+                    <h:selectOneMenu value="#{itm.isClosed}" disabled="true">
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                    </h:selectOneMenu>
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">
+
+                    </f:facet>
+                    <!-- row record -->
+                    <h:commandLink value="#{langsys['Edit']}">
+                        <f:ajax listener="#{accPeriodBean.copyAccPeriod(itm,accPeriod)}" execute="@form" render="frmMain:pnlgInput frmMain:pnlgAddNew frmMain:pgrdMsgs frmMain:growl1 frmMain:dtblAccountPeriod"/>
+                    </h:commandLink>
+                    <h:outputText value="&nbsp;&nbsp;" rendered="#{itm.isOpen==0 and itm.is_reopen==0}"/>
+                    <h:commandLink value="#{langsys['Open']}" rendered="#{itm.isOpen==0 and itm.is_reopen==0}">
+                        <f:ajax listener="#{accPeriodBean.openAccPeriod(itm)}" execute="@form" render="frmMain:pnlgInput frmMain:pnlgAddNew frmMain:pgrdMsgs frmMain:growl1 frmMain:dtblAccountPeriod"/>
+                    </h:commandLink>
+                    <h:outputText value="&nbsp;&nbsp;" rendered="#{itm.isClosed==0 and itm.isOpen==1}"/>
+                    <h:commandLink value="#{langsys['Close']}" rendered="#{itm.isClosed==0 and itm.isOpen==1}">
+                        <f:ajax listener="#{accPeriodBean.closeAccPeriod(itm)}" execute="@form" render="frmMain:pnlgInput frmMain:pnlgAddNew frmMain:pgrdMsgs frmMain:growl1 frmMain:dtblAccountPeriod"/>
+                    </h:commandLink>
+                    <h:outputText value="&nbsp;&nbsp;" rendered="#{itm.isClosed==1}"/>
+                    <h:commandLink value="#{langsys['Reopen']}" rendered="#{itm.isClosed==1}">
+                        <f:ajax listener="#{accPeriodBean.reOpenAccPeriod(itm)}" execute="@form" render="frmMain:pnlgInput frmMain:pnlgAddNew frmMain:pgrdMsgs frmMain:growl1 frmMain:dtblAccountPeriod"/>
+                    </h:commandLink>
+                    <h:outputText value="&nbsp;&nbsp;"/>
+                    <h:commandLink value="#{langsys['Delete']}">
+                        <f:ajax listener="#{accPeriodBean.deleteAccPeriod(itm)}" execute="@form" render="frmMain:pnlgInput frmMain:pnlgAddNew frmMain:pgrdMsgs frmMain:growl1 frmMain:dtblAccountPeriod"/>
+                    </h:commandLink>
+                    <h:outputText value="&nbsp;&nbsp;" rendered="#{itm.isOpen==1 and itm.isClosed==0}"/>
+                    <h:commandLink value="#{langsys['Open']} #{langsys['Balance']}" rendered="#{itm.isOpen==1 and itm.isClosed==0}">
+                        <f:ajax listener="#{accLedgerBean.reportAccLedgerOpenBal(itm.accPeriodId)}" execute="@form" render="frmMain:pnlgInput frmMain:pnlgAddNew frmMain:pgrdMsgs frmMain:growl1 frmMain:dtblAccountPeriod frmMain:tblOpenBal"/>
+                    </h:commandLink>
+                </p:column>
+            </p:dataTable>
+
+            <p:dataTable id="tblOpenBal" tableStyle="width:auto;" var="itm" value="#{accLedgerBean.accLedgerListOpenBal}" 
+                         paginator="true" rows="50" 
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
+                         rowsPerPageTemplate="50,100,200,400">
+                <f:facet name="header">
+                    #{accLedgerBean.openBalanceHeader}                    
+                    <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
+                    <p:columnToggler datasource="tblOpenBal" trigger="toggler" />
+                </f:facet>
+                <f:facet name="{Exporters}">
+                    <h:commandLink>
+                        <p:graphicImage name="images/excel.png" width="24"/>
+                        <p:dataExporter type="xls" target="tblOpenBal" fileName="Open_Bal_Prev_Period" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/pdf.png" width="24"/>
+                        <p:dataExporter type="pdf" target="tblOpenBal" fileName="Open_Bal_Prev_Period"/>
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/csv.png" width="24"/>
+                        <p:dataExporter type="csv" target="tblOpenBal" fileName="Open_Bal_Prev_Period" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/xml.png" width="24"/>
+                        <p:dataExporter type="xml" target="tblOpenBal" fileName="Open_Bal_Prev_Period" />
+                    </h:commandLink>
+                </f:facet>
+                <p:column headerText="#{langsys['Account']} #{langsys['Type']}">
+                    <h:outputText value="#{accTypeBean.getAccTypeById(accCoaBean.getAccCoaByCodeOrId(itm.accountCode,0).accTypeId).accTypeName}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Account']} #{langsys['Name']}">
+                    <h:outputText value="#{accCoaBean.getAccCoaByCodeOrId(itm.accountCode,0).accountName}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Account']} #{langsys['Code']}">
+                    <h:outputText value="#{itm.accountCode}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Child']} #{langsys['Account']}">
+                    <h:outputText value="#{accChildAccountBean.getAccChildAccById(itm.accChildAccountId).childAccountName}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Currency']}">
+                    <h:outputText value="#{itm.currencyCode}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Debit']} #{langsys['Balance']}" style="text-align: right;">
+                    <h:outputText value="#{itm.debitAmount}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Credit']} #{langsys['Balance']}" style="text-align: right;">
+                    <h:outputText value="#{itm.creditAmount}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </h:body>
+</html>
+

@@ -1,0 +1,270 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Transactor</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+        <f:loadBundle basename="#{menuItemBean.menuItemObj.LANG_BASE_NAME_SYS}" var="langsys" />
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{transactorBean.initTransactorObj()}"/>
+        <f:viewAction action="#{utilityBean.clearList(transactorBean.transactorList)}"/>
+        <f:viewAction action="#{iso_country_codeBean.refreshIso_country_codesList()}"/>
+        <f:viewAction action="#{id_typeBean.refreshId_typesList(1,2,2)}"/>
+    </f:metadata>
+    <h:body>
+        <h:form id="form" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
+                    return false;">
+
+            <h:panelGrid id="pnlHeader" styleClass="clsGridMainHeader" columns="1">
+                <h:outputLabel styleClass="clsLabelTop" value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]} #{langsys['Detail']}" rendered="#{transactorBean.transactorObj.transactorType.equals('CUSTOMER')}"/>
+                <h:outputLabel styleClass="clsLabelTop" value="#{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]} #{langsys['Detail']}" rendered="#{transactorBean.transactorObj.transactorType.equals('SUPPLIER')}"/>
+                <h:outputLabel styleClass="clsLabelTop" value="#{langsys['Scheme']} #{langsys['Detail']}" rendered="#{transactorBean.transactorObj.transactorType.equals('SCHEME')}"/>
+                <h:outputLabel styleClass="clsLabelTop" value="#{langsys['Provider']} #{langsys['Detail']}" rendered="#{transactorBean.transactorObj.transactorType.equals('PROVIDER')}"/>
+            </h:panelGrid>
+            <h:panelGrid id="pnlInput" styleClass="clsGridMainInput" columns="4">
+                <h:panelGrid id="pnlSearch" columns="1">
+                    <h:outputLabel  value="#{langsys['Type']} #{langsys['Name']}/#{langsys['Reference']}/#{langsys['File']}"/>
+                    <h:inputText value="#{transactorBean.searchTransactorNames}" autocomplete="off" style="width: 200px;">
+                        <f:ajax event="keyup" listener="#{transactorBean.refreshTransactorsListByNameRefFile(transactorBean.searchTransactorNames,transactorBean.transactorObj.transactorType)}" render="pnlSearchResult"/>
+                    </h:inputText>
+                    <h:panelGrid id="pnlSearchResult">
+                        <p:dataTable rowIndexVar="rowIndex" id="dtblTransactor" value="#{transactorBean.transactorList}" var="t" 
+                                     tableStyle="width:auto;" 
+                                     >  
+                            <p:column>
+                                <!-- column header -->
+                                <f:facet name="header"></f:facet>
+                                <!-- row record -->
+                                <h:commandLink value="#{t.transactorNames}" style="font-size: 14px;">
+                                    <f:ajax listener="#{transactorBean.displayTransactor(t,transactorBean.transactorObj)}" execute="dtblTransactor" render="form:pnlCol1 form:pnlCol2 form:pnlSalary"/>
+                                </h:commandLink><br /> 
+                                <h:outputLabel  value="#{t.cpName}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </h:panelGrid>
+                </h:panelGrid>
+                <h:panelGrid id="pnlCol1" columns="2">
+                    <h:outputLabel  value="#{langsys['Type']}:" style="font-weight: 500;"><span style="color: red; font-weight: bold;"> *</span></h:outputLabel>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuTransactorType" value="#{transactorBean.transactorObj.transactorType}" style="width: 210px;" required="true">
+                        <f:selectItem itemLabel="#{transactorBean.getDisplayName(menuItemBean.menuItemObj,transactorBean.transactorObj)}" itemValue="#{transactorBean.transactorObj.transactorType}"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel  value="#{langsys['Category']}:" id="lblCategory" style="font-weight: 500;"><span style="color: red; font-weight: bold;"> *</span></h:outputLabel>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuTransactorCategory" value="#{transactorBean.transactorObj.category}" style="width: 210px;" required="true">
+                        <f:selectItem itemLabel="" />
+                        <f:selectItem itemLabel="#{langsys['Consumer']}" itemValue="Consumer"/>
+                        <f:selectItem itemLabel="#{langsys['Business']}" itemValue="Business"/>
+                        <f:selectItem itemLabel="#{langsys['Government']}" itemValue="Government"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel  value="#{langsys['Segment']}:"/>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuTransactorSegment" value="#{transactorBean.transactorObj.transactor_segment_id}" style="width: 210px;">
+                        <f:selectItem itemLabel="" itemValue="0"/>
+                        <f:selectItems value="#{transactor_segmentBean.transactor_segments}" var="s" itemLabel="#{s.segment_name}" itemValue="#{s.transactor_segment_id}"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel  value="#{langsys['Reference']} #{langsys['No.']}:"/>
+                    <h:inputText styleClass="clsInput" id="itxtRef" value="#{transactorBean.transactorObj.transactorRef}" autocomplete="off" style="width: 203px;" disabled="#{transactorBean.transactorObj.trans_number_format.length()>0}">
+                    </h:inputText>
+                    <h:outputLabel style="font-weight: 500;"><p:commandLink id="cmdbValidateTIN" value="Tax Identity No(TIN)" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" title="Click here to validate TIN detail">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <f:ajax listener="#{transactorBean.updateTaxpayer(transactorBean.transactorObj)}" execute="pnlCol1 pnlCol2" render="pnlCol1 pnlCol2" />
+                    </p:commandLink><span style="color: red; font-weight: bold;"> *</span></h:outputLabel>
+                    <h:inputText styleClass="clsInput" id="itxtTaxIdentity" value="#{transactorBean.transactorObj.taxIdentity}" autocomplete="off" style="width: 203px;" required="true">
+                    </h:inputText>
+                    <h:outputLabel  value="#{langsys['Business']} #{langsys['Name']}:" title="#{langsys['Legal']} #{langsys['Business']} #{langsys['Name']}" style="font-weight: 500;"><span style="color: red; font-weight: bold;"> *</span></h:outputLabel>
+                    <h:inputText styleClass="clsInput" id="itxtTransactorNames" value="#{transactorBean.transactorObj.transactorNames}" autocomplete="off" style="width: 203px;" required="true">
+                    </h:inputText>
+                    <h:outputLabel  value="#{langsys['Trade']} #{langsys['Name']}:" title="#{langsys['Publicity']} #{langsys['Name']}, #{langsys['Nickname']}"/>
+                    <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.trade_name}" autocomplete="off" style="width: 203px;">
+                    </h:inputText>
+                    <h:outputLabel  value="#{langsys['Title']}:"/>
+                    <h:inputText styleClass="clsInput" id="itxtTitle" value="#{transactorBean.transactorObj.title}" autocomplete="off" style="width: 203px;">
+                    </h:inputText>
+                    <h:outputLabel  value="#{langsys['Phone']}:"/>
+                    <h:inputText styleClass="clsInput" id="itxtPhone" value="#{transactorBean.transactorObj.phone}" autocomplete="off" style="width: 203px;">
+                    </h:inputText>
+                    <h:outputLabel  value="#{langsys['Email']}:"/>
+                    <h:inputText styleClass="clsInput" id="itxtEmail" value="#{transactorBean.transactorObj.email}" autocomplete="off" style="width: 203px;">
+                    </h:inputText>
+                    <h:outputLabel  value="#{langsys['Position']}:"/>
+                    <h:inputText styleClass="clsInput" id="itxtPosition" value="#{transactorBean.transactorObj.position}" autocomplete="off" style="width: 203px;">
+                    </h:inputText>
+                    <h:outputLabel  value="#{langsys['Website']}:"/>
+                    <h:inputText styleClass="clsInput" id="itxtWebsite" value="#{transactorBean.transactorObj.website}" autocomplete="off" style="width: 203px;">
+                    </h:inputText>
+
+                    <h:outputLabel  value="#{langsys['Contact']} #{langsys['Person']}:"/>
+                    <h:inputText styleClass="clsInput" id="itxtCpName" value="#{transactorBean.transactorObj.cpName}" autocomplete="off" style="width: 203px;">
+                    </h:inputText>
+                    <h:outputLabel  value="#{langsys['Contact']} #{langsys['Title']}:"/>
+                    <h:inputText styleClass="clsInput" id="itxtCpTitle" value="#{transactorBean.transactorObj.cpTitle}" autocomplete="off" style="width: 203px;">
+                    </h:inputText>
+
+                    <h:outputLabel  value="#{langsys['Contact']} #{langsys['Phone']}:"/>
+                    <h:inputText styleClass="clsInput" id="itxtCpPhone" value="#{transactorBean.transactorObj.cpPhone}" autocomplete="off" style="width: 203px;">
+                    </h:inputText>
+                    <h:outputLabel  value="#{langsys['Contact']} #{langsys['Email']}:"/>
+                    <h:inputText styleClass="clsInput" id="itxtCpEmail" value="#{transactorBean.transactorObj.cpEmail}" autocomplete="off" style="width: 203px;">
+                    </h:inputText>
+                    <h:outputLabel  value="#{langsys['Date']} #{langsys['of']} #{langsys['Birth']}(DOB):"/>
+                    <p:calendar styleClass="clsInput" id="calDOB" navigator="true" showButtonPanel="true" value="#{transactorBean.transactorObj.DOB}" pattern="#{companySetting.getDateFormat()}" size="17"/>
+                </h:panelGrid>
+                <h:panelGrid id="pnlCol2" columns="2">
+                    <h:outputLabel  value="#{langsys['Sex']}:"/>
+                    <h:selectOneMenu styleClass="clsMenu" value="#{transactorBean.transactorObj.sex}" style="width: 210px;">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItem itemLabel="F" itemValue="F"/>
+                        <f:selectItem itemLabel="M" itemValue="M"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel  value="#{langsys['Occupation']}:"/>
+                    <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.occupation}" autocomplete="off" style="width: 203px;"/>
+                    <h:outputLabel  value="#{langsys['Country']}:"/>
+                    <h:selectOneMenu styleClass="clsMenu" value="#{transactorBean.transactorObj.locCountry}" style="width: 210px;">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItems value="#{iso_country_codeBean.iso_country_codeList}" var="ic" itemValue="#{ic.code_3}" itemLabel="#{ic.country_short_name}"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel  value="#{langsys[menuItemBean.menuItemObj.LOC_LEVEL_2_LABEL]}:"/>
+                    <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.locDistrict}" autocomplete="on" style="width: 203px;"/>
+                    <h:outputLabel  value="#{langsys[menuItemBean.menuItemObj.LOC_LEVEL_3_LABEL]}:"/>
+                    <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.locTown}" autocomplete="on" style="width: 203px;"/>
+                    <h:outputLabel  value="#{langsys['Physical']} #{langsys['Address']}:"/>
+                    <h:inputTextarea styleClass="clsInput" id="itxaPhysicalAddress" rows="1" value="#{transactorBean.transactorObj.physicalAddress}" style="width: 205px;"/>
+                    <h:outputLabel  value="#{langsys['First']} #{langsys['Date']}:"/>
+                    <p:calendar styleClass="clsInput" navigator="true" showButtonPanel="true" value="#{transactorBean.transactorObj.firstDate}" pattern="#{companySetting.getDateFormat()}" size="17"/>
+                    <h:outputLabel  value="#{langsys['File']} #{langsys['Reference']}:"/>
+                    <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.fileReference}" autocomplete="off" style="width: 203px;"/>
+                    <h:outputLabel  value="ID #{langsys['Type']}:"/>
+                    <h:selectOneMenu id="menuId_type" styleClass="clsMenu" value="#{transactorBean.transactorObj.idType}" style="width: 210px;">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItems value="#{id_typeBean.id_typeList}" var="it" itemValue="#{it.id_type_code}" itemLabel="#{it.id_type_name}"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel  value="ID #{langsys['Number']}:"/>
+                    <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.idNumber}" autocomplete="off" style="width: 203px;"/>
+                    <h:outputLabel  value="ID #{langsys['Expiry']} #{langsys['Date']}:"/>
+                    <p:calendar styleClass="clsInput" navigator="true" showButtonPanel="true" value="#{transactorBean.transactorObj.idExpiryDate}" pattern="#{companySetting.getDateFormat()}" size="17"/>
+                    <h:outputLabel  value="#{langsys['Account']} #{langsys['Details']}:"/>
+                    <h:inputTextarea styleClass="clsInput" id="itxaAccountDetails" rows="1" value="#{transactorBean.transactorObj.accountDetails}" style="width: 202px;">
+                    </h:inputTextarea>
+                    <h:outputLabel  value="#{langsys['Is']} #{langsys['Suspended']}:"/>
+                    <h:selectOneMenu styleClass="clsMenu" value="#{transactorBean.transactorObj.isSuspended}" style="width: 210px;">
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="No"/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="Yes"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel  value="#{langsys['Suspended']} #{langsys['Reason']}:"/>
+                    <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.suspendedReason}" autocomplete="off" style="color: red;width: 203px;"/>
+                    <h:outputLabel  value="#{langsys['Is']} #{langsys['Credit']} #{langsys['Limit']}:"/>
+                    <h:selectOneMenu styleClass="clsMenu" value="#{transactorBean.transactorObj.is_credit_limit}" style="width: 210px;">
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel  value="#{langsys['Credit']} #{langsys['Limit']} (#{generalUserSetting.LOCAL_CURRENCY.currencyCode}):"/>
+                    <h:inputText styleClass="clsInput" value="#{transactorBean.transactorObj.credit_limit}" autocomplete="off" style="width: 203px;">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
+                </h:panelGrid>
+                <h:panelGrid id="pnlSalary" columns="1" rendered="#{transactorBean.transactorObj.transactorType.equals('EMPLOYEE')}">
+                    <h:outputLabel  value="#{langsys['Gross']} #{langsys['Pay']} (#{langsys['Monthly']}):"/>
+                    <h:inputText id="itxtGrossPay" styleClass="clsInput" value="#{transactorBean.transactorObj.monthGrossPay}" autocomplete="off">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:ajax event="change" listener="#{transactorBean.refreshTotalSalaryDeductions(transactorBean.transactorObj)}" execute="@form" render="@form"/>
+                    </h:inputText>
+                    <p:dataTable rowIndexVar="rowIndex" id="dtblDeductions" value="#{transactorBean.salaryDeductions}" var="sd" 
+                                 styleClass="cls-table" tableStyle="width:auto;" 
+                                 >
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Deductions']}</f:facet>
+                            <!-- row record -->
+                            <h:selectOneMenu styleClass="clsMenu" value="#{sd.deductionName}" style="width: 100px;">
+                                <f:selectItem itemLabel="" itemValue=""/>
+                                <f:selectItem itemLabel="#{langsys['MEDICAL']}" itemValue="MEDICAL"/>
+                                <f:selectItem itemLabel="#{langsys['HOUSING']}" itemValue="HOUSING"/>
+                                <f:selectItem itemLabel="#{langsys['RBS']}" itemValue="RBS"/>
+                                <f:selectItem itemLabel="#{langsys['PAYE']}" itemValue="PAYE"/>
+                                <f:selectItem itemLabel="#{langsys['NSSF']}" itemValue="NSSF"/>
+                                <f:selectItem itemLabel="#{langsys['Other']}" itemValue="OTHER"/>
+                            </h:selectOneMenu>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Percentage']} (%)</f:facet>
+                            <!-- row record -->
+                            <h:inputText id="itxtInnerPerc" value="#{sd.perc}" style="width: 50px;">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:ajax event="change" listener="#{transactorBean.calcSalaryDeductionAmount(transactorBean.transactorObj,sd)}" execute="@form" render="@form"/>
+                            </h:inputText>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Amount']}</f:facet>
+                            <!-- row record -->
+                            <h:inputText id="itxtInnerAmount" value="#{sd.amount}" style="width: 80px;">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:ajax event="change" listener="#{transactorBean.calcSalaryDeductionPerc(transactorBean.transactorObj,sd)}" execute="@form" render="@form"/>
+                            </h:inputText>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">
+                                <h:commandButton id="cmdbAddItem" value="+">
+                                    <f:ajax listener="#{transactorBean.addSalaryDeduction()}" execute="@form" render="@form"/>
+                                </h:commandButton>
+                            </f:facet>
+                            <!-- row record -->
+                            <h:commandButton id="cmdbRemoveItem" value="-">
+                                <f:ajax listener="#{transactorBean.removeSalaryDeduction(transactorBean.transactorObj,sd)}" execute="@form" render="@form"/>
+                            </h:commandButton>
+                        </p:column> 
+                    </p:dataTable>
+                    <h:outputLabel  value="#{langsys['Net']} #{langsys['Pay']} (#{langsys['Monthly']}):"/>
+                    <h:inputText id="itxtMonthNetPay" styleClass="clsInput" value="#{transactorBean.transactorObj.monthNetPay}" autocomplete="off" disabled="true">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:ajax event="change" execute="@this" render="@this"/>
+                    </h:inputText>
+                </h:panelGrid>
+            </h:panelGrid>
+
+            <h:panelGrid id="pnlButton" styleClass="clsGridMainCommands" columns="1">
+                <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <f:ajax listener="#{transactorBean.saveTransactor(transactorBean.transactorObj,transactorBean.salaryDeductions)}" execute="@form" render="pnlInput pnlMessage growl1" />
+                    </p:commandButton>
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="#{langsys['CLEAR']} (ALT+C)" accesskey="c">
+                        <p:ajax listener="#{transactorBean.clearTransactor2(transactorBean.transactorObj,transactorBean.salaryDeductions)}" process="@form" update="pnlInput" />
+                    </p:commandButton>
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbDelete" value="#{langsys['DELETE']}" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{transactorBean.deleteTransactorCall(transactorBean.transactorObj,transactorBean.salaryDeductions)}" process="@form" update="pnlInput pnlMessage growl1" />
+                    </p:commandButton>
+                </h:panelGrid>
+            </h:panelGrid>
+
+            <h:panelGrid id="pnlMessage" styleClass="clsGridMainMessages" columns="1">
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transactorBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
+            <p:growl id="growl1"/>
+        </h:form>
+    </h:body>
+</html>
+

@@ -1,0 +1,342 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Balance Sheet</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:event listener="#{navigationBean.checkAccessDenied('47', 'View')}" type="preRenderView" />
+    <f:event listener="#{accLedgerBean.initResetAccBalanceSheet(accBalanceSheet)}" type="preRenderView" />
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="formReport">
+            <h:panelGrid id="pnlgHeader" columns="1" styleClass="clsPanelReportFilterTitle">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys['Balance']} #{langsys['Sheet']} (#{langsys['Statement']} #{langsys['of']} #{langsys['Financial']} #{langsys['Position']})"/>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgFilter" columns="7" styleClass="clsPanelReportFilter">
+                <h:outputLabel value="#{langsys['Accounting']} #{langsys['Period']}"/>
+                <h:selectOneMenu id="menuAccPeriod" value="#{accBalanceSheet.accPeriodId}" >
+                    <f:selectItems value="#{accPeriodBean.returnAccPeriodsCurrentFirst()}" var="ap" itemLabel="#{ap.accPeriodName}" itemValue="#{ap.accPeriodId}"/>
+                </h:selectOneMenu>
+                <p:commandButton id="cmdbSearch" value="#{langsys['BALANCE']} #{langsys['SHEET']}" accesskey="b" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.refreshAccBalanceSheet(accBalanceSheet)}" process="@form" update="@form"/>
+                </p:commandButton>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgMessage">
+                <p:outputLabel value="#{accLedgerBean.actionMessage}" style="color: red;"/>
+            </h:panelGrid>
+            <p:panelGrid id="pnlgDetail" columns="4">
+                <f:facet name="header">
+                    <p:row>
+                        <p:column colspan="4">#{companySetting.getLICENSE_CLIENT_NAME()} #{companySetting.getBranchCode()}</p:column>
+                    </p:row>
+                </f:facet>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="#{accCurrencyBean.localCurrency.currencyCode}"/>
+
+                <p:outputLabel value="#{langsys['ASSETS']}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="#{langsys['Fixed']} #{langsys['Assets']}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Property']}, #{langsys['Plant']} #{langsys['and']} #{langsys['Equipment']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'1-20-000','Dr','Property, Plant and Equipment')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.assetFixedPPE)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Accumulated']} #{langsys['Depreciation']} (#{langsys['Contra']})" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'1-20-010','Cr','Accumulated Depreciation (Contra)')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.assetFixedAccumDep)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Other']} #{langsys['Noncurrent']} #{langsys['Assets']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'1-20-020','Dr','Other Noncurrent Assets')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.assetFixedOtherNonCur)}"/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="#{langsys['Current']} #{langsys['Assets']}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Cash']} #{langsys['and']} #{langsys['Cash']} #{langsys['Equivalents']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'1-00-000','Dr','Cash and Cash Equivalents')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.assetCurCash)}" style="text-align: right;"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Receivables']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'1-00-010','Dr','Receivables')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.assetCurRec)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Inventory']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'1-00-020','Dr','Inventory')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.assetCurInv)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Prepaid']} #{langsys['Expenses']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'1-00-030','Dr','Prepaid Expenses')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.assetCurPreExp)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Other']} #{langsys['Current']} #{langsys['Assets']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'1-00-040','Dr','Other Current Assets')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.assetCurOtherCur)}"/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="#{langsys['TOTAL']} #{langsys['ASSETS']}"/>
+                <p:outputLabel value="(#{langsys['Fixed']} #{langsys['Assets']} + #{langsys['Current']} #{langsys['Assets']})"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.assetTotal)}" style="color: blue;"/>
+
+
+                <p:outputLabel value="#{langsys['LIABILITIES']}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="#{langsys['Long']} #{langsys['Term']} #{langsys['Liabilities']}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Long']} #{langsys['Term']} #{langsys['Debt']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'2-10-000','Cr','Long Term Debt')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.liabLongDebt)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Deferred']} Taxes" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'2-10-010','Cr','Deferred Taxes')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.liabLongDefTax)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Other']} #{langsys['Noncurrent']} #{langsys['Liabilities']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'2-10-020','Cr','Other Noncurrent Liabilities')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.liabLongOtherNonCur)}"/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="#{langsys['Current']} #{langsys['Liabilities']}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Payables']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'2-00-000','Cr','Payables')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.liabCurPay)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Accrued']} #{langsys['Compensation']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'2-00-010','Cr','Accrued Compensation')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.liabCurAccrComp)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Accrued']} Taxes" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'2-00-020','Cr','Accrued Taxes')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.liabCurAccrTax)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Other']} #{langsys['Current']} #{langsys['Liabilities']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'2-00-030','Cr','Other Current Liabilities')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.liabCurOtherCur)}"/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="#{langsys['TOTAL']} #{langsys['LIABILITIES']}"/>
+                <p:outputLabel value="(#{langsys['Long']} #{langsys['Term']} #{langsys['Liabilities']} + #{langsys['Current']} #{langsys['Liabilities']})"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.liabTotal)}" style="color: blue;"/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="#{langsys['NET']} #{langsys['ASSETS']}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="(#{langsys['Total']} #{langsys['Assets']} - #{langsys['Total']} #{langsys['Liabilities']})"/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.netAssets)}" style="color: blue;background-color: yellow;"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value="#{langsys['EQUITY']}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="#{langsys['Equity']}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Paid']} #{langsys['in']} #{langsys['Capital']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'3-10-000-010','Cr','Paid in Capital')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.equityPaidCap)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Partners']} #{langsys['Capital']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'3-10-000-020','Cr','Partners Capital')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.equityPartCap)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Common']} #{langsys['Stock']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'3-10-000-030','Cr','Common Stock')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.equityCommStock)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Preferred']} #{langsys['Stock']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'3-10-000-040','Cr','Preferred Stock')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.equityPrefStock)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Member']} #{langsys['Contribution']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'3-10-000-050','Cr','Member Contribution')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.equityMembCont)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Retained']} #{langsys['Earnings']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'3-10-000-060','Cr','Retained Earnings')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.equityRetEarn)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Drawing']} #{langsys['Account']} (#{langsys['Contra']} #{langsys['Equity']})" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'3-10-000-070','Dr','Drawing Account (Contra Equity)')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.equityDrawing)}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value=""/>
+                <p:commandLink value="#{langsys['Dividends']} (#{langsys['Contra']} #{langsys['Equity']})" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="PF('dlgCAT').show();">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.initViewCategoryBalanceSheet(accBalanceSheet.accPeriodId,'3-10-000-080','Dr','Dividends (Contra Equity)')}" process="@form" update=":formCAT"/>
+                </p:commandLink>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.equityDividend)}"/>
+
+                <p:outputLabel value=""/>
+                <p:outputLabel value="#{langsys['TOTAL']} #{langsys['EQUITY']}"/>
+                <p:outputLabel value=""/>
+                <p:outputLabel value="#{accJournalBean.returnBalanceString(accBalanceSheet.equityTotal)}" style="color: blue;background-color: yellow;"/>
+            </p:panelGrid>
+        </h:form>
+        <ui:include src="ViewCategoryLedger.xhtml"/>
+    </h:body>
+</html>
+

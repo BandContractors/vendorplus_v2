@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Email</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  type="text/javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{navigationBean.checkAccessDenied(utilityBean.convertIntAsString(88), 'View')}"/>
+    </f:metadata>
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="form" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
+                    return false;">
+            <h:panelGrid styleClass="clsGridMainHeader" columns="1">
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="Compose and Send Email"/>
+            </h:panelGrid>
+            <h:panelGrid columns="1">
+                <h:panelGrid columns="2">
+                    <p:outputLabel value="Category:"/>
+                    <h:selectOneMenu id="menuCategory" value="#{contact_listBean.contact_listObj.category}" style="width: 900px;">
+                        <f:selectItem itemLabel="None (all categories)" itemValue=""/>
+                        <f:selectItems value="#{contact_listBean.getDistinctCategory()}" var="c" itemLabel="#{c.category}" itemValue="#{c.category}"/>
+                        <f:ajax event="change" execute="@this" render="menuSubcategory itxtTo CountList"/>
+                    </h:selectOneMenu>
+                    <p:outputLabel value="Subcategory:"/>
+                    <h:selectOneMenu id="menuSubcategory" value="#{contact_listBean.contact_listObj.subcategory}" style="width: 900px;">
+                        <f:selectItem itemLabel="None (all subcategories)" itemValue=""/>
+                        <f:selectItems value="#{contact_listBean.getDistinctSubcategory(contact_listBean.contact_listObj.category)}" var="sc" itemLabel="#{sc.subcategory}" itemValue="#{sc.subcategory}"/>
+                        <f:ajax event="change" execute="@this" render="itxtTo CountList"/>
+                    </h:selectOneMenu>
+                    <p:outputLabel value="Contacts selected:"/>
+                    <p:outputLabel id="CountList" value="#{emailEntityBean.countList(contact_listBean.contact_listObj)}"/>
+                    <p:outputLabel value="Subject:"/>
+                    <p:inputText id="itxtSubject" value="#{emailEntity.subject}" autocomplete="on" style="width: 890px;"/>
+                    <p:outputLabel value="To:"/>
+                    <p:inputText id="itxtTo" value="#{emailEntity.toEmail}" autocomplete="on" style="width: 890px;"/>
+                </h:panelGrid>
+                <h:panelGrid columns="1">
+                    <p:outputLabel value="Message:"/>
+                    <p:textEditor widgetVar="editor1" value="#{emailEntity.message}" height="150" style="margin-bottom:10px"/>
+                </h:panelGrid>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainCommands" columns="1">
+                <p:commandButton id="cmdbSearch" value="SEND" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{emailEntityBean.validateSendEmail(contact_listBean.contact_listObj, emailEntity)}" process="@form" update="growl1 ActionMsg"/>
+                </p:commandButton>
+            </h:panelGrid>
+            <p:growl id="growl1"/>
+            <p:outputLabel id="ActionMsg" value="#{emailEntityBean.actionMessage}" style="color: red;"/>
+        </h:form>
+    </h:body>
+</html>
+

@@ -1,0 +1,141 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Item Map</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:event listener="#{navigationBean.checkAccessDenied('8', 'View')}" type="preRenderView" />
+    <f:metadata>
+        <f:viewAction action="#{itemMapBean.clearItemMap(itemMap,itemBean.selectedItem,itemBean.selectedItemX)}"/>
+    </f:metadata>
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="ItemMapForm" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
+                    return false;">
+
+            <h:panelGrid styleClass="clsGridMainHeader" columns="1">
+                <h:outputLabel styleClass="clsLabelTop" id="olblItemMapHeader" value="#{langsys['Item']} #{langsys['Mapping']}"/>
+            </h:panelGrid>
+
+            <h:panelGrid id="gridItemMapDetail" styleClass="clsGridMainInput" columns="7">
+                <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Big']} #{langsys['Item']}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" value=""/>
+                <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Contains']}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Small']} #{langsys['Item']}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" value=""/>
+                <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Position']}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" value=""/>
+
+                <p:autoComplete id="autcItem1" widgetVar="WautcItem1" value="#{itemBean.selectedItem}"  
+                                completeMethod="#{itemBean.getItemObjectList}" 
+                                var="itm" 
+                                itemLabel="#{itm.description}" 
+                                itemValue="#{itm}" 
+                                converter="ItemConverter" style="text-align: left" 
+                                forceSelection="true" queryDelay="0" 
+                                >
+                    <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="text-align: left" >  
+                        #{itm.description} 
+                    </p:column> 
+                    <p:column headerText="#{langsys['Alias']}" style="text-align: left" >  
+                        #{itm.alias_name} 
+                    </p:column>
+                    <p:ajax event="itemSelect" listener="#{itemMapBean.changeItemMap('Big',itemMap,itemBean.selectedItem)}" process="@this" update="dtblItemMap txtBigUnitSymbol"/>
+                    <p:ajax event="change" listener="#{itemMapBean.changeItemMap('Big',itemMap,itemBean.selectedItem)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="dtblItemMap txtBigUnitSymbol"/>
+                </p:autoComplete>
+                <h:inputText id="txtBigUnitSymbol" style="width: 80px;height: 24px;" value="#{itemMap.bigUnitSymbol}" disabled="true"/>
+                <h:inputText id="itxtFractionQty" styleClass="clsInputTransItem" style="width: 80px;height: 24px;" value="#{itemMap.fractionQty}" autocomplete="off"/>
+                <p:autoComplete id="autcItem2" widgetVar="WautcItem2" value="#{itemBean.selectedItemX}"  
+                                completeMethod="#{itemBean.getItemObjectList}" 
+                                var="itm" 
+                                itemLabel="#{itm.description}" 
+                                itemValue="#{itm}" 
+                                converter="ItemConverter" style="text-align: left" 
+                                forceSelection="true" queryDelay="0"  
+                                >
+                    <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="text-align: left" >  
+                        #{itm.description} 
+                    </p:column> 
+                    <p:ajax event="itemSelect" listener="#{itemMapBean.changeItemMap('Small',itemMap,itemBean.selectedItemX)}" process="@this" update="dtblItemMap txtSmallUnitSymbol"/>
+                    <p:ajax event="change" listener="#{itemMapBean.changeItemMap('Small',itemMap,itemBean.selectedItemX)}" rendered="#{itemBean.selectedItemX!=null}" process="@this" update="dtblItemMap txtSmallUnitSymbol"/>
+                </p:autoComplete>
+                <h:inputText id="txtSmallUnitSymbol" style="width: 80px;height: 24px;" value="#{itemMap.smallUnitSymbol}" disabled="true"/>
+                <h:selectOneMenu styleClass="clsInputTransItem" id="menuPosition" value="#{itemMap.position}" style="height: 30px;">
+                    <f:selectItem itemLabel="1" itemValue="1"/>
+                    <f:selectItem itemLabel="2" itemValue="2"/>
+                </h:selectOneMenu>
+                <h:commandButton value="#{langsys['Save']}" style="width: 120px;height: 30px;" >
+                    <f:ajax listener="#{itemMapBean.saveItemMap(itemMap,itemBean.selectedItem,itemBean.selectedItemX)}" execute="gridItemMapDetail" render="dtblItemMap growl1"/>
+                </h:commandButton>
+            </h:panelGrid>
+
+            <p:dataTable rowIndexVar="rowIndex" style="width: 790px" id="dtblItemMap" value="#{itemMapBean.getItemMaps(itemMap.bigItemId,itemMap.smallItemId)}" var="im" 
+                         styleClass="cls-table" 
+                         >  
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Position']}</f:facet>
+                    <!-- row record -->
+                    #{im.position}
+                </p:column>
+
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Big']} #{langsys['Item']}</f:facet>
+                    <!-- row record -->
+                    #{itemBean.getItem(im.bigItemId).getDescription()}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header"></f:facet>
+                    <!-- row record -->
+                    #{im.bigUnitSymbol}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Contains']}</f:facet>
+                    <!-- row record -->
+                    #{im.fractionQty}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Small']} #{langsys['Item']}</f:facet>
+                    <!-- row record -->
+                    #{itemBean.getItem(im.smallItemId).getDescription()}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header"></f:facet>
+                    <!-- row record -->
+                    #{im.smallUnitSymbol}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Action']}</f:facet>
+                    <!-- row record -->
+                    <h:commandLink value="#{langsys['Delete']} #{langsys['Mapping']}" action="#{itemMapBean.deleteItemMap(im)}" onclick="return confirmDelete();">
+                        <f:ajax execute="dtblItemMap" render="dtblItemMap"/>
+                    </h:commandLink>
+                </p:column> 
+            </p:dataTable>
+            <p:growl id="growl1"/>
+        </h:form>
+    </h:body>
+</html>
+

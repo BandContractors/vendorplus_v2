@@ -1,0 +1,211 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>#{menuItemBean.menuItemObj.CUSTOMER_NAME} Statement</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{navigationBean.checkAccessDenied('57', 'View')}"/>
+        <f:viewAction action="#{transactorBean.initClearTransactor(transactorBean.selectedBillTransactor)}"/>
+        <f:viewAction action="#{transBean.initClearCustomerCard()}"/>
+    </f:metadata>
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+
+        <h:form id="formReport">
+            <h:panelGrid id="id0" columns="1" styleClass="clsPanelReportFilterTitle">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]} #{langsys['Statement']} #{langsys['Report']}"/>
+            </h:panelGrid>
+            <h:panelGrid id="id1" columns="9" styleClass="clsPanelReportFilter">
+                <p:outputLabel styleClass="clsLabelReportFilter" id="id2" value="#{langsys['From']} #{companySetting.getStoreEquivName()}:"/>
+                <h:selectOneMenu styleClass="clsInputReportFilter" id="menuFromStore" value="#{trans.storeId}" >
+                    <f:selectItem itemLabel="" itemValue="0"/>
+                    <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
+                </h:selectOneMenu>
+                <p:outputLabel styleClass="clsLabelReportFilter" id="id10" value="#{langsys['From']} #{langsys['Date']}:"/>
+                <p:calendar styleClass="clsInputReportFilter" id="calTransDateFrom"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{trans.transactionDate}" size="10"/>
+                <p:outputLabel styleClass="clsLabelReportFilter" id="id11" value="#{langsys['To']} #{langsys['Date']}:"/>
+                <p:calendar styleClass="clsInputReportFilter" id="calTransDateTo"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{trans.transactionDate2}" size="10">
+                </p:calendar>
+                <h:outputLabel styleClass="clsLabelReportFilter" value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}:"/>
+                <p:autoComplete styleClass="clsInputReportFilter" id="autcBillTransactor" value="#{transactorBean.selectedBillTransactor}" 
+                                completeMethod="#{transactorBean.getTransactorObjectList}" 
+                                var="trct2" 
+                                itemLabel="#{trct2.transactorNames}" 
+                                itemValue="#{trct2}" 
+                                converter="TransactorConverter" style="text-align: left" 
+                                forceSelection="true" 
+                                >
+                    <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
+                        #{trct2.transactorNames} 
+                    </p:column> 
+                    <p:column headerText="#{langsys['Contact']} #{langsys['Person']}" style="text-align: left">  
+                        #{trct2.cpName} 
+                    </p:column> 
+                    <p:ajax event="itemSelect" listener="#{trans.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}"/>
+                    <p:ajax event="change" listener="#{trans.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}" rendered="#{transactorBean.selectedBillTransactor!=null} "/>
+                </p:autoComplete>
+                <p:commandButton styleClass="clsButtonReportFilter" id="cmdbSearch" value="#{langsys['Search']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{transBean.refreshReportCustomerCard(trans)}" process="id1" update="id1 pnlTransaction pnlgActionMessage"/>
+                </p:commandButton>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgActionMessage">
+                <p:outputLabel value="#{transBean.actionMessage}" style="color: red;"/>
+            </h:panelGrid>
+            <p:commandButton id="cmdbPrint" value="#{langsys['Print']} #{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]} #{langsys['Statement']} (ALT+P)" icon="ui-icon-print" type="button" accesskey="p">
+                <p:printer target="pnlTransaction" rendered="false"/>
+            </p:commandButton>
+            <p:panel id="pnlTransaction" style="border: none;">
+                <h:panelGrid columns="3" style="border-style: none;-webkit-print-color-adjust: exact;width: 100%; margin: 0px;"> 
+                    <h:panelGrid>
+                        <h:panelGrid columns="1">
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 18pt;color:red;font-weight: bold;text-decoration: none;">#{companySetting.getLICENSE_CLIENT_NAME()}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 9pt;color:blue;font-weight: bold;text-decoration: none;">#{companySetting.getSloghan()}</h:outputLabel>
+                        </h:panelGrid>
+                        <h:panelGrid columns="2">
+                            <p:graphicImage value="#{companySetting.getLogoUrl()}" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'Yes')}" />
+                            <h:panelGrid columns="1" style="text-align: left;">
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','BOX_ADDRESS').parameter_value}</h:outputLabel>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{companySetting.getPhysicalAddress()}</h:outputLabel>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Telephone']}:#{companySetting.getPhone()}</h:outputLabel>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Mobile']}:#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value}</h:outputLabel>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">TIN:#{companySetting.getTaxIdentity()}</h:outputLabel>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                        <h:panelGrid columns="1">
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 9pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Email']}:#{companySetting.getEmail()} #{langsys['Website']}:#{companySetting.getWebsite()}</h:outputLabel>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <h:panelGrid>
+                        <h:panelGrid columns="1">
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 12pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Amount']} #{langsys['Due']} (#{accCurrencyBean.localCurrency.currencyCode})</h:outputLabel>
+                            <h:outputLabel style="color: coral;font-weight: bold;font-size: 18pt;" value="#{accJournalBean.returnBalanceString(accLedgerBean.getReceivableAccBalanceTrade(transactorBean.selectedBillTransactor.transactorId))}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 12pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Deposit']} (#{accCurrencyBean.localCurrency.currencyCode})</h:outputLabel>
+                            <h:outputLabel style="color: green;font-weight: bold;font-size: 18pt;" value="#{accJournalBean.returnBalanceString(accLedgerBean.getPrepaidIncomeAccBalanceToCur(transactorBean.selectedBillTransactor.transactorId,accCurrencyBean.localCurrency.currencyCode))}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputLabel>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <h:panelGrid style="float: right;">
+                        <h:panelGrid columns="1" style="background-color: #000000">
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 18pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">#{langsys[utilityBean.formatCapitaliseAllCharacter(menuItemBean.menuItemObj.CUSTOMER_NAME)]} #{langsys['STATEMENT']}</h:outputLabel>
+                        </h:panelGrid>
+                        <h:panelGrid columns="1">
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 12pt;color:#000000;font-weight: normal;text-decoration: none;">#{transactorBean.selectedBillTransactor.transactorNames}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{transactorBean.selectedBillTransactor.physicalAddress.length()>0}">#{transactorBean.selectedBillTransactor.physicalAddress}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{transactorBean.selectedBillTransactor.email.length()>0}">#{transactorBean.selectedBillTransactor.email}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{transactorBean.selectedBillTransactor.phone.length()>0}">#{transactorBean.selectedBillTransactor.phone}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{transactorBean.selectedBillTransactor.taxIdentity.length()>0}">TIN:#{transactorBean.selectedBillTransactor.taxIdentity}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 12pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{transactorBean.selectedBillTransactor.transactorRef.length()>0}">#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]} #{langsys['Reference']} #{langsys['No.']}: #{transactorBean.selectedBillTransactor.transactorRef}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 12pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{transactorBean.selectedBillTransactor.cpName.length()>0}">#{langsys['Attention']}: #{transactorBean.selectedBillTransactor.cpName}</h:outputLabel>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </h:panelGrid>
+
+                <table id="tblTransaction" border="1" cellspacing="0" cellpadding="2" style="-webkit-print-color-adjust: exact;width: 100%;font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                    <tr style="background-color: yellow;font-weight: bold">
+                        <td colspan="4" align="center" style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                            #{langsys['Transactions']} #{langsys['for']} #{langsys['period']}
+                            <h:outputText value="#{utilityBean.formatDate(trans.transactionDate)}"/> to 
+                            <h:outputText value="#{utilityBean.formatDate(trans.transactionDate2)}"/>
+                        </td>
+                        <td colspan="1" style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                            <h:outputText value="#{transBean.grandTotalLoc}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </td>
+                        <td colspan="1" style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                            <h:outputText value="#{transBean.grandTotalPaidLoc}" style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;color: blue">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </td>
+                        <td colspan="1" style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                            <h:outputText value="#{accJournalBean.returnBalanceString(transBean.grandTotalBalanceLoc)}" style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;color: red">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </td>
+                        <td colspan="1" style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                            <h:outputText value="#{accCurrencyBean.localCurrency.currencyCode}"/>
+                        </td>
+                    </tr>
+                    <tr style="background-color: #ADD8E6;font-weight: bold;">
+                        <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Invoice']} #{langsys['Type']}</td>
+                        <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Date']}</td>
+                        <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Item']} #{langsys['Description']}</td>
+                        <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Amount']}</td>
+                        <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Total']}</td>
+                        <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Total']} #{langsys['Paid']}</td>
+                        <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Balance']}</td>
+                        <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Currency']}</td>
+                    </tr>
+                    <ui:repeat var="t" value="#{transBean.customerCardTranss}" varStatus="status">
+                        <tr style="background-color: #E5E5E5;">
+                            <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{t.transactionTypeName}: #{t.transactionNumber}</td>
+                            <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                                <h:outputText value="#{utilityBean.formatDate(t.transactionDate)}"/>
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                                <h:outputText value="#{t.grandTotal}">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputText>
+                            </td>
+                            <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                                <h:outputText value="#{t.totalPaid}" style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;color: blue">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputText>
+                            </td>
+                            <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                                <h:outputText value="#{t.grandTotal-t.totalPaid}" style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;color: red">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputText>
+                            </td>
+                            <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{t.currencyCode}</td>
+                        </tr>
+                        <ui:repeat var="ti" value="#{transItemBean.getTransItemsByTransactionId3(t.transactionId)}">
+                            <tr>
+                                <td colspan="2" style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;"></td>
+                                <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{ti.description} #{ti.descSpecific}</td>
+                                <td style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                                    <h:outputText value="#{ti.amountIncVat}">
+                                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    </h:outputText>
+                                </td>
+                                <td colspan="5"></td>
+                            </tr>
+                        </ui:repeat>
+                    </ui:repeat>
+                </table>
+                <h:panelGrid columns="1" style="float: left;text-align: left;">
+                    <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: bold;text-decoration: none;">#{langsys['Make']} #{langsys['all']} #{langsys['checks']} #{langsys['payable']} #{langsys['to']}</h:outputLabel>
+                    <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: bold;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','PAYEE_NAME').parameter_value}</h:outputLabel>
+                    <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','ACC_DETAIL1').parameter_value}</h:outputLabel>
+                    <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','ACC_DETAIL2').parameter_value}</h:outputLabel>
+                </h:panelGrid>
+            </p:panel>
+        </h:form>
+    </h:body>
+</html>
+

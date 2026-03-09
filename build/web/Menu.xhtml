@@ -1,0 +1,535 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>VendorPlus</title>
+        <style>
+            .user .ui-menuitem-text{color:white;} .ui-menu .ui-menuitem .ui-state-hover{
+                color : white;
+                background: #7BC043;
+                -webkit-box-shadow: 0px 0px 8px #85b2cb;
+                box-shadow: 0px 0px 8px #85b2cb;
+            }
+            .ui-menubar,.ui-menu-child,.ui-menu {background: #fff !important; color: #1F3A5F !important; font-weight: bold !important; text-shadow: 0 1px 2px #00000033;}
+        </style>
+        <script  language="javascript">
+            function doUpdateMenuClick() {
+                remoteBtnUpdateMenu();
+            }
+        </script>
+        <f:loadBundle basename="#{menuItemBean.menuItemObj.LANG_BASE_NAME_SYS}" var="langsys" />
+        <f:loadBundle basename="#{menuItemBean.menuItemObj.LANG_BASE_NAME_OUT}" var="langout" />
+    </h:head>
+    <h:body style="background-color: white;">
+        <h:form id="frmMenu">  
+            <div style="background-color: #1F3A5F;width: 100%;color: white;padding: 15px 0;text-align: center;">
+                <p:outputLabel id="olblTitle" value="VendorPlus" style="font-size: 28px;font-weight: bold;"/>
+                <br/>
+                <p:outputLabel value="#{menuItemBean.menuItemObj.LICENSE_CLIENT_NAME}  (#{menuItemBean.menuItemObj.CURRENT_STORE.storeName})" style="font-size: 12px;"/>
+            </div>
+            <p:remoteCommand name="remoteBtnUpdateMenu" process="@this" update="mnubMain"/>
+            <p:menubar id="mnubMain">  
+                <p:menuitem value="#{langsys['Home']}" action="#{navigationBean.redirectToHome()}" icon="ui-icon-home" />
+                <p:submenu label="Transact" icon="ui-icon-plus"> 
+                    <p:separator />
+                    <p:submenu label="#{langsys['Purchase']} #{langsys['and']} #{langsys['Expense']}">  
+                        <p:separator />
+                        <p:submenu label="#{langsys['Purchase']} #{langsys['Order']}">
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Goods']} #{langsys['and']} #{langsys['Services']}" action="#{navigationBean.redirectToPurchaseOrderGoods()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Expenses']}" action="#{navigationBean.redirectToPurchaseOrderExpenses()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Assets']}" action="#{navigationBean.redirectToPurchaseOrderAssets()}" />
+                            <p:separator />
+                        </p:submenu>
+                        <p:separator  rendered="#{menuItemBean.menuItemObj.PURCHASE_INVOICE_MODE eq 0}"/>
+                        <p:submenu label="#{langsys['Item']} #{langsys['Received']}"  rendered="#{menuItemBean.menuItemObj.PURCHASE_INVOICE_MODE eq 0}">
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Goods']} #{langsys['and']} #{langsys['Services']}" action="#{navigationBean.redirectToItemReceivedGoods()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Expenses']}" action="#{navigationBean.redirectToItemReceivedExpenses()}" />
+                            <p:separator />
+                        </p:submenu>
+                        <p:separator />
+                        <p:submenu label="#{langsys['Purchase']} #{langsys['Invoice']}">
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Goods']} #{langsys['and']} #{langsys['Services']}" action="#{navigationBean.redirectToPurchaseInvoiceGoods()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Expenses']}" action="#{navigationBean.redirectToPurchaseInvoiceExpenses()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Assets']}" action="#{navigationBean.redirectToPurchaseInvoiceAssets()}" />
+                            <p:separator />
+                        </p:submenu>
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Record']} #{langsys['Expense']}" action="#{navigationBean.redirectToExpenseEntry()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="#{langsys['Sales']}">
+                        <p:separator />
+                        <p:submenu label="#{langsys['Sale']} #{langsys['Quotation']}">  
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Quotation']}" action="#{navigationBean.redirectToRetailSaleQuotation()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Wholesale']} #{langsys['Quotation']}" action="#{navigationBean.redirectToWholeSaleQuotation()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Special']} #{langsys['Sale']} #{langsys['Quotation']}" action="#{navigationBean.redirectToSpecialSaleQuotation()}" />
+                            <p:separator />
+                        </p:submenu>
+                        <p:separator />
+                        <p:submenu label="#{langsys['Sale']} #{langsys['Order']}">  
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Order']}" action="#{navigationBean.redirectToSaleOrderRetail()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Wholesale']} #{langsys['Order']}" action="#{navigationBean.redirectToSaleOrderWhole()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Special']} #{langsys['Sale']} #{langsys['Order']}" action="#{navigationBean.redirectToSaleOrderSpecial()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Quick']} #{langsys['Order']}" action="#{navigationBean.redirectToSaleOrderQuick()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Order']} #{langsys['Dashboard']}" action="SaleOrderQuickDashboard?faces-redirect=true" />
+                            <p:separator />
+                        </p:submenu>
+                        <p:separator />
+                        <p:submenu label="#{langsys['Sale']} #{langsys['Invoice']}">  
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Invoice']}" action="#{navigationBean.redirectToRetailSaleInvoice()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Wholesale']} #{langsys['Invoice']}" action="#{navigationBean.redirectToWholeSaleInvoice()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Special']} #{langsys['Sale']} #{langsys['Invoice']}" action="#{navigationBean.redirectToSpecialSaleInvoice()}" />
+                            <p:separator />
+                        </p:submenu>
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Goods']} #{langsys['Delivery']}" action="#{navigationBean.redirectToGoodsDelivery()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Sales']} #{langsys['Package']}" action="#{navigationBean.redirectToSalesPackaging()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:submenu label="#{langsys['Hire']}" rendered="#{menuItemBean.menuItemObj.HIRE_MODULE_ON==1}">
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Hire']} #{langsys['Quotation']}" action="#{navigationBean.redirectToHireQuotation()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Hire']} #{langsys['Invoice']}" action="#{navigationBean.redirectToHireInvoice()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Delivery']} #{langsys['Note']}" action="#{navigationBean.redirectToHireDeliveryNote()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Return']} #{langsys['Note']}" action="#{navigationBean.redirectToHireReturnNote()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="#{langsys['Production']}">  
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Map']} #{langsys['Product']} #{langsys['and']} #{langsys['Inputs']}" action="#{navigationBean.redirectToProductionMap()}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Production']}" action="#{navigationBean.redirectToProduction()}" /> 
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="#{langsys['Manage']} #{langsys['Stock']}">  
+                        <p:separator /> 
+                        <p:submenu label="#{langsys['Item']} #{langsys['Transfers']}">  
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Item']} #{langsys['Transfer']} #{langsys['Request']}" action="#{navigationBean.redirectToTransferRequest()}" /> 
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Item']} #{langsys['Transfer']}" action="#{navigationBean.redirectToTransfer()}" /> 
+                            <p:separator />
+                        </p:submenu>
+                        <p:separator />
+                        <p:menuitem value="#{langsys['UnPack']} #{langsys['Stock']}" action="#{navigationBean.redirectToUnpackStock()}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Dispose']} #{langsys['Stock']}" action="#{navigationBean.redirectToDisposeStock()}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Adjust']} #{langsys['Stock']}" action="#{navigationBean.redirectToAdjustStock()}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Consume']} #{langsys['Stock']}" action="#{navigationBean.redirectToConsumeStock()}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Stock']} #{langsys['Take']}" action="#{navigationBean.redirectToStockTake()}" /> 
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="#{langsys['Cash']} #{langsys['Receipts']}">  
+                        <p:separator />
+                        <p:menuitem value="#{langsys['From']} #{langsys['Credit']} #{langsys['Sale']}" action="#{navigationBean.redirectToCashReceiptCS()}" />  
+                        <p:separator />
+                        <p:menuitem value="#{langsys['From']} #{langsys['Shareholder']}" action="#{navigationBean.redirectToCashReceiptCC()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Receive']} #{langsys['Loan']}" action="#{navigationBean.redirectToCashReceiptLOAN()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Receive']} #{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]} #{langsys['Deposit']}" action="#{navigationBean.redirectToCashReceiptPrepaidIncome()}" />  
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Receive']} #{langsys['Other']} #{langsys['Revenue']}" action="#{navigationBean.redirectToCashReceiptRevenue()}" />  
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="#{langsys['Cash']} #{langsys['Payments']}">  
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Credit']} #{langsys['Purchase']} #{langsys['Payment']}" action="#{navigationBean.redirectToCashPaymentPI()}" />  
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Loan']} #{langsys['Repayment']}" action="#{navigationBean.redirectToCashPaymentLOAN()}" />  
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Owner']} #{langsys['Cash']} #{langsys['Drawing']}" action="#{navigationBean.redirectToCashPaymentDRAW()}" />  
+                        <p:separator />
+                        <p:menuitem value="#{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]} #{langsys['Advance']}  #{langsys['Payment']}" action="#{navigationBean.redirectToCashPaymentPrepaidExpense()}" />  
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Payment']} #{langsys['against']} #{langsys['Liability']}" action="#{navigationBean.redirectToCashPaymentLIABILITY()}" />  
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                </p:submenu>  
+                <p:submenu label="#{langsys['Item']}" icon="ui-icon-pencil">  
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Measure']} #{langsys['Units']}" action="#{navigationBean.redirectToUnit()}"/> 
+                    <p:separator />
+                    <p:submenu label="#{langsys['Categorise']} #{langsys['Items']}">   
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Category']}" action="#{navigationBean.redirectToCategory()}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Subcategory']}" action="#{navigationBean.redirectToSubCategory()}" />  
+                        <p:separator />
+                    </p:submenu> 
+                    <p:separator /> 
+                    <p:submenu label="#{langsys['Item']} #{langsys['Details']}">   
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Items']} #{langsys['for']} #{langsys['Sale']}" action="#{navigationBean.redirectToItem('Stock')}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Items']} #{langsys['for']} #{langsys['Expenditure']}" action="#{navigationBean.redirectToItem('Expense')}" />  
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Asset']} #{langsys['Items']}" action="#{navigationBean.redirectToItem('Asset')}" />  
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Item']} #{langsys['Location']}" action="#{navigationBean.redirectToItemLocation()}" />
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Big']} #{langsys['Small']} #{langsys['Item']} #{langsys['Map']}" action="#{navigationBean.redirectToItemMap()}" /> 
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Sale']} #{langsys['Packages']}" action="#{navigationBean.redirectToItemCombination()}" /> 
+                    <p:separator />
+                    <p:submenu label="#{langsys['Trade']} #{langsys['Discount']}">   
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Packages']}" action="#{navigationBean.redirectToDiscountPackage()}" /> 
+                        <p:separator />
+                    </p:submenu> 
+                    <p:separator />
+                </p:submenu> 
+                <p:submenu label="#{langsys['Contacts']}" icon="ui-icon-suitcase">  
+                    <p:separator />
+                    <p:menuitem value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]} #{langsys['Details']}" action="#{navigationBean.redirectToTransactorCustomer()}" /> 
+                    <p:separator />
+                    <p:menuitem value="#{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]} #{langsys['Details']}" action="#{navigationBean.redirectToTransactorSupplier()}" /> 
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Provider']} #{langsys['Details']}" action="#{navigationBean.redirectToTransactorProvider()}" /> 
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Segments']}" action="#{navigationBean.redirectToTransactorSegment()}" /> 
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Merge']} #{langsys['Contacts']}" action="#{navigationBean.redirectToTransactorMerge()}" /> 
+                    <p:separator />
+                </p:submenu>
+                <p:submenu label="#{langsys['Accounts']}" icon="ui-icon-lightbulb">  
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Accounting']} #{langsys['Period']}" action="#{navigationBean.redirectToAccountPeriod()}" /> 
+                    <p:separator />
+                    <p:submenu label="#{langsys['Chart']} #{langsys['of']} #{langsys['Accounts']}">   
+                        <p:menuitem value="#{langsys['Chart']} #{langsys['of']} #{langsys['Accounts']}" action="#{navigationBean.redirectToChartOfAccounts()}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Child']} #{langsys['Accounts']}" action="#{navigationBean.redirectToChildAccounts()}" /> 
+                        <p:separator />
+                    </p:submenu> 
+                    <p:separator />
+                    <p:submenu label="#{langsys['Opening']} #{langsys['Balance']}">   
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Customer']} #{langsys['Balance']}" action="#{navigationBean.redirectToOpenBalanceCustomer()}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Supplier']} #{langsys['Balance']}" action="#{navigationBean.redirectToOpenBalanceSupplier()}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Cash']} #{langsys['Account']} #{langsys['Balance']}" action="#{navigationBean.redirectToOpenBalanceCash()}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Other']} #{langsys['Account']} #{langsys['Balance']}" action="#{navigationBean.redirectToOpenBalanceOtherAcc()}" /> 
+                        <p:separator />
+                    </p:submenu>  
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Record']} #{langsys['Journal']} #{langsys['Entry']}" action="#{navigationBean.redirectToJournalEntryTrans()}" /> 
+                    <p:separator />
+                    <p:submenu label="#{langsys['Cash']} #{langsys['Management']}">   
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Cash']} #{langsys['Transfer']}" action="#{navigationBean.redirectToCashTransfer()}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Cash']} #{langsys['Adjustment']}" action="#{navigationBean.redirectToCashAdjustment()}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Daily']} #{langsys['Cash']} #{langsys['Balancing']}" action="#{navigationBean.redirectToCashBalancingDaily()}" /> 
+                        <p:separator />
+                    </p:submenu> 
+                    <p:separator />
+                </p:submenu>
+                <p:submenu label="#{langsys['Settings']}" icon="ui-icon-gear"> 
+                    <p:separator />
+                    <p:submenu label="#{langsys['Branch']} #{langsys['Settings']}">  
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Basic']} #{langsys['Settings']}" action="#{navigationBean.redirectToCompanySetting()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['More']} #{langsys['Settings']}" action="#{navigationBean.redirectToMoreSetting()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="#{langsys['Branch']} #{langsys[companySetting.getStoreEquivName()]}">  
+                        <p:separator />
+                        <p:menuitem value="#{langsys[companySetting.getStoreEquivName()]} #{langsys['Detail']}" action="#{navigationBean.redirectToStore()}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys[companySetting.getStoreEquivName()]} #{langsys['Locations']}" action="#{navigationBean.redirectToLocation()}" /> 
+                        <p:separator />
+                    </p:submenu> 
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Transaction']} #{langsys['Types']}" action="#{navigationBean.redirectToTransactionType()}" /> 
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Transaction']} #{langsys['Subtypes']}" action="#{navigationBean.redirectToTransactionReason()}" />   
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Payment']} #{langsys['Methods']}" action="#{navigationBean.redirectToPayMethod()}" />   
+                    <p:separator />
+                    <p:submenu label="#{langsys['Users']} #{langsys['and']} #{langsys['Groups']}">  
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Group']} #{langsys['Details']}" action="#{navigationBean.redirectToGroupDetail()}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Group']} #{langsys['Rights']}" action="#{navigationBean.redirectToGroupRight()}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['User']} #{langsys['Details']}" action="#{navigationBean.redirectToUserDetail()}" /> 
+                        <p:separator />
+                        <p:menuitem value="User Management CRM" action="#{navigationBean.redirectToUserManagementCRM()}" 
+                                    icon="fa fa-users" style="color: #7BC043; font-weight: bold;" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Group']} #{langsys['Users']}" action="#{navigationBean.redirectToGroupUser()}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['User']} #{langsys['Category']}" action="#{navigationBean.redirectToUserCategory()}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['User']} #{langsys['Item']} #{langsys['Earning']}" action="#{navigationBean.redirectToUserItemEarn()}" /> 
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Currency']} #{langsys['Details']}" action="#{navigationBean.redirectToCurrency()}" /> 
+                    <p:separator />
+                    <p:menuitem value="#{langsys['View']} #{langsys['License']} #{langsys['Details']}" action="#{navigationBean.redirectToLicenseDetail()}" />   
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Shift']}" action="#{navigationBean.redirectToShift()}" />   
+                    <p:separator />
+                </p:submenu>
+                <p:submenu label="#{langsys['Reports']}" icon="ui-icon-document">
+                    <p:separator />
+                    <p:submenu label="#{langsys['Dashboards']}" rendered="#{1==1}" icon="ui-icon-document">  
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Day']} #{langsys['Closing']}" action="DashboardDayClose?faces-redirect=true" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Sales']} #{langsys['Trend']}" action="DashboardSales?faces-redirect=true" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Top']} #{langsys['Selling']}" action="DashboardSalesItems?faces-redirect=true" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Expenses']} #{langsys['Trend']}" action="DashboardExpenses?faces-redirect=true" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Top']} #{langsys['Expenses']}" action="DashboardExpensesItems?faces-redirect=true" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Stock']} #{langsys['Trend']}" action="DashboardStock?faces-redirect=true" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:submenu label="#{langsys['Item']} #{langsys['Detail']}">
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Item']} #{langsys['Detail']}" action="#{navigationBean.redirectToReportItemDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Items']} #{langsys['Location']}" action="#{navigationBean.redirectToReportItemDetailLocation()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="#{langsys['Contacts']} #{langsys['Reports']}">
+                        <p:separator />
+                        <p:menuitem value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]} #{langsys['List']}" action="#{navigationBean.redirectToReportPartnerCustomer()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]} #{langsys['List']}" action="#{navigationBean.redirectToReportPartnerSupplier()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Scheme']} #{langsys['List']}" action="#{navigationBean.redirectToReportPartnerScheme()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Provider']} #{langsys['List']}" action="#{navigationBean.redirectToReportPartnerProvider()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Provider']} #{langsys['Bill']} #{langsys['Report']}" action="#{navigationBean.redirectToReportProviderBill()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]} #{langsys['Statement']}" action="#{navigationBean.redirectToReportCustomerCard()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]} #{langsys['Statement']}" action="#{navigationBean.redirectToReportSupplierCard()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="#{langsys['Inventory']}">
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Stock']} #{langsys['Movement']}" action="#{navigationBean.redirectToReportInventoryLedger()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Stock']} #{langsys['Value']}" action="#{navigationBean.redirectToReportStock()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Stock']} #{langsys['Status']}" action="#{navigationBean.redirectToReportStockStatus()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Risk']} #{langsys['of']} #{langsys['Expiry']}" action="#{navigationBean.redirectToReportExpiryStatus()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Asset']} #{langsys['Inventory']}" action="#{navigationBean.redirectToReportInventoryAsset()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="#{langsys['Sales']} #{langsys['Reports']}">  
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Sale']} #{langsys['Invoices']}" action="#{navigationBean.redirectToReportSalesInvoiceDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Credit']} #{langsys['and']} #{langsys['Debit']} #{langsys['Notes']}" action="#{navigationBean.redirectToReportSalesCrDrNoteDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Sale']} #{langsys['Quotations']}" action="#{navigationBean.redirectToReportSalesQuotationDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Sale']} #{langsys['Orders']}" action="#{navigationBean.redirectToReportSalesOrderDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Goods']} #{langsys['Delivery']}" action="#{navigationBean.redirectToReportSalesDeliveryDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['User']} #{langsys['Earn']} #{langsys['Report']}" action="#{navigationBean.redirectToReportSalesUserEarnDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Sales']} #{langsys['Package']}" action="#{navigationBean.redirectToReportSalesPackageDetail()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="#{langsys['Purchase']} #{langsys['and']} #{langsys['Expense']}">  
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Purchase']} #{langsys['and']} #{langsys['Expense']}" action="#{navigationBean.redirectToReportPurchaseInvoiceDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Purchase']} #{langsys['Orders']}" action="#{navigationBean.redirectToReportPurchaseOrderDetail()}" />
+                        <p:separator rendered="#{menuItemBean.menuItemObj.PURCHASE_INVOICE_MODE eq 0}"/>
+                        <p:menuitem value="#{langsys['Items']} #{langsys['Received']}" action="#{navigationBean.redirectToReportPurchaseItemReceivedDetail()}" rendered="#{menuItemBean.menuItemObj.PURCHASE_INVOICE_MODE eq 0}"/>
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator rendered="#{menuItemBean.menuItemObj.HIRE_MODULE_ON==1}"/>
+                    <p:submenu label="#{langsys['Hire']} #{langsys['Reports']}" rendered="#{menuItemBean.menuItemObj.HIRE_MODULE_ON==1}">
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Hire']} #{langsys['Quotations']}" action="#{navigationBean.redirectToReportHireQuotationDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Hire']} #{langsys['Invoices']}" action="#{navigationBean.redirectToReportHireInvoiceDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Delivery']} #{langsys['Notes']}" action="#{navigationBean.redirectToReportHireDeliveryNoteDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Return']} #{langsys['Notes']}" action="#{navigationBean.redirectToReportHireReturnNoteDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Unreturned']} #{langsys['Items']}" action="#{navigationBean.redirectToReportHireUnReturnedDetail()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator/>
+                    <p:submenu label="#{langsys['Production']}">  
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Production']} #{langsys['Report']}" action="#{navigationBean.redirectToReportProductionDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Input']} #{langsys['Output']} #{langsys['Report']}" action="#{navigationBean.redirectToReportProdInputOutputDetail()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator/>
+                    <p:submenu label="#{langsys['Stock']} #{langsys['Manage']} #{langsys['Reports']}">  
+                        <p:separator />
+                        <p:submenu label="#{langsys['Item']} #{langsys['Transfers']}">  
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Requests']}" action="#{navigationBean.redirectToReportTransferRequestDetail()}" />
+                            <p:separator />
+                            <p:menuitem value="#{langsys['Transfers']}" action="#{navigationBean.redirectToReportTransferDetail()}" />
+                            <p:separator />
+                        </p:submenu>
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Stock']} #{langsys['Disposal']}" action="#{navigationBean.redirectToReportDisposeStockDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Stock']} #{langsys['Adjustment']}" action="#{navigationBean.redirectToReportAdjustStockDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Stock']} #{langsys['Consumption']}" action="#{navigationBean.redirectToReportConsumeStockDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Stock']} #{langsys['Take']}" action="#{navigationBean.redirectToReportStockTake()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="#{langsys['Item']} #{langsys['Transactions']}">  
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Item']} #{langsys['Transactions']}" action="#{navigationBean.redirectToItemTransaction()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="#{langsys['Cash']} #{langsys['Report']}">
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Daily']} #{langsys['Cash']} #{langsys['Balancing']}" action="#{navigationBean.redirectToReportReportCashBalancingDaily()}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Cash']} #{langsys['Flow']} #{langsys['By']} #{langsys['User']}" action="#{navigationBean.redirectToReportCashFlowUser()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Cash']} #{langsys['Accounts']} #{langsys['Balance']}" action="#{navigationBean.redirectToReportCashAccBalances()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Cash']} #{langsys['Receipts']}" action="#{navigationBean.redirectToReportCashReceiptDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Cash']} #{langsys['Payments']}" action="#{navigationBean.redirectToReportCashPaymentDetail()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="#{langsys['Receivables']}">
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Receivables']} #{langsys['Detail']}" action="#{navigationBean.redirectToReportReceivableDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Receivables']} #{langsys['Summary']}" action="#{navigationBean.redirectToReportReceivableSummary()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Sales']} #{langsys['Invoice']} #{langsys['Aging']}" action="#{navigationBean.redirectToReportSalesInvoiceAge()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="#{langsys['Payables']}">
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Payables']} #{langsys['Detail']}" action="#{navigationBean.redirectToReportPayableDetail()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Payables']} #{langsys['Summary']}" action="#{navigationBean.redirectToReportPayableSummary()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Supplier']} #{langsys['Invoice']} #{langsys['Aging']}" action="#{navigationBean.redirectToReportSupplierInvoiceAge()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="#{langsys['Accounts']}">
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Journal']} #{langsys['Entry']}" action="#{navigationBean.redirectToReportJournal()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Account']} #{langsys['Balances']} (#{langsys['Trial Balance']})" action="#{navigationBean.redirectToTrialBalance()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Opening']} #{langsys['Balance']} (#{langsys['Manual']})" action="#{navigationBean.redirectToReportOpenBalance()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Post']} #{langsys['Closing']} #{langsys['Trial Balance']}" action="#{navigationBean.redirectToPostCloseTrialBalance()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Cash']} #{langsys['Flow']} #{langsys['Statement']}" action="#{navigationBean.redirectToCashFlowStatement()}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Balance Sheet']}" action="#{navigationBean.redirectToBalanceSheet()}" /> 
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Income Statement']}" action="#{navigationBean.redirectToIncomeStatement()}" /> 
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="#{langsys['Risk']} #{langsys['Reports']}">  
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Overpaid']} #{langsys['Transactions']}" action="#{navigationBean.redirectToReportOverpaidTrans()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['Stock']} #{langsys['Pricing']}/#{langsys['Qty']} #{langsys['Errors']}" action="#{navigationBean.redirectToReportStockPriceQtyError()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                    <p:submenu label="#{langsys['Interface']} #{langsys['Reports']}">  
+                        <p:separator />
+                        <p:menuitem value="#{langsys['TaxBody']} #{langsys['Sales']}" action="#{navigationBean.redirectToReportSalesTaxAPI()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['TaxBody']} #{langsys['Stock']}" action="#{navigationBean.redirectToReportStockTaxAPI()}" />
+                        <p:separator />
+                        <p:menuitem value="SMbi #{langsys['Interface']}" action="#{navigationBean.redirectToReportSMbiAPI()}" />
+                        <p:separator />
+                        <p:menuitem value="#{langsys['EFD']} #{langsys['Logs']} #{langsys['Report']}" action="#{navigationBean.redirectToReportEFDLogs()}" />
+                        <p:separator />
+                    </p:submenu>
+                    <p:separator />
+                </p:submenu>  
+                <p:menuitem id="mniAlert" value="#{generalUserSetting.userUnreadStockAlertsCount}" action="#{navigationBean.redirectToReportAlerts()}" icon="fa fa-fw fa-envelope" style="background-color:#FF0000;color: #ffffff;float: right;" rendered="#{generalUserSetting.userUnreadStockAlertsCount>0}"/>
+                <p:submenu label="#{menuItemBean.menuItemObj.CURRENT_USER.userName}" style="background-color: #F0F0F0;color: #ffffff;float: right;" icon="ui-icon-person">  
+                    <p:separator />
+                    <p:menuitem value="#{langsys['Logout']}" action="#{login.userLogout()}" icon="ui-icon-power" />
+                    <p:separator />
+                    <p:menuitem value="Profile" action="#{navigationBean.redirectToMyAccount()}" icon="ui-icon-person" />
+                    <p:separator />
+                </p:submenu>
+            </p:menubar>
+        </h:form> 
+    </h:body>
+</html>

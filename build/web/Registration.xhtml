@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Trans itional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <h:head>
+        <title>Register - VendorPlus</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/png" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{dBConnection.readConnectionConfigurations('configurations.ConfigFile')}"/>
+    </f:metadata>
+    <h:body style="background-color: white;">
+        <h:form id="form">  
+            <div class="card" style="max-width: 900px; margin: 2rem auto;">
+                <h:panelGrid id="pnlgHeader" columns="1" style="background-color: #7BC043;width: 100%;color: white; height: 3rem;text-align: center;">
+                    <h:outputLabel styleClass="clsLabelTop" value="VendorPlus Registration" style="font-size: 24px;"/>
+                </h:panelGrid>
+
+                <h:panelGrid style="width: 100%;margin-top: 2rem;text-align: center;" columns="1">
+                    <h:graphicImage alt="LOGO" value="resources/images/vendorplus.jpeg" style="max-width: 300px;"/>
+                    
+                    <h:panelGrid rendered="#{!userRegistrationBean.registrationSuccessful}" columns="2" style="margin: 2rem auto;" cellpadding="10">
+                        <h:outputLabel value="Create Your Account" style="font-size: 18px; font-weight: bold; color: #7BC043;" colspan="2"/>
+                        
+                        <!-- User Information Section -->
+                        <h:outputLabel value="User Information" style="font-weight: bold; text-decoration: underline; margin-top: 1rem;" colspan="2"/>
+                        
+                        <p:outputLabel value="* Username" for="txtUserName"/>
+                        <p:inputText id="txtUserName" value="#{userRegistrationBean.userName}" required="true" 
+                                     requiredMessage="Username is required" style="width: 300px;" maxlength="50"/>
+                        
+                        <p:outputLabel value="* Password" for="txtPassword"/>
+                        <p:password id="txtPassword" value="#{userRegistrationBean.password}" required="true" 
+                                    requiredMessage="Password is required" style="width: 300px;" 
+                                    feedback="true" promptLabel="Enter password" weakLabel="Weak" goodLabel="Good" strongLabel="Strong"/>
+                        
+                        <p:outputLabel value="* Confirm Password" for="txtPasswordConfirm"/>
+                        <p:password id="txtPasswordConfirm" value="#{userRegistrationBean.passwordConfirm}" required="true" 
+                                    requiredMessage="Please confirm password" style="width: 300px;"/>
+                        
+                        <p:outputLabel value="* First Name" for="txtFirstName"/>
+                        <p:inputText id="txtFirstName" value="#{userRegistrationBean.firstName}" required="true" 
+                                     requiredMessage="First Name is required" style="width: 300px;" maxlength="50"/>
+                        
+                        <p:outputLabel value="Second Name" for="txtSecondName"/>
+                        <p:inputText id="txtSecondName" value="#{userRegistrationBean.secondName}" style="width: 300px;" maxlength="50"/>
+                        
+                        <p:outputLabel value="Third Name" for="txtThirdName"/>
+                        <p:inputText id="txtThirdName" value="#{userRegistrationBean.thirdName}" style="width: 300px;" maxlength="50"/>
+                        
+                        <p:outputLabel value="* Email Address" for="txtEmail"/>
+                        <p:inputText id="txtEmail" value="#{userRegistrationBean.emailAddress}" required="true" 
+                                     requiredMessage="Email is required" style="width: 300px;" maxlength="200"/>
+                        
+                        <p:outputLabel value="Phone Number" for="txtPhone"/>
+                        <p:inputText id="txtPhone" value="#{userRegistrationBean.phoneNo}" style="width: 300px;" maxlength="50"/>
+                        
+                        <p:outputLabel value="Transaction Code" for="txtTransCode"/>
+                        <p:password id="txtTransCode" value="#{userRegistrationBean.transCode}" style="width: 300px;" 
+                                    maxlength="20" promptLabel="Optional transaction PIN"/>
+                        
+                        <!-- Company/Organization Information Section -->
+                        <h:outputLabel value="Company/Organization Information" style="font-weight: bold; text-decoration: underline; margin-top: 1rem;" colspan="2"/>
+                        
+                        <p:outputLabel value="* Company/Organization Name" for="txtCompanyName"/>
+                        <p:inputText id="txtCompanyName" value="#{userRegistrationBean.companyName}" required="true" 
+                                     requiredMessage="Company Name is required" style="width: 300px;" maxlength="200"/>
+                        
+                        <p:outputLabel value="Tax ID / Business Registration" for="txtTaxId"/>
+                        <p:inputText id="txtTaxId" value="#{userRegistrationBean.taxId}" style="width: 300px;" maxlength="100"/>
+                        
+                        <p:outputLabel value="Address" for="txtAddress"/>
+                        <p:inputTextarea id="txtAddress" value="#{userRegistrationBean.address}" style="width: 300px;" rows="3" maxlength="500"/>
+                        
+                        <p:outputLabel value="City" for="txtCity"/>
+                        <p:inputText id="txtCity" value="#{userRegistrationBean.city}" style="width: 300px;" maxlength="100"/>
+                        
+                        <p:outputLabel value="Country" for="txtCountry"/>
+                        <p:inputText id="txtCountry" value="#{userRegistrationBean.country}" style="width: 300px;" maxlength="100"/>
+                        
+                        <!-- Action Buttons -->
+                        <h:outputLabel value="" />
+                        <h:panelGrid columns="2" style="margin-top: 1rem;">
+                            <p:commandButton value="Register" 
+                                             action="#{userRegistrationBean.registerUser()}" 
+                                             update="pnlgHeader form"
+                                             style="color: white;background-color: #7BC043; border-radius: 20px; width: 140px; margin-right: 10px;"
+                                             onstart="PF('statusDialog').show()" 
+                                             onsuccess="PF('statusDialog').hide()">
+                                <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                    <p:graphicImage name="/images/ajax-loader.gif"/>
+                                </p:dialog>
+                            </p:commandButton>
+                            
+                            <p:button value="Back to Login" outcome="Login.xhtml" 
+                                      style="color: #7BC043;background-color: white; border: 2px solid #7BC043; border-radius: 20px; width: 140px;"/>
+                        </h:panelGrid>
+                        
+                        <h:outputLabel value="* Required fields" style="font-size: 12px; font-style: italic; color: #666;" colspan="2"/>
+                    </h:panelGrid>
+                    
+                    <!-- Success Message Panel -->
+                    <h:panelGrid rendered="#{userRegistrationBean.registrationSuccessful}" columns="1" style="margin: 2rem auto; text-align: center;">
+                        <p:graphicImage library="default" name="images/success.png" width="64" height="64" alt="Success" 
+                                        onerror="this.style.display='none'" rendered="false"/>
+                        <h:outputLabel value="✓" style="font-size: 64px; color: #7BC043; font-weight: bold;"/>
+                        <h:outputLabel value="Registration Successful!" style="font-size: 24px; font-weight: bold; color: #7BC043; margin-top: 1rem;"/>
+                        <h:outputLabel value="Your account has been created successfully. You can now login with your username and password." 
+                                       style="font-size: 16px; margin: 1rem 0;"/>
+                        <p:button value="Go to Login" outcome="Login.xhtml" 
+                                  style="color: white;background-color: #7BC043; border-radius: 20px; width: 200px; margin-top: 1rem; padding: 10px;"/>
+                    </h:panelGrid>
+                    
+                    <!-- Messages -->
+                    <h:panelGrid id="pnlgMessage" style="text-align: center;width: 100%; margin-top: 1rem;">
+                        <h:outputLabel styleClass="clsActionMessage" style="color:green; font-weight: bold;" value="#{userRegistrationBean.actionMessageSuccess}"/>
+                        <h:outputLabel styleClass="clsActionMessage" style="color: red; font-weight: bold;" value="#{userRegistrationBean.actionMessageFailure}"/>
+                        <h:messages id="msgsMainMessage" style="color: red"/><br/>
+                    </h:panelGrid>
+                </h:panelGrid>
+            </div>
+        </h:form>
+    </h:body>
+</html>

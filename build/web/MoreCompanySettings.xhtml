@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Settings</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:metadata>
+        <f:event listener="#{navigationBean.checkAccessDenied('88', 'View')}" type="preRenderView" />
+        <f:viewAction action="#{parameter_listBean.initClearParameter_list(parameter_list)}"/>
+    </f:metadata>
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="form">
+            <h:panelGrid styleClass="clsPanelReportFilterTitle" columns="2">
+                <h:outputLabel styleClass="clsLabelTop" id="olblContact_listHeader" value="#{langsys['MORE']} #{langsys['COMPANY']} #{langsys['SETTINGS']} "/>
+                <h:outputLabel styleClass="clsLabelTop" style="background-color: #000000;font-weight: bold;" value="#{langsys['All']} #{langsys['Text']} #{langsys['Must']} #{langsys['be']} #{langsys['Entered']} #{langsys['in']} #{langsys['English']} "/>
+            </h:panelGrid>
+            <h:panelGrid columns="2">
+                <h:outputLabel  value="#{langsys['Context']}"/>
+                <p:inputText styleClass="clsInput" value="#{parameter_list.context}" style="width: 348px" autocomplete="off" disabled="true"/>
+                <h:outputLabel  value="#{langsys['Parameter']} #{langsys['Name']}"/>
+                <p:inputText style="width: 348px" value="#{parameter_list.parameter_name}" autocomplete="off" disabled="true">
+                </p:inputText>
+            </h:panelGrid>
+            <h:panelGrid columns="3">
+                <h:outputLabel  value="#{langsys['Parameter']} #{langsys['Value']}"/>
+                <p:inputTextarea id="parameter_value" value="#{parameter_list.parameter_value}" cols="69" rows="3"/>
+                <h:commandButton value="#{langsys['ENCRYPT']}">
+                    <f:ajax listener="#{parameter_list.setParameter_value(parameter_listBean.encryptParameterValue(parameter_list.parameter_value))}" execute="parameter_value" render="parameter_value olblActionMessage" />
+                </h:commandButton> 
+                <h:outputLabel  value="#{langsys['Description']}"/>
+                <p:inputTextarea styleClass="clsInput" value="#{parameter_list.description}" cols="69" rows="3" disabled="true"/>
+                <h:outputLabel  value=""/>
+            </h:panelGrid>  
+            <h:panelGrid styleClass="clsPanelReportFilterTitle" columns="1">
+                <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['UPDATE']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{parameter_listBean.saveParameter_list(parameter_list)}" process="@form" update="@form" />
+                </p:commandButton>
+            </h:panelGrid>
+            <h:panelGrid styleClass="clsGridMainMessages" columns="1">
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{contact_listBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
+            <p:growl/>
+            <p:dataTable tableStyle="width:auto;" id="dtblContact_list" value="#{parameter_listBean.getParameterListAll()}" var="t" 
+                         > 
+                <p:column headerText="#{langsys['Context']}">
+                    <h:outputLabel value="#{t.context}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Parameter']} #{langsys['Name']}">
+                    <h:outputLabel value="#{t.parameter_name}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Parameter']} #{langsys['Value']}">
+                    <h:outputLabel value="#{t.parameter_value}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Action']}">
+                    <h:commandButton value="#{langsys['Edit']}">
+                        <f:ajax listener="#{parameter_listBean.displayParameter_list(t, parameter_list)}" execute="@form" render="@form"/>
+                    </h:commandButton>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </h:body>
+</html>
+

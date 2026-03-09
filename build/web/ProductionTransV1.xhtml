@@ -1,0 +1,421 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Production</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+            function doHiddenClear() {
+                document.getElementById("TransFormProd:cmdbClear").click();
+            }
+        </script> 
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{navigationBean.checkAccessDenied(utilityBean.convertIntAsString(107), 'View')}"/>
+        <f:viewAction action="#{navigationBean.checkLicenseExpired()}"/>    
+        <f:viewAction action="#{transProductionBean.initTransProduction(itemProductionMap, transProductionBean.itmCombinationList,itemBean.selectedItem,itemBean.selectedItemX)}" />
+        <f:viewAction action="#{transProductionBean.initClearAll('PARENT',trans,transProductionBean.itmCombinationList,transItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,null,transBean.transUserDetail,null)}" />
+        <f:viewAction action="#{statusBean.initClearStatus()}"/>
+        <f:viewAction action="#{transBean.initCurrencyCode(9, trans)}"/>
+        <f:viewAction action="#{transBean.initTransType(70,107)}"/>
+        <f:viewAction action="#{transBean.initTransTypeRef(11,16)}"/>
+        <f:viewAction action="#{utilityBean.clearList(transProductionBean.orderProducedList)}"/>
+        <f:viewAction action="#{transProductionBean.clearTransProductionItem(transProductionBean.itemProductionMapObj)}"/>
+        <f:viewAction action="#{utilityBean.clearList(stockBean.batchList)}"/>
+    </f:metadata> 
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="TransFormProd" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
+                    return false;">
+
+            <h:panelGrid styleClass="clsGridMainHeader" columns="3">
+                <h:selectOneMenu styleClass="clsMenu" id="menuTransactionReason" value="#{trans.transactionReasonId}">
+                    <f:selectItem itemValue="#{transBean.transReasonObj.transactionReasonId}" itemLabel="#{generalUserSetting.getCurrentStore().getStoreName()} / #{transBean.transReasonObj.transactionReasonName}"/>
+                </h:selectOneMenu>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Stock']}:#{langsys['Output']}↑ #{langsys['Input']}↓"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Ledger']}:INV-ACC↓↑ COS-ACC↓↑"/>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainInput" columns="3">
+                <h:outputLabel  value="#{transBean.transTypeObj.transactionDateLabel}:"/>
+                <p:calendar id="calTransactionDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" size="8"/>
+                <h:panelGrid id="pnlSearch" columns="5" style="background-color: #b3f2b3;width: 100%;">
+                    <h:outputLabel value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}:"/>
+                    <p:autoComplete id="autcTransactorSearch" value="#{transactorBean.selectedTransactor}" 
+                                    completeMethod="#{transactorBean.getTransactorActiveObjectList}" 
+                                    var="trct" 
+                                    itemLabel="#{trct.transactorNames}" 
+                                    itemValue="#{trct}" 
+                                    converter="TransactorConverter" style="text-align: left;" 
+                                    forceSelection="true" 
+                                    >
+                        <p:column headerText="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}" style="text-align: left" >  
+                            #{trct.transactorNames} 
+                        </p:column> 
+                        <p:column headerText="#{langsys['Type']}" style="text-align: left" >  
+                            #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
+                        </p:column> 
+                        <p:column headerText="#{langsys['Contact']} #{langsys['Person']}" style="text-align: left">  
+                            #{trct.cpName} 
+                        </p:column> 
+                        <p:ajax event="itemSelect" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}" />
+                        <p:ajax event="change" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}" rendered="#{transactorBean.selectedTransactor!=null}" />
+                        <p:ajax event="itemSelect" listener="#{transBean.refreshTransList(11,transactorBean.selectedTransactor.transactorId,20,'is_processed','0,2')}" update="menuTransNumber" />
+                        <p:ajax event="change" listener="#{transBean.refreshTransList(11,transactorBean.selectedTransactor.transactorId,20,'is_processed','0,2')}" rendered="#{transactorBean.selectedTransactor!=null}" update="menuTransNumber" />
+                    </p:autoComplete>
+                    <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeRefObj.transactionNumberLabel)}:"/>
+                    <p:selectOneMenu id="menuTransNumber" value="#{trans.transactionRef}" editable="true" dynamic="true">
+                        <f:selectItem itemLabel="#{langsys['Select']} #{langsys['or']} #{langsys['Type']}" itemValue="0"/>
+                        <f:selectItems value="#{transBean.transList}" var="stl" itemLabel="#{stl.transactionNumber}" itemValue="#{stl.transactionNumber}"/>
+                        <p:ajax listener="#{transProductionBean.refreshOrderProducedList(trans,transProductionBean.orderProducedList,transItem)}" process="@form" update="TransFormProd:pnlgProduced TransFormProd:gridTransItem TransFormProd:pgrdSpecific TransFormProd:gridRawMaterialItem TransFormProd:dtbRawItem "/>
+                    </p:selectOneMenu>
+                    <p:commandButton id="cbtnAcquire" value="#{langsys['OK']}" style="background-color: black;color: white;font-weight: bold;" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" >
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{transProductionBean.refreshOrderProducedList(trans,transProductionBean.orderProducedList,transItem)}" process="@form" update="TransFormProd:pnlgProduced TransFormProd:gridTransItem TransFormProd:pgrdSpecific TransFormProd:gridRawMaterialItem TransFormProd:dtbRawItem "/>
+                    </p:commandButton>
+                </h:panelGrid>
+            </h:panelGrid>
+            <h:panelGrid columns="2">
+                <h:panelGrid columns="1">
+                    <p:panel header="#{langsys['Produced']} #{langsys['Item']} (#{langsys['Output']}/#{langsys['Product']})">
+                        <h:panelGrid id="gridTransItem" columns="5">
+                            <p:commandLink actionListener="#{itemBean.openChildItem('Stock',transItem.itemId)}" value="#{langsys['Produced']} #{langsys['Item']}"/>  
+                            <h:outputLabel value="PCs"/>
+                            <h:outputLabel value="#{langsys['Size']}"/>
+                            <h:outputLabel value="#{langsys['Unit']}"/>
+                            <h:outputLabel value="#{langsys['Qty']}"/>
+
+                            <p:autoComplete id="proItem" widgetVar="WproItem" value="#{itemBean.selectedItem}"  
+                                            completeMethod="#{itemBean.getItemObjectListForProduction}" 
+                                            var="pro_itm" 
+                                            itemLabel="#{pro_itm.description}" 
+                                            itemValue="#{pro_itm}" 
+                                            converter="ItemConverter" style="text-align: left" 
+                                            forceSelection="true" queryDelay="0"  
+                                            rendered="#{transItem.transactionItemId==0}" 
+                                            disabled="#{trans.transactionRef.length()>0}"
+                                            >
+                                <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="text-align: left" >  
+                                    #{pro_itm.description} 
+                                </p:column> 
+                                <p:column headerText="#{langsys['Alias']}" style="text-align: left" >  
+                                    #{pro_itm.alias_name} 
+                                </p:column> 
+                                <p:column headerText="#{langsys['Item']} #{langsys['Code']}" style="text-align: left" >  
+                                    #{pro_itm.itemCode} 
+                                </p:column> 
+                                <p:column headerText="#{langsys['Currency']}" style="text-align: left">
+                                    <h:outputText value="#{pro_itm.currencyCode}">
+                                    </h:outputText>
+                                </p:column>
+                                <p:ajax event="blur" listener="#{itemBean.refreshItemUnitList(itemBean.selectedItem,transItem,1)}" process="@this menuUnit1" update="menuUnit1"/>
+                                <p:ajax event="blur" listener="#{itemProductionMap.setOutput_unit_id(transItem.unit_id)}" process="@this"/>
+                                <p:ajax event="blur" listener="#{itemProductionMap.setOutputItemId(itemBean.selectedItem.itemId)}" process="@this"/>
+                                <p:ajax event="blur" listener="#{transItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,70,107,'',trans,transItem,itemBean.selectedItem,1.0)}" process="@this" update="dtbRawItem batch menuUnit1 itxtQty itxtUnitCost calMnfDate calExpDate pgrdSpecific"/>
+                                <p:ajax event="blur" listener="#{transProductionBean.getItemProductionMapsByParentItemId(itemProductionMap.outputItemId)}" process="@this" update="dtbRawItem batch menuUnit1 itxtQty itxtUnitCost calMnfDate calExpDate pgrdSpecific"/>
+                                <p:ajax event="blur" listener="#{transProductionBean.updateUnitCostProduction(transItem,generalUserSetting.currentStore.storeId)}" process="@this" update="itxtUnitCost"/>
+                            </p:autoComplete>
+                            <p:inputText value="#{transItem.description}" style="width: 205px" disabled="true" rendered="#{transItem.transactionItemId==1}"/>
+                            <h:inputText id="itxtUnitSizeQty" style="width: 100px" value="#{transItem.specific_size_qty}" autocomplete="off">
+                                <f:ajax event="change" listener="#{transProductionBean.specifySizeProduced(transItem)}" render="itxtQty dtbRawItem"/>
+                                <f:ajax event="keyup" listener="#{transProductionBean.specifySizeProduced(transItem)}" render="itxtQty dtbRawItem"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:ajax event="change" listener="#{transProductionBean.updateListUponChangeOutputQty(transItem,generalUserSetting.currentStore.storeId,transProductionBean.itmCombinationList)}" execute="@this" render="dtbRawItem"/>
+                                <f:ajax event="keyup" listener="#{transProductionBean.updateListUponChangeOutputQty(transItem,generalUserSetting.currentStore.storeId,transProductionBean.itmCombinationList)}" execute="@this" render="dtbRawItem"/>
+                            </h:inputText>
+                            <h:inputText id="itxtUnitSize" style="width: 100px" value="#{transItem.specific_size}" autocomplete="off" disabled="true">
+                                <f:ajax event="change" listener="#{transProductionBean.specifySizeProduced(transItem)}" render="itxtQty totQty dtbRawItem"/>
+                                <f:ajax event="keyup" listener="#{transProductionBean.specifySizeProduced(transItem)}" render="itxtQty totQty dtbRawItem"/>
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:inputText>
+                            <p:selectOneMenu id="menuUnit1" styleClass="clsMenu" value="#{itemProductionMap.output_unit_id}" style="width: 90px;" rendered="#{transItem.transactionItemId==0}">
+                                <f:selectItems value="#{itemBean.getItemUnitList(itemProductionMap.outputItemId, null, 1)}" var="iu" itemLabel="#{iu.unit_symbol}" itemValue="#{iu.unit_id}"/>
+                                <p:ajax listener="#{transItem.setUnit_id(itemProductionMap.output_unit_id)}" process="@this"/>
+                                <p:ajax listener="#{transProductionBean.updateUnitCostProduction(transItem,generalUserSetting.currentStore.storeId)}" process="@this" update="itxtUnitCost"/>
+                            </p:selectOneMenu>
+                            <p:inputText value="#{transItem.unitSymbol}" style="width: 110px" disabled="true" rendered="#{transItem.transactionItemId==1}"/>
+                            <p:inputText id="itxtQty" style="width: 100px" value="#{transItem.itemQty}" autocomplete="off" disabled="true">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:ajax event="change" listener="#{transProductionBean.updateListUponChangeOutputQty(transItem,generalUserSetting.currentStore.storeId,transProductionBean.itmCombinationList)}" execute="@this" render="totQty dtbRawItem"/>
+                                <f:ajax event="keyup" listener="#{transProductionBean.updateListUponChangeOutputQty(transItem,generalUserSetting.currentStore.storeId,transProductionBean.itmCombinationList)}" execute="@this" render="totQty dtbRawItem"/>
+                            </p:inputText>
+
+                            <h:outputLabel value="#{langsys['Batch']}"/>
+                            <h:outputLabel value="#{langsys['Manuf']} #{langsys['Date']}"/>
+                            <h:outputLabel value="#{langsys['Expiry']} #{langsys['Date']}"/>
+                            <h:outputLabel value="#{langsys['Unit']} #{langsys['Cost']}"/>
+                            <h:outputLabel value=""/>
+                            <p:inputText id="batch" value="#{transItem.batchno}" style="width: 210px"/>
+                            <p:calendar id="calMnfDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{transItem.itemMnfDate}" size="8" pattern="#{companySetting.getDateFormat()}">
+                            </p:calendar>
+                            <p:calendar id="calExpDate" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{transItem.itemExpryDate}" size="8" pattern="#{companySetting.getDateFormat()}">
+                            </p:calendar>
+                            <p:inputText id="itxtUnitCost" value="#{transItem.unitCostPrice}" style="width: 100px;">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </p:inputText>
+                            <h:outputLabel value=""/>
+                        </h:panelGrid>
+                        <h:panelGrid id="pgrdSpecific">
+                            <h:panelGrid id="pgrdSpecific2" columns="3" rendered="#{itemBean.selectedItem.isGeneral==1 || transItem.is_general==1}">
+                                <h:outputLabel value="#{langsys['Specific']} #{langsys['Name']}"/>
+                                <h:outputLabel value="#{langsys['Specific']} #{langsys['Code']}"/>
+                                <h:outputLabel value="#{langsys['More']} #{langsys['Description']}"/>
+                                <p:inputText id="itxtDescSppecific" style="width: 205px" disabled="false" value="#{transItem.descSpecific}"/>
+                                <p:inputText id="itxtCodeSpecific" style="width: 110px" disabled="false" value="#{transItem.codeSpecific}"/>
+                                <p:inputTextarea id="itxaDescMore" rows="1" cols="25" value="#{transItem.descMore}"/>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </p:panel>
+                    <p:panel header="#{langsys['Used']} #{langsys['Item']} (#{langsys['Input']}/#{langsys['Raw Material']})">
+                        <h:panelGrid id="gridRawMaterialItem" styleClass="clsGridMainInput" columns="8">
+                            <p:commandLink actionListener="#{itemBean.openChildItem('Expense',transItem.itemId)}" value="#{langsys['Item']} #{langsys['Description']}"/>
+                            <h:outputLabel value="#{langsys['Unit']}"/> 
+                            <h:outputLabel value="#{langsys['Batch']}"/> 
+                            <h:outputLabel value="#{langsys['Current']} #{langsys['Qty']}"/> 
+                            <h:outputLabel value="#{langsys['Unit']} #{langsys['Qty']} #{langsys['Used']}"/>
+                            <h:outputLabel value="#{langsys['Total']} #{langsys['Qty']} #{langsys['Used']}"/>
+                            <h:outputLabel value="#{langsys['Qty']} #{langsys['Left']} (#{langsys['Balance']})"/> 
+                            <h:outputLabel value=""/> 
+                            <p:autoComplete id="rawItem" widgetVar="WrawItem" value="#{itemBean.selectedItemX}"  
+                                            completeMethod="#{itemBean.getItemObjectListForRawMaterial}" 
+                                            var="raw_itm" 
+                                            itemLabel="#{raw_itm.description}" 
+                                            itemValue="#{raw_itm}" 
+                                            converter="ItemConverter" style="text-align: left" 
+                                            forceSelection="true" queryDelay="0" 
+                                            >
+                                <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="text-align: left" >  
+                                    #{raw_itm.description} 
+                                </p:column>
+                                <p:column headerText="#{langsys['Alias']}" style="text-align: left" >  
+                                    #{raw_itm.alias_name} 
+                                </p:column>
+                                <p:column headerText="#{langsys['Item']} #{langsys['Code']}" style="text-align: left" >  
+                                    #{raw_itm.itemCode} 
+                                </p:column>
+                                <p:ajax event="blur" listener="#{itemBean.refreshItemUnitList(itemBean.selectedItemX,transItem,1)}" process="@this menuUnit2" update="menuUnit2"/>
+                                <p:ajax event="blur" listener="#{transProductionBean.itemProductionMapObj.setInput_unit_id(transItem.unit_id)}" process="@this"/>
+                                <p:ajax event="blur" listener="#{itemProductionMapBean.updateModelInput(transProductionBean.itemProductionMapObj,itemBean.selectedItemX,transItem)}" process="@this" update="menuUnit2 itxtQty3 itxtQty4"/>
+                                <p:ajax event="blur" listener="#{stockBean.refreshItemBatchList(generalUserSetting.getCurrentStore().getStoreId(),itemBean.selectedItemX.itemId)}" rendered="#{itemBean.selectedItemX!=null}" process="@this" update="menuBatchInputOutside"/>
+                                <p:ajax event="blur" listener="#{stockBean.setStockCurrentQtyUnit(transProductionBean.itemProductionMapObj,generalUserSetting.currentStore.storeId,itemBean.selectedItemX.itemId,transProductionBean.itemProductionMapObj.input_unit_id)}" rendered="#{itemBean.selectedItemX!=null}" process="@this" update="itxtCurrentQty itxtLeftQty"/>
+                            </p:autoComplete>
+                            <p:selectOneMenu id="menuUnit2" styleClass="clsMenu" value="#{transProductionBean.itemProductionMapObj.input_unit_id}" style="width: 90px;">
+                                <f:selectItems value="#{itemBean.getItemUnitList(transProductionBean.itemProductionMapObj.inputItemId, null, 1)}" var="iu" itemLabel="#{iu.unit_symbol}" itemValue="#{iu.unit_id}"/>
+                                <p:ajax listener="#{stockBean.setStockCurrentQtyUnit(transProductionBean.itemProductionMapObj,generalUserSetting.currentStore.storeId,itemBean.selectedItemX.itemId,transProductionBean.itemProductionMapObj.input_unit_id)}" process="@this rawItem" update="itxtCurrentQty itxtLeftQty"/>
+                            </p:selectOneMenu>
+                            <h:selectOneMenu id="menuBatchInputOutside" value="#{transProductionBean.itemProductionMapObj.batchno}" style="width: 100px;height: 30px;">
+                                <f:selectItem itemLabel="" itemValue=""/>
+                                <f:selectItems value="#{stockBean.batchList}" var="ic2" itemLabel="#{ic2.batchno}" itemValue="#{ic2.batchno}"/>
+                                <f:ajax event="change" listener="#{stockBean.setStockCurrentQtyUnit(transProductionBean.itemProductionMapObj,generalUserSetting.currentStore.storeId,transProductionBean.itemProductionMapObj.inputItemId,transProductionBean.itemProductionMapObj.input_unit_id)}" execute="gridRawMaterialItem" render="itxtCurrentQty itxtLeftQty"/>
+                            </h:selectOneMenu>
+                            <p:inputText id="itxtCurrentQty" style="width: 70px" value="#{transProductionBean.itemProductionMapObj.inputQtyCurrent}" autocomplete="off" disabled="true">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </p:inputText>
+                            <p:inputText id="itxtQty3" style="width: 70px" value="#{transProductionBean.itemProductionMapObj.inputQty}" autocomplete="off">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:ajax event="keyup" listener="#{transProductionBean.updateUponChangeInputUnitQtyUsed(transItem,transProductionBean.itemProductionMapObj)}" execute="@this" render="itxtQty4 itxtLeftQty" />
+                            </p:inputText>
+                            <p:inputText id="itxtQty4" style="width: 70px" value="#{transProductionBean.itemProductionMapObj.inputQtyTotal}" autocomplete="off">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:ajax event="keyup" listener="#{transProductionBean.updateUponChangeInputTotalQtyUsed(transItem,transProductionBean.itemProductionMapObj)}" execute="@this" render="itxtQty3" />
+                            </p:inputText>
+                            <p:inputText id="itxtLeftQty" style="width: 70px" value="#{transProductionBean.itemProductionMapObj.inputQtyBalance}" autocomplete="off">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                <f:ajax event="keyup" listener="#{transProductionBean.updateUponChangeInputQtyLeft(transItem,transProductionBean.itemProductionMapObj)}" execute="@this" render="itxtQty3 itxtQty4" />
+                            </p:inputText>
+                            <h:commandButton styleClass="clsButtonSmall" value="#{langsys['Add']}" style="height: 29px;">
+                                <f:ajax listener="#{transProductionBean.addTransProductionItem(transItem,itemBean.selectedItemX,transProductionBean.itemProductionMapObj)}" execute="gridRawMaterialItem" render="dtbRawItem growl1Raw gridRawMaterialItem itxtUnitCost"/>
+                            </h:commandButton>
+                            <p:growl id="growl1Raw" sticky="true"/>
+                        </h:panelGrid>
+                        <h:panelGrid id="gridItemStatus" styleClass="clsGridItemStatus" columns="1">
+                            <h:outputLabel id="olblItemAddedStstus" class="clsSuccessStatus" value="#{statusBean.itemAddedStatus}" rendered="#{statusBean.showItemAddedStatus==1}"/>
+                            <h:outputLabel id="olblItemNotAddedStstus" class="clsFailStatus" value="#{statusBean.itemNotAddedStatus}" rendered="#{statusBean.showItemNotAddedStatus==1}"/>
+                        </h:panelGrid>
+                        <p:dataTable rowIndexVar="rowIndex" id="dtbRawItem"  value="#{transProductionBean.itmCombinationList}" var="ati" 
+                                     styleClass="cls-table" tableStyle="width:auto;" 
+                                     >  
+                            <p:column>
+                                <!-- column header -->
+                                <f:facet name="header">#</f:facet>
+                                <!-- row record -->
+                                #{rowIndex+1}
+                            </p:column>
+                            <p:column>
+                                <!-- column header -->
+                                <f:facet name="header">#{langsys['Item']} #{langsys['Description']}</f:facet>
+                                <!-- row record -->
+                                #{ati.inputItemName}
+                            </p:column>
+                            <p:column>
+                                <!-- column header -->
+                                <f:facet name="header">#{langsys['Unit']}</f:facet>
+                                <!-- row record -->
+                                #{ati.inputItemUnit}
+                            </p:column>
+                            <p:column>
+                                <!-- column header -->
+                                <f:facet name="header">#{langsys['Batch']}</f:facet>
+                                <!-- row record -->
+                                <h:selectOneMenu id="menuBatchInputInside" value="#{ati.batchno}" style="width: 100px;">
+                                    <f:selectItem itemLabel="" itemValue=""/>
+                                    <f:selectItems value="#{stockBean.getStocks(generalUserSetting.getCurrentStore().getStoreId(),ati.inputItemId)}" var="ic2" itemLabel="#{ic2.batchno}" itemValue="#{ic2.batchno}"/>
+                                    <f:ajax event="change" listener="#{stockBean.setStockCurrentQtyUnit(ati,generalUserSetting.currentStore.storeId,ati.inputItemId,ati.input_unit_id)}" execute="@this" render="currentQty leftQty"/>
+                                </h:selectOneMenu>
+                            </p:column>
+                            <p:column>
+                                <!-- column header -->
+                                <f:facet name="header">#{langsys['Current']} #{langsys['Qty']}</f:facet>
+                                <!-- row record -->
+                                <p:inputText id="currentQty" value="#{ati.inputQtyCurrent}" style="width: 50px;" disabled="true">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </p:inputText>
+                            </p:column>
+                            <p:column>
+                                <!-- column header -->
+                                <f:facet name="header">#{langsys['Unit']} #{langsys['Qty']} #{langsys['Used']}</f:facet>
+                                <!-- row record -->
+                                <p:inputText id="unitQty" value="#{ati.inputQty}" style="width: 50px;">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:ajax event="keyup" listener="#{transProductionBean.updateUponChangeInputUnitQtyUsed(transItem,generalUserSetting.currentStore.storeId,ati)}" execute="@this" render="totQty TransFormProd:itxtUnitCost leftQty" />
+                                </p:inputText>
+                            </p:column>                      
+                            <p:column>
+                                <!-- column header -->
+                                <f:facet name="header">#{langsys['Total']} #{langsys['Qty']} #{langsys['Used']}</f:facet>
+                                <!-- row record -->
+                                <h:inputText value="#{ati.inputQtyTotal}" id="totQty" style="width: 50px;">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:ajax event="keyup" listener="#{transProductionBean.updateUponChangeInputTotalQtyUsed(transItem,generalUserSetting.currentStore.storeId,ati)}" execute="@this" render="unitQty TransFormProd:itxtUnitCost leftQty" />
+                                </h:inputText>
+                            </p:column>
+                            <p:column>
+                                <!-- column header -->
+                                <f:facet name="header">#{langsys['Qty']} #{langsys['Left']} (#{langsys['Balance']})</f:facet>
+                                <!-- row record -->
+                                <h:inputText value="#{ati.inputQtyBalance}" id="leftQty" style="width: 50px;">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    <f:ajax event="keyup" listener="#{transProductionBean.updateUponChangeInputQtyLeft(transItem,generalUserSetting.currentStore.storeId,ati)}" execute="@this" render="totQty unitQty TransFormProd:itxtUnitCost" />
+                                </h:inputText>
+                            </p:column>
+                            <p:column>
+                                <!-- column header -->
+                                <f:facet name="header">#{langsys['Action']}</f:facet>
+                                <!-- row record -->
+                                <h:commandLink value="Remove">
+                                    <f:ajax execute="dtbRawItem" listener="#{transProductionBean.removeTransProductionItem(transItem,ati)}" render="dtbRawItem TransFormProd:itxtUnitCost"/>
+                                </h:commandLink>                    
+                            </p:column> 
+                        </p:dataTable>
+                    </p:panel>
+                    <h:panelGrid id="pgrdOthers" styleClass="clsGridMainInput" columns="2">
+                        <h:outputLabel value="#{transBean.transTypeObj.transactionUserLabel}:"/>
+                        <p:autoComplete id="autcTransactionUser" value="#{transBean.transUserDetail}" 
+                                        completeMethod="#{userDetailBean.getUserDetailObjectListActive}" 
+                                        var="ud" 
+                                        itemLabel="#{ud.firstName} #{ud.secondName} #{ud.thirdName}" 
+                                        itemValue="#{ud}" 
+                                        converter="UserDetailConverter" style="text-align: left" 
+                                        forceSelection="true" queryDelay="0" 
+                                        >
+                            <p:column headerText="#{langsys['User']}/#{langsys['Staff']} #{langsys['Names']}" style="text-align: left" >  
+                                #{ud.firstName} #{ud.secondName} #{ud.thirdName} 
+                            </p:column> 
+                            <p:column headerText="#{langsys['User']} #{langsys['Category']}" style="text-align: left" >  
+                                #{userCategoryBean.getUserCategory(ud.userCategoryId).userCategoryName} 
+                            </p:column> 
+                            <p:ajax event="itemSelect" listener="#{trans.setTransactionUserDetailId(transBean.transUserDetail.userDetailId)}"/>
+                            <p:ajax event="change" listener="#{trans.setTransactionUserDetailId(transBean.transUserDetail.userDetailId)}" rendered="#{transBean.transUserDetail!=null}"/>
+                        </p:autoComplete>
+                    </h:panelGrid>
+                </h:panelGrid>
+                <h:panelGrid columns="1" id="pnlgProduced">
+                    <p:panel header="#{langsys['Production']} #{langsys['Summary']} #{langsys['for']} #{langsys['Selected']} #{langsys['Order']}">
+                        <p:dataTable rowIndexVar="rowIndex" id="dtblProduced"  value="#{transProductionBean.orderProducedList}" var="ati" 
+                                     styleClass="cls-table" tableStyle="width:auto;" 
+                                     >  
+                            <p:column style="font-size: 12px;">
+                                <!-- column header -->
+                                <f:facet name="header">#</f:facet>
+                                <!-- row record -->
+                                <p:commandButton id="cmdbProduce" value="#{rowIndex+1}" disabled="#{(ati.outputQty-ati.orderedQty)>=0}">
+                                    <p:ajax listener="#{transProductionBean.setItemForProduction(ati,generalUserSetting.currentStore.storeId,70,107,'',trans,transItem,itemBean.selectedItem)}" process="@form" update="TransFormProd:gridTransItem TransFormProd:pgrdSpecific"/>
+                                    <p:ajax listener="#{transProductionBean.getItemProductionMapsByParentItemId(transItem.itemId,transItem)}" process="@this" update="TransFormProd:dtbRawItem"/>
+                                    <p:ajax listener="#{transProductionBean.updateUnitCostProduction(transItem,generalUserSetting.currentStore.storeId)}" process="@this" update="TransFormProd:itxtUnitCost"/>
+                                </p:commandButton>
+                            </p:column>
+                            <p:column style="font-size: 12px;">
+                                <!-- column header -->
+                                <f:facet name="header">#{langsys['Production']} #{langsys['Item']}</f:facet>
+                                <!-- row record -->
+                                #{ati.outputItemName} 
+                                #{ati.descSpecific} 
+                                #{ati.codeSpecific}
+                            </p:column>
+                            <p:column style="font-size: 12px;">
+                                <!-- column header -->
+                                <f:facet name="header">#{langsys['Ordered']} #{langsys['Qty']}</f:facet>
+                                <!-- row record -->
+                                <p:outputLabel value="#{ati.orderedQty}">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </p:outputLabel>
+                                #{ati.outputItemUnit}
+                                #{transProductionBean.getPCsOrdered(ati)}
+                            </p:column>                      
+                            <p:column style="font-size: 12px;">
+                                <!-- column header -->
+                                <f:facet name="header">#{langsys['Produced']} #{langsys['Qty']}</f:facet>
+                                <!-- row record -->
+                                <p:outputLabel value="#{ati.outputQty}">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </p:outputLabel>
+                                #{ati.outputItemUnit}
+                                #{transProductionBean.getPCsProduced(ati)}
+                            </p:column>                      
+                        </p:dataTable>
+                    </p:panel>
+                </h:panelGrid>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainCommands" columns="1">
+                <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']} (ALT+S)" accesskey="s" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>                                
+                        <p:ajax listener="#{transProductionBean.saveTransProductionCEC(generalUserSetting.currentStore.storeId,70,107,transItem,transProductionBean.itmCombinationList,transBean.transUserDetail,trans,itemBean.selectedItem,transactorBean.selectedTransactor,transProductionBean.orderProducedList)}" process="@form" update="dtbRawItem gridTransItem gridItemStatus pgrdOthers pgrdSpecific pnlgProduced pgrdMsgs pnlgOutput growl1"/>
+                    </p:commandButton>
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="#{langsys['CLEAR']} (ALT+C)" accesskey="c">
+                        <p:ajax listener="#{transProductionBean.clearAll(trans,transProductionBean.itmCombinationList,transItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,null,transBean.transUserDetail,null,null,null)}" process="@form" update="@form"/>
+                    </p:commandButton>
+                </h:panelGrid>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainMessages" columns="1" id="pgrdMsgs">
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
+            <p:growl id="growl1"/>
+            <!-- INVOICE STARTS HERE -->
+            <h:panelGrid id="pnlgOutput" style="width: 100%">
+                <ui:include src="#{transBean.getPrintFileName('PARENT',transBean.transTypeObj,0)}"/>
+            </h:panelGrid>
+        </h:form>
+    </h:body>
+</html>
+

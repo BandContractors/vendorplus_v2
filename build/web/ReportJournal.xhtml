@@ -1,0 +1,183 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Journal Entry Report</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:event listener="#{navigationBean.checkAccessDenied('44', 'View')}" type="preRenderView" />
+    <f:event listener="#{accJournalBean.initResetAccJournalReport(accJournal, accJournalBean,null)}" type="preRenderView" />
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="formReport">
+            <h:panelGrid id="pnlgHeader" columns="1" styleClass="clsPanelReportFilterTitle">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys['Journal']} #{langsys['Entry']} #{langsys['Report']}"/>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgFilter" columns="7" styleClass="clsPanelReportFilter">
+                <p:outputLabel value="#{langsys['Accounting']} #{langsys['Period']}"/>
+                <p:outputLabel value="#{langsys['Date']} #{langsys['Type']}"/>
+                <p:outputLabel value="#{langsys['From']} #{accJournalBean.dateType}" id="lblDate1"/>
+                <p:outputLabel value="#{langsys['To']} #{accJournalBean.dateType}" id="lblDate2"/>
+                <p:outputLabel value="#{langsys['Account']}"/>
+                <p:outputLabel value="#{langsys['Child']} #{langsys['Account']}"/>
+                <p:outputLabel value=""/>
+
+                <h:selectOneMenu id="menuAccPeriod" value="#{accJournal.accPeriodId}" >
+                    <f:selectItems value="#{accPeriodBean.returnAccPeriodsCurrentFirst()}" var="ap" itemLabel="#{ap.accPeriodName}" itemValue="#{ap.accPeriodId}"/>
+                    <f:selectItem itemLabel=""/>
+                </h:selectOneMenu>
+                <h:selectOneMenu id="menuDateType" value="#{accJournalBean.dateType}" >
+                    <f:selectItem itemLabel=""/>
+                    <f:selectItem itemValue="Journal Date" itemLabel="#{langsys['Journal']} #{langsys['Date']}"/>
+                    <f:selectItem itemValue="Add Date" itemLabel="#{langsys['Add']} #{langsys['Date']}"/>
+                    <f:ajax event="change" execute="@this" render="lblDate1 lblDate2"/>
+                </h:selectOneMenu>
+                <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{accJournalBean.date1}" size="12"/>
+                <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{accJournalBean.date2}" size="12"/>
+
+
+                <p:autoComplete id="autcItem" widgetVar="WautcItem" value="#{transItemBean.selectedAccCoa}"  
+                                completeMethod="#{accCoaBean.getAccCoaObjectListAll}" 
+                                var="itm" 
+                                itemLabel="#{itm.accountName}" 
+                                itemValue="#{itm}" 
+                                converter="AccCoaConverter" style="text-align: left" 
+                                forceSelection="true" queryDelay="0" 
+                                >
+                    <p:column headerText="#{langsys['Account']} #{langsys['Name']}" style="text-align: left" >  
+                        #{itm.accountName} 
+                    </p:column> 
+                    <p:column headerText="#{langsys['Account']} #{langsys['Code']}" style="text-align: left" >  
+                        #{itm.accountCode} 
+                    </p:column> 
+                    <p:column headerText="#{langsys['Type']}" style="text-align: left">  
+                        #{accTypeBean.getAccTypeById(itm.accTypeId).accTypeName}
+                    </p:column> 
+                    <p:column headerText="#{langsys['Group']}/#{langsys['Category']}" style="text-align: left"> 
+                        #{accGroupBean.getAccGroupById(itm.accGroupId).accGroupName} / 
+                        #{accCategoryBean.getAccCategoryById(itm.accCategoryId).accCategoryName}
+                    </p:column> 
+                    <p:ajax event="itemSelect" listener="#{accJournal.setAccountCode(transItemBean.selectedAccCoa.accountCode)}" process="@this menuChildAcc" update="menuChildAcc"/>
+                    <p:ajax event="change" listener="#{accJournal.setAccountCode(transItemBean.selectedAccCoa.accountCode)}" rendered="#{transItemBean.selectedAccCoa!=null}" process="@this menuChildAcc" update="menuChildAcc"/>
+                </p:autoComplete>
+                <h:selectOneMenu styleClass="clsMenu" id="menuChildAcc" value="#{accJournal.accChildAccountId}" style="width: 240px">
+                    <f:selectItem itemLabel="" itemValue=""/>
+                    <f:selectItems value="#{accChildAccountBean.getAccChildAccounts(accJournal.accountCode,0,0)}" var="ea" itemLabel="#{ea.childAccountName}" itemValue="#{ea.accChildAccountId}"/>
+                </h:selectOneMenu>
+                <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']}" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accJournalBean.reportAccJournal(accJournal,accJournalBean)}" process="@form" update="pnlgMessage tblDetail"/>
+                </p:commandButton>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgMessage">
+                <p:outputLabel value="#{accJournalBean.actionMessage}" style="color: red;"/>
+            </h:panelGrid>
+            <p:dataTable id="tblDetail" tableStyle="width:auto;" var="itm" value="#{accJournalBean.accJournalList}" 
+                         paginator="true" rows="50" 
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
+                         rowsPerPageTemplate="50,100,200,400">
+                <f:facet name="header">
+                    <p:dataTable id="tblSummary" var="sm" value="#{accJournalBean.accJournalSummary}">
+                        <p:column headerText="#{langsys['Currency']}">
+                            <h:outputText value="#{sm.currencyCode}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Total']} #{langsys['Debit']} #{langsys['Amount']}" style="text-align: right;">
+                            <h:outputText value="#{sm.debitAmount}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{langsys['Total']} #{langsys['Credit']} #{langsys['Amount']}" style="text-align: right;">
+                            <h:outputText value="#{sm.creditAmount}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{langsys['Net']} #{langsys['Amount']}" style="text-align: right;">
+                            <h:outputText value="#{accJournalBean.returnNetAmountString(sm.debitAmount,sm.creditAmount)}"/>
+                        </p:column>
+                    </p:dataTable>
+                    #{accJournalBean.accJournalList.size()} #{langsys['Records']} #{langsys['Found']}
+                    <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
+                    <p:columnToggler datasource="tblDetail" trigger="toggler" />
+                </f:facet>
+                <f:facet name="{Exporters}">
+                    <h:commandLink>
+                        <p:graphicImage name="images/excel.png" width="24"/>
+                        <p:dataExporter type="xls" target="tblDetail" fileName="Journal_Entry" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/pdf.png" width="24"/>
+                        <p:dataExporter type="pdf" target="tblDetail" fileName="Journal_Entry"/>
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/csv.png" width="24"/>
+                        <p:dataExporter type="csv" target="tblDetail" fileName="Journal_Entry" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/xml.png" width="24"/>
+                        <p:dataExporter type="xml" target="tblDetail" fileName="Journal_Entry" />
+                    </h:commandLink>
+                </f:facet>
+                <p:column headerText="#{langsys['Journal']} #{langsys['Date']}" rendered="#{accJournalBean.dateType.equals('Journal Date')}">
+                    <h:outputText value="#{utilityBean.formatDate(itm.journalDate)}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Add']} #{langsys['Date']}" rendered="#{accJournalBean.dateType.equals('Add Date')}">
+                    <h:outputText value="#{utilityBean.formatDate(itm.addDate)}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Transaction']}">
+                    <h:outputText value="#{transactionTypeBean.getTransactionType(itm.payTypeId).transactionTypeName}" rendered="#{null==itm.transactionTypeId or itm.transactionTypeId==0}"/>
+                    <h:outputText value="#{transactionTypeBean.getTransactionType(itm.transactionTypeId).transactionTypeName}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Subtype']}">
+                    <h:outputLabel value="#{transactionReasonBean.getTransactionReason(itm.payReasonId).transactionReasonName} " rendered="#{null==itm.transactionReasonId or itm.transactionReasonId==0}"/>
+                    <h:outputLabel value="#{transactionReasonBean.getTransactionReason(itm.transactionReasonId).transactionReasonName} "/>
+                    <h:outputText value="#{itm.payId}" rendered="#{itm.transactionId==0 and itm.payId>0}"/>
+                    <h:outputText value="#{itm.transaction_number}" rendered="#{itm.transactionId>0}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Partner']}">
+                    <h:outputText value="#{transactorBean.getTransactor(itm.billTransactorId).transactorNames} " rendered="#{itm.billTransactorId>0}"/>
+                    <h:outputText value="#{accChildAccountBean.getAccChildAccById(payBean.getPay(itm.payId).accChildAccountId2).childAccountName}"  rendered="#{itm.billTransactorId==0}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Account']} #{langsys['Name']}">
+                    <h:outputText value="#{accCoaBean.getAccCoaByCodeOrId(itm.accountCode,0).accountName}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Child']} #{langsys['Account']}">
+                    <h:outputText value="#{accChildAccountBean.getAccChildAccById(itm.accChildAccountId).childAccountName}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Currency']}">
+                    <h:outputText value="#{itm.currencyCode}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Debit']} #{langsys['Amount']}" style="text-align: right;">
+                    <h:outputText value="#{itm.debitAmount}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Credit']} #{langsys['Amount']}" style="text-align: right;">
+                    <h:outputText value="#{itm.creditAmount}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Narration']}">
+                    <h:outputText value="#{itm.narration}"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </h:body>
+</html>
+

@@ -1,0 +1,112 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <h:head>
+        <title>Login</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/png" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  type="text/javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{dBConnection.readConnectionConfigurations('configurations.ConfigFile')}"/>
+        <f:viewAction action="#{parameter_listBean.refreshSavedParameterLists()}"/>
+        <f:viewAction action="#{accCurrencyBean.refreshSavedCurrencyLists()}"/>
+        <f:viewAction action="#{login.initStoresList()}"/>
+        <f:viewAction action="#{menuItemBean.refreshMenuItemObj()}"/>
+        <f:viewAction action="#{login.refreshLicenseDaysLeft()}"/>
+        <f:viewAction action="#{login.refreshWarnings()}"/>
+    </f:metadata>
+    <h:body style="background-color: white;">
+        <h:form id="form">  
+            <div class="card">
+                <h:panelGrid id="pnlgLoginHeader" columns="1" style="background-color: #7BC043;width: 100%;color: white; height: 3rem;text-align: center;">
+                    <h:outputLabel styleClass="clsLabelTop" value="VendorPlus" style="font-size: 24px;"/>
+                </h:panelGrid>
+
+                <h:panelGrid style="width: 100%;margin-top: 5rem;text-align: center;" columns="2">
+                    <h:graphicImage  alt="LOGO" value="resources/images/vendorplus.jpeg" style="max-width: 500px;"/>
+                    <h:panelGrid columns="1"  style="margin-left: 2rem;margin-top: 2px;text-align: center;">
+                        <h:panelGrid columns="1" style="text-align: center;width: 100%">
+                            <h:graphicImage id="gimgLogo" alt="LOGO" value="#{companySetting.getLogoUrl()}" />
+                            <h:outputLabel style="color: red;font-weight: bold;" value="#{menuItemBean.menuItemObj.LICENSE_CLIENT_NAME}"/>
+                            <h:outputLabel value="#{companySetting.getBranchCode()}"/>
+                        </h:panelGrid>
+                        <br/>
+                        <h:panelGrid id="pnlgInput" >
+                            <p:outputLabel value="User Name"/>
+                            <p:inputText id="itxtUserName" value="#{login.loggedInUserName}" autocomplete="off" style="width: 220px;"> 
+                                <f:ajax event="change" listener="#{login.setLoggedInUserDetail(null)}" render="menuStore pnlgLoginHeader"/>
+                                <f:ajax event="keyup" listener="#{login.setLoggedInUserDetail(null)}" render="menuStore pnlgLoginHeader"/>
+                            </p:inputText>
+                            <p:outputLabel  value="Password"/>
+                            <p:password id="itxtPassword" value="#{login.loggedInPassword}" autocomplete="off" style="width: 220px;">
+                                <f:ajax event="change" listener="#{login.setLoggedInUserDetail(null)}" render="menuStore pnlgLoginHeader"/>
+                                <f:ajax event="keyup" listener="#{login.setLoggedInUserDetail(null)}" render="menuStore pnlgLoginHeader"/>
+                            </p:password>
+                            <p:outputLabel  value=""/>
+                            <p:commandButton styleClass="clsButtonMedium" value="Verify" accesskey="c" style="width: 225px;color: white;background-color: #7BC043; border-radius: 20px" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                                <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                    <p:graphicImage name="/images/ajax-loader.gif"/>
+                                </p:dialog>
+                                <f:ajax listener="#{login.confirmUser()}" execute="itxtUserName itxtPassword" render="menuStore olblActionMessageSuccess olblActionMessageFailure pnlgLoginHeader"/>
+                            </p:commandButton>
+                            <br/>
+                            <p:outputLabel  value="#{companySetting.getStoreEquivName()}"/>
+                            <h:selectOneMenu styleClass="clsMenu" id="menuStore" value="#{login.loggedInStoreId}" style="width: 220px;">
+                                <f:selectItem itemLabel="" itemValue="0"/>
+                                <f:selectItems value="#{login.storesList}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                        <h:panelGrid columns="1" style="text-align: center;">
+                            <p:commandButton styleClass="clsButtonMedium" style="color: white;width: 225px;background-color: #7BC043; border-radius: 20px" id="cmdbLogin" value="LOGIN" accesskey="l" rendered="true" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                                <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                    <p:graphicImage name="/images/ajax-loader.gif"/>
+                                </p:dialog>
+                                <p:ajax listener="#{login.userLogin(1)}" process="pnlgInput @this" update="pnlgLoginHeader pnlgMessage"/>
+                            </p:commandButton>
+                            <p:spacer height="10"/>
+                            <h:outputLabel value="Don't have an account?" style="font-size: 14px;"/>
+                            <p:button value="Register Now" outcome="Registration.xhtml" 
+                                      style="color: #7BC043;background-color: white; border: 2px solid #7BC043; border-radius: 20px; width: 225px; margin-top: 10px;"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <h:panelGrid>
+                        <h:panelGrid rendered="#{60 gt login.LICENSE_DAYS_LEFT and login.LICENSE_TYPE ne 9 and login.LICENSE_TYPE ne 0}">
+                            <p:spacer/>
+                            <p:spacer/>
+                            <p:outputLabel value="License Expiry Notice!" style="color: red;font-size: 20px;font-weight: bold;"/>
+                            <c:if test="#{0>=login.LICENSE_DAYS_LEFT}">
+                                <p:outputLabel value="License expired!" style="font-weight: bold;"/>
+                            </c:if>
+                            <c:if test="#{login.LICENSE_DAYS_LEFT>0}">
+                                <p:outputLabel value="#{login.LICENSE_DAYS_LEFT} day(s) to lincence expiry!" style="font-weight: bold;"/>
+                            </c:if>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </h:panelGrid>
+                <h:panelGrid id="pnlgMessage"  style="text-align: center;width: 100%">
+                    <h:outputLabel styleClass="clsActionMessage" id="olblActionMessageSuccess" style="color:green" value="#{login.actionMessageSuccess}"/>
+                    <h:outputLabel styleClass="clsActionMessage" id="olblActionMessageFailure" style="color: red" value="#{login.actionMessageFailure}"/>
+                    <h:outputLabel id="outlNavMsg" value="#{navigationBean.navMsg}" style="color: red"/>
+                    <h:messages id="msgsMainMessage" style="color: red"/><br/>
+                </h:panelGrid> 
+            </div>
+        </h:form>
+    </h:body>
+</html>

@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Xrate</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  type="text/javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:event listener="#{navigationBean.checkAccessDenied('88', 'View')}" type="preRenderView" />
+    <f:event listener="#{accXrateBean.initXrateList()}" type="preRenderView" />
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="form" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
+                    return false;">
+            <h:panelGrid styleClass="clsGridMainHeader" columns="1">
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="Currency Exchange Rates"/>
+            </h:panelGrid>
+            <p:dataTable id="dtblXrate" value="#{accXrateBean.accXrateList}" var="itm" 
+                         tableStyle="width:auto;">
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Foreign Currency</f:facet>
+                    <!-- row record -->
+                    #{itm.foreignCurrencyCode}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Xrate Name</f:facet>
+                    <!-- row record -->
+                    #{itm.xrateName}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Xrate no</f:facet>
+                    <!-- row record -->
+                    #{itm.xrateNo}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Local</f:facet>
+                    <!-- row record -->
+                    #{utilityBean.returnYesNoString(itm.isLocalXrate)}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Active</f:facet>
+                    <!-- row record -->
+                    #{utilityBean.returnYesNoString(itm.isActive)}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Action</f:facet>
+                    <!-- row record -->
+                    <h:commandLink value="Edit">
+                        <f:ajax listener="#{accXrateBean.copyAccXrate(itm,accXrate)}" execute="@form" render="@form"/>
+                    </h:commandLink>
+                    &nbsp;
+                </p:column>
+            </p:dataTable>
+            <h:panelGrid styleClass="clsGridMainCommands" columns="1">
+                <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
+                    <h:commandButton styleClass="clsButtonBig" id="cmdbSave" value="SAVE (ALT+S)" accesskey="s">
+                        <f:ajax listener="#{accXrateBean.saveAccXrate(accXrate)}" execute="@form" render="@form" />
+                    </h:commandButton>
+                </h:panelGrid>
+            </h:panelGrid>
+            <h:panelGrid styleClass="clsGridMainMessages" columns="1">
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{accXrateBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
+            <p:growl/>
+        </h:form>
+    </h:body>
+</html>
+

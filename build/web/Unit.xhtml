@@ -1,0 +1,127 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Unit</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{unitBean.refreshUnit_tax_lists()}"/>
+        <f:viewAction action="#{unitBean.clearUnit(unit,unitBean.unit_tax_listObj)}"/>
+    </f:metadata>
+    <f:event listener="#{navigationBean.checkAccessDenied('8', 'View')}" type="preRenderView" />
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="form" styleClass="clsMainFrom">
+
+            <h:panelGrid styleClass="clsGridMainHeader" columns="1">
+                <h:outputLabel styleClass="clsLabelTop" id="olblUnitHeader" value="#{langsys['Item']} #{langsys['Unit']}"/>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainInput" columns="6">
+                <h:outputLabel  value="#{langsys['Unit']} #{langsys['Name']}:"/>
+                <h:inputText styleClass="clsInput" id="itxtUnitName" value="#{unit.unitName}" autocomplete="off" style="width: 250px;"> 
+                </h:inputText>
+
+                <h:outputLabel  value="#{langsys['Unit']} #{langsys['Symbol']}:"/>
+                <h:inputText styleClass="clsInput" id="itxtUnitSymbol" value="#{unit.unitSymbol}" autocomplete="off" style="width: 100px;">
+                </h:inputText>
+                <h:outputLabel  value="Tax #{langsys['Code']}:"/>
+                <p:autoComplete id="autcUnitTax" widgetVar="WautcItem" value="#{unitBean.unit_tax_listObj}"  
+                                completeMethod="#{unitBean.searchUnit_tax_lists}" 
+                                var="unt" 
+                                itemLabel="#{unt.unit_name_tax}" 
+                                itemValue="#{unt}" 
+                                converter="Unit_tax_listConverter" style="text-align: left" 
+                                forceSelection="true" queryDelay="0" 
+                                onkeypress="if (event.keyCode == 13)
+                                            return false;" >
+                    <p:column headerText="#{langsys['Code']}" style="text-align: left" >  
+                        #{unt.unit_symbol_tax} 
+                    </p:column>
+                    <p:column headerText="#{langsys['Name']}" style="text-align: left" >  
+                        #{unt.unit_name_tax} 
+                    </p:column>
+                </p:autoComplete>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainCommands" columns="1">
+                <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
+                    <h:commandButton styleClass="clsButton" id="cmdbSave" value="#{langsys['Save']}">
+                        <f:ajax listener="#{unitBean.saveUnit(unit,unitBean.unit_tax_listObj)}" execute="@form" render="@form" />
+                    </h:commandButton>
+                    <h:commandButton styleClass="clsButton" id="cmdbClear" value="#{langsys['Clear']}">
+                        <f:ajax listener="#{unitBean.clearUnit(unit,unitBean.unit_tax_listObj)}" execute="@form" render="@form" />
+                    </h:commandButton>
+                    <h:commandButton styleClass="clsButton" id="cmdbDelete" value="#{langsys['Delete']}" onclick="return confirmDelete();">
+                        <f:ajax listener="#{unitBean.deleteUnitByObject(unit)}" execute="@form" render="@form" />
+                    </h:commandButton>
+                </h:panelGrid>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainMessages" columns="1">
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{unitBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainSearch" columns="1">
+                <h:outputLabel id="olblMainSearch" value="#{langsys['Search']} #{langsys['Unit']}"/>
+                <h:inputText id="itxtMainSearch" value="#{unitBean.searchUnitName}" autocomplete="off">
+                    <f:ajax event="keyup" render="dtblUnit"/>
+                </h:inputText>
+            </h:panelGrid>
+
+            <p:dataTable id="dtblUnit" value="#{unitBean.getUnitsByUnitName(unitBean.searchUnitName)}" var="u" 
+                         > 
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Unit']} #{langsys['Name']}</f:facet>
+                    <!-- row record -->
+                    #{u.unitName}
+                </p:column>
+
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Unit']} #{langsys['Symbol']}</f:facet>
+                    <!-- row record -->
+                    #{u.unitSymbol}
+                </p:column>
+
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Tax #{langsys['Code']}</f:facet>
+                    <!-- row record -->
+                    #{u.unit_symbol_tax}
+                </p:column>
+
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Action']}</f:facet>
+                    <!-- row record -->
+                    <h:commandLink value="#{langsys['Edit']}">
+                        <f:ajax listener="#{unitBean.displayUnit(u,unit,unitBean.unit_tax_listObj)}" execute="@form" render="@form"/>
+                    </h:commandLink>
+                    &nbsp;
+                </p:column>
+
+            </p:dataTable>
+
+        </h:form>
+    </h:body>
+</html>
+

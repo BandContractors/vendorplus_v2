@@ -1,0 +1,166 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Group Rights</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{utilityBean.clearList(groupRightBean.groupRightsForEdit)}"/>
+    </f:metadata>
+    <f:event listener="#{navigationBean.checkAccessDenied('88', 'View')}" type="preRenderView" />
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="form" styleClass="clsMainFrom">
+            <h:panelGrid styleClass="clsGridMainHeader" columns="1">
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="#{langsys['Group']} #{langsys['Rights']}"/>
+            </h:panelGrid>
+            <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="5">
+                <h:outputLabel  value="#{langsys['Select']} #{langsys['Group']}:"/>
+                <h:selectOneMenu styleClass="clsMenu" id="menuGroupDetail" value="#{groupRight.groupDetailId}">
+                    <f:selectItem itemLabel="" itemValue="0"/>
+                    <f:selectItems value="#{groupDetailBean.groupDetails}" var="g" itemLabel="#{g.groupName}" itemValue="#{g.groupDetailId}"/>
+                    <f:ajax event="change" listener="#{groupRightBean.setSelectedGroupDetailId(groupRight.groupDetailId)}"/>
+                    <f:ajax event="change" listener="#{utilityBean.clearList(groupRightBean.groupRightsForEdit)}" render="dtblGroupRightEdit"/>
+                </h:selectOneMenu>
+
+                <h:outputLabel  value="#{langsys['Select']} #{companySetting.getStoreEquivName()}:"/>
+                <h:selectOneMenu styleClass="clsMenu" id="menuStore" value="#{groupRight.storeId}">
+                    <f:selectItem itemLabel="" itemValue="0"/>
+                    <f:selectItems value="#{storeBean.stores}" var="s" itemLabel="#{s.storeName}" itemValue="#{s.storeId}"/>
+                    <f:ajax event="change" listener="#{groupRightBean.setSelectedStoreId(groupRight.storeId)}"/>
+                    <f:ajax event="change" listener="#{utilityBean.clearList(groupRightBean.groupRightsForEdit)}" render="dtblGroupRightEdit"/>
+                </h:selectOneMenu>
+
+                <p:commandButton id="cbtnAcquire" value="#{langsys['Retrieve']}" style="background-color: black;color: white;font-weight: bold;" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" >
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{groupRightBean.retrieveGroupRightsForEdit()}" process="pnlHeader" update="dtblGroupRightEdit"/>
+                </p:commandButton>
+
+            </h:panelGrid>
+
+            <h:dataTable id="dtblGroupRightEdit" value="#{groupRightBean.groupRightsForEdit}" var="gre" 
+                         styleClass="cls-table" 
+                         headerClass="cls-table-header" 
+                         rowClasses="cls-table-odd-row,cls-table-even-row" 
+                         columnClasses="cls-table-col1,cls-table-col2,cls-table-col3,cls-table-col4,cls-table-col5"
+                         > 
+                <h:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Transaction']} #{langsys['Type']}</f:facet>
+                    <!-- row record -->
+                    #{transactionTypeBean.getTransactionType(transactionReasonBean.getTransactionReason2(gre.functionName).transactionTypeId).transactionTypeName}
+                </h:column>
+                <h:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Transaction']} #{langsys['Subtype']}</f:facet>
+                    <!-- row record -->
+                    #{transactionReasonBean.getTransactionReason2(gre.functionName).transactionReasonName}
+                </h:column>
+                <h:column>
+                    <!-- column header -->
+                    <f:facet name="header">
+                        #{langsys['VIEW']}
+                        <h:selectBooleanCheckbox value="#{groupRightBean.allView}">
+                            <f:ajax listener="#{groupRightBean.allowAll('View', groupRightBean.allView)}" render="dtblGroupRightEdit"/>
+                        </h:selectBooleanCheckbox>
+                    </f:facet>
+                    <!-- row record -->
+                    <h:selectOneMenu styleClass="clsMenu" style="color:#{groupDetailBean.getRightTextColor(gre.allowView)}" id="menuAllowView" value="#{gre.allowView}">
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="Yes"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="No"/>
+                        <f:ajax event="change" render="menuAllowView"/>
+                    </h:selectOneMenu>
+                </h:column>
+                <h:column>
+                    <!-- column header -->
+                    <f:facet name="header">
+                        #{langsys['ADD']}
+                        <h:selectBooleanCheckbox value="#{groupRightBean.allAdd}">
+                            <f:ajax listener="#{groupRightBean.allowAll('Add', groupRightBean.allAdd)}" render="dtblGroupRightEdit"/>
+                        </h:selectBooleanCheckbox>
+                    </f:facet>
+                    <!-- row record -->
+                    <h:selectOneMenu styleClass="clsMenu" style="color:#{groupDetailBean.getRightTextColor(gre.allowAdd)}" id="menuAllowAdd" value="#{gre.allowAdd}">
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="Yes"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="No"/>
+                        <f:ajax event="change" render="menuAllowAdd"/>
+                    </h:selectOneMenu>
+                </h:column>
+                <h:column>
+                    <!-- column header -->
+                    <f:facet name="header">
+                        #{langsys['EDIT']}
+                        <h:selectBooleanCheckbox value="#{groupRightBean.allEdit}">
+                            <f:ajax listener="#{groupRightBean.allowAll('Edit', groupRightBean.allEdit)}" render="dtblGroupRightEdit"/>
+                        </h:selectBooleanCheckbox>
+                    </f:facet>
+                    <!-- row record -->
+                    <h:selectOneMenu styleClass="clsMenu" style="color:#{groupDetailBean.getRightTextColor(gre.allowEdit)}" id="menuAllowEdit" value="#{gre.allowEdit}">
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="Yes"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="No"/>
+                        <f:ajax event="change" render="menuAllowEdit"/>
+                    </h:selectOneMenu>
+                </h:column>
+                <h:column>
+                    <!-- column header -->
+                    <f:facet name="header">
+                        #{langsys['DELETE']}
+                        <h:selectBooleanCheckbox value="#{groupRightBean.allDelete}">
+                            <f:ajax listener="#{groupRightBean.allowAll('Delete', groupRightBean.allDelete)}" render="dtblGroupRightEdit"/>
+                        </h:selectBooleanCheckbox>
+                    </f:facet>
+                    <!-- row record -->
+                    <h:selectOneMenu styleClass="clsMenu" style="color:#{groupDetailBean.getRightTextColor(gre.allowDelete)}" id="menuAllowDelete" value="#{gre.allowDelete}">
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="Yes"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="No"/>
+                        <f:ajax event="change" render="menuAllowDelete"/>
+                    </h:selectOneMenu>
+                </h:column>
+
+                <h:column>
+                    <!-- column header -->
+                    <f:facet name="header"></f:facet>
+                    <!-- row record -->
+                    <h:selectBooleanCheckbox value="#{gre.allowAll}">
+                        <f:ajax listener="#{groupRightBean.allowAll(gre)}" render="menuAllowView menuAllowAdd menuAllowEdit menuAllowDelete"/>
+                    </h:selectBooleanCheckbox>
+                </h:column>
+
+            </h:dataTable>
+
+            <h:panelGrid styleClass="clsGridMainCommands" columns="1">
+                <p:commandButton id="cbtnSave" value="#{langsys['SAVE']} #{langsys['GROUP']} #{langsys['RIGHT']}" style="background-color: black;color: white;font-weight: bold;" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" >
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{groupRightBean.saveGroupRight()}" process="@form" update="pnlMessage"/>
+                </p:commandButton>
+            </h:panelGrid>
+
+            <h:panelGrid id="pnlMessage" styleClass="clsGridMainMessages" columns="1">
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{userRightBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
+
+        </h:form>
+    </h:body>
+</html>
+

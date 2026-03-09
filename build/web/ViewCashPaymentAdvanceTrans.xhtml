@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>View Cash Advance</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+            function confirmUpdate()
+            {
+                return confirm('Are you sure you want to UPDATE this Transaction?');
+            }
+            function confirmCancel()
+            {
+                return confirm('Are you sure you want to CANCEL this Transaction?');
+            }
+            function doPrintHiddenClick() {
+                document.getElementById("formTransaction:cmdbvPrint").click();
+            }
+        </script> 
+    </h:head>
+    <h:body>
+        <p:dialog header="" widgetVar="dlgCPPrepaidExpense" modal="true" height="100%" width="100%" dynamic="true" maximizable="true">
+            <h:form id="formTransactionCPPrepaidExpense" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
+                        return false;"> 
+                <p:panel id="pnlTransaction">
+                    <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="width: 100%">
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['VIEW']}" rendered="#{payBean.actionType.equals('View')}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['CANCEL']}" rendered="#{payBean.actionType.equals('Cancel')}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Advance']} #{langsys['payment']} #{langsys['to']} #{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]} (#{langsys['Prepaid']} #{langsys['Expense']}) : #{langsys['Pay']} #{langsys['No.']} : #{payBean.payObj.pay_number}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value=""/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Ledger:']}#{langsys['Cash']}↓ #{langsys['Prepaid']} #{langsys['Expense']}↑"/>
+                    </h:panelGrid>
+                    <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="6">
+                        <h:outputLabel value="#{langsys['Amount']} #{langsys['Paid']}:"/>
+                        <h:inputText value="#{payBean.payObj.paidAmount}" disabled="true">
+                            <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:inputText>
+                        <h:outputLabel value="#{langsys['Currency']}:"/>
+                        <h:inputText value="#{payBean.payObj.currencyCode}" disabled="true"/>
+                        <h:outputLabel value="#{langsys['Paid']} #{langsys['To']}:"/>
+                        <h:inputText value="#{transactorBean.getTransactor(payBean.payObj.billTransactorId).transactorNames}" style="width: 170px;" disabled="true"/>
+                        <h:outputLabel value="#{langsys['Pay']} #{langsys['Date']}:"/>
+                        <h:inputText value="#{utilityBean.formatDate(payBean.payObj.payDate)}" disabled="true"/>
+                        <h:outputLabel value="#{langsys['Add']} #{langsys['Date']}:"/>
+                        <h:inputText value="#{utilityBean.formatDate(payBean.payObj.addDate)}" disabled="true"/>
+                        <h:outputLabel value="#{langsys['Paid']} #{langsys['By']}:"/>
+                        <h:inputText value="#{userDetailBean.getUserDetail(payBean.payObj.addUserDetailId).userName}" style="width: 170px;" disabled="true"/>
+
+                        <h:outputLabel value="#{langsys['Payment']} #{langsys['Method']}:"/>
+                        <h:inputText value="#{payMethodBean.getPayMethod(payBean.payObj.payMethodId).payMethodName}" disabled="true"/>
+                        <h:outputLabel value="#{langsys['Paid']} #{langsys['from']} #{langsys['Account']}:"/>
+                        <h:inputText value="#{accChildAccountBean.getAccChildAccById(payBean.payObj.accChildAccountId).childAccountName}" disabled="true"/>
+                        <h:outputLabel value="#{langsys['Reference']} #{langsys['No.']}:"/>
+                        <h:inputText value="#{payBean.payObj.payRefNo}" style="width: 170px;" disabled="true"/>
+                        <h:outputLabel value="#{langsys['Status']}:"/>
+                        <h:inputText value="#{payBean.getStatus(payBean.payObj.status)}" disabled="true"/>
+
+                        <h:outputLabel value="#{langsys['Status']} #{langsys['Description']}:"/>
+                        <h:inputText value="#{payBean.payObj.statusDesc}" disabled="true"/>
+                    </h:panelGrid>
+                    <h:panelGrid styleClass="clsGridMainCommands" columns="2" style="width: 100%">
+                        <h:panelGrid styleClass="clsGridMainCommands1" columns="2">
+                            <h:commandButton styleClass="clsButtonVeryBig" id="cmdbCancel" value="#{langsys['CANCEL']} (ALT+C)" onclick="return confirmCancel();" accesskey="c" rendered="#{payBean.actionType.equals('Cancel') and generalUserSetting.currentStore.storeId==payBean.payObj.storeId and payBean.payObj.paidAmount>0}">
+                                <f:ajax listener="#{payBean.cancelPayV2(payBean.payObj,payBean.payTransList)}" execute="pnlTransaction" render="pnlTransaction pnlgOutput"/>
+                            </h:commandButton>
+                        </h:panelGrid>
+                        <h:panelGrid columns="1">
+                            <h:outputLabel value="#{langsys['Print']} #{langsys['File']}" style="color: white;"/>
+                            <h:selectOneMenu styleClass="clsMenu" value="#{transBean.overridePrintVersion}">
+                                <f:selectItem itemLabel="" itemValue="0"/>
+                                <f:selectItem itemLabel="#{langsys['Print']} #{langsys['File']} 1" itemValue="1"/>
+                                <f:selectItem itemLabel="#{langsys['Print']} #{langsys['File']} 2" itemValue="2"/>
+                                <f:ajax event="change" render="pnlgOutput"/>
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                    </h:panelGrid>
+
+                    <h:panelGrid styleClass="clsGridMainMessages" columns="1">
+                        <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{payBean.actionMessage}"/>
+                        <h:messages id="msgsMainMessage" style="color: red"/><br/>
+                    </h:panelGrid>
+                </p:panel>
+                <p:growl/>
+                <!-- INVOICE STARTS HERE -->
+                <h:panelGrid id="pnlgOutput" style="width: 100%">
+                    <ui:include src="#{transBean.getPrintFileName('PARENT',transactionTypeBean.getTransactionType(15),transBean.overridePrintVersion)}"/>
+                </h:panelGrid>
+                <!-- INVOICE ENDS HERE -->
+            </h:form>
+        </p:dialog>
+    </h:body>
+</html>
+

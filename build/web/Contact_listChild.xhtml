@@ -1,0 +1,172 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Contact</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{contact_listBean.initContact_listObj()}"/>
+    </f:metadata>
+    <h:body>
+        <h:form id="form" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
+                    return false;">
+
+            <h:panelGrid styleClass="clsGridMainHeader" columns="1">
+                <h:outputLabel styleClass="clsLabelTop" id="olblContact_listHeader" value="CONTACT DETAIL"/>
+            </h:panelGrid>
+            <h:panelGrid columns="4">
+                <h:outputLabel  value="Type:"/>
+                <p:selectOneMenu value="#{contact_listBean.contact_listObj.type}" style="width: 165px">
+                    <f:selectItem itemLabel="Business" itemValue="Business"/>
+                    <f:selectItem itemLabel="Control" itemValue="Control"/>
+                    <f:selectItem itemLabel="Mixed" itemValue="Mixed"/>
+                    <f:selectItem itemLabel="Consumer" itemValue="Consumer"/>
+                </p:selectOneMenu>
+                <h:outputLabel  value="Company Name:"/>
+                <p:inputText style="width: 350px" value="#{contact_listBean.contact_listObj.company_name}" autocomplete="off">
+                </p:inputText>
+                <h:outputLabel  value="Category:"/>
+                <p:inputText style="width: 350px" value="#{contact_listBean.contact_listObj.category}" autocomplete="off">
+                </p:inputText>
+                <h:outputLabel  value="Sub-Category:"/>
+                <p:inputTextarea value="#{contact_listBean.contact_listObj.subcategory}" cols="33" rows="2">
+                </p:inputTextarea>
+                <h:outputLabel  value="Email 1:"/>
+                <p:inputText style="width: 350px" value="#{contact_listBean.contact_listObj.email1}" autocomplete="off">
+                </p:inputText>
+                <h:outputLabel  value="Email 2:"/>
+                <p:inputText style="width: 350px" value="#{contact_listBean.contact_listObj.email2}" autocomplete="off">
+                </p:inputText>
+                <h:outputLabel  value="Address:"/>
+                <p:inputText style="width: 350px" value="#{contact_listBean.contact_listObj.address}" autocomplete="off">
+                </p:inputText>
+                <h:outputLabel  value="First Name"/>
+                <p:inputText style="width: 350px" id="fname" value="#{contact_listBean.contact_listObj.first_name}" autocomplete="off">
+                </p:inputText>
+                <h:outputLabel  value="Second Name"/>
+                <p:inputText style="width: 350px" id="sname" value="#{contact_listBean.contact_listObj.second_name}" autocomplete="off">
+                </p:inputText>
+                <h:outputLabel  value="Phone 1"/>
+                <p:inputText style="width: 350px" id="phone1" value="#{contact_listBean.contact_listObj.phone1}" autocomplete="off">
+                </p:inputText>
+                <h:outputLabel  value="Phone 2"/>
+                <p:inputText style="width: 350px" id="phone2" value="#{contact_listBean.contact_listObj.phone2}" autocomplete="off">
+                </p:inputText>
+                <h:outputLabel  value="Title"/>
+                <p:inputText style="width: 350px" value="#{contact_listBean.contact_listObj.title}" autocomplete="off">
+                </p:inputText>
+                <h:outputLabel  value="Source"/>
+                <p:inputText style="width: 350px" id="source" value="#{contact_listBean.contact_listObj.source}" autocomplete="off">
+                </p:inputText>
+                <h:outputLabel  value="Location Level 1"/>
+                <p:inputText style="width: 350px" id="level1" value="#{contact_listBean.contact_listObj.loc_level1}" autocomplete="off">
+                </p:inputText>
+                <h:outputLabel  value="Location Level 2"/>
+                <p:inputText style="width: 350px" id="level2" value="#{contact_listBean.contact_listObj.loc_level2}" autocomplete="off">
+                </p:inputText>
+                <h:outputLabel  value="Location Level 3"/>
+                <p:inputText style="width: 350px" id="level3" value="#{contact_listBean.contact_listObj.loc_level3}" autocomplete="off">
+                </p:inputText>
+                <h:outputLabel  value="Location Level 4"/>
+                <p:inputText style="width: 350px" id="level4" value="#{contact_listBean.contact_listObj.loc_level4}" autocomplete="off">
+                </p:inputText>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainCommands" columns="1">
+                <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="SAVE (ALT+S)" style="color: white; background-color: #7BC043" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <f:ajax listener="#{contact_listBean.saveContact_list(contact_listBean.contact_listObj)}" execute="@form" render="@form" />
+                    </p:commandButton>
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="CLEAR (ALT+C)" style="color: white; background-color: #FF0000"  accesskey="c">
+                        <f:ajax listener="#{contact_listBean.clearContact_list(contact_listBean.contact_listObj)}" execute="@form" render="@form" />
+                    </p:commandButton>
+                </h:panelGrid>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainMessages" columns="1">
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{contact_listBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
+            <p:growl/>
+
+            <h:panelGrid styleClass="clsGridMainSearch" columns="1">
+                <h:outputLabel id="olblMainSearch" value="SEARCH CONTACT LIST" style="font-weight: bolder"/>
+                <p:inputText id="itxtMainSearch" value="#{contact_listBean.searchContactNames}" style="width: 400px" placeholder="  -- enter Company Name/Email/First name --  " autocomplete="off">
+                    <f:ajax event="keyup" render="dtblContact_list" />
+                </p:inputText>
+            </h:panelGrid>
+
+            <h:dataTable id="dtblContact_list" value="#{contact_listBean.getContact_listsByCompanyEmailFirstName(contact_listBean.searchContactNames)}" var="t" 
+                         styleClass="cls-table" 
+                         headerClass="cls-table-header" 
+                         rowClasses="cls-table-odd-row,cls-table-even-row" 
+                         columnClasses="cls-table-col1,cls-table-col2,cls-table-col3,cls-table-col4,cls-table-col5,cls-table-col6,cls-table-col7"
+
+                         > 
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Type</f:facet>
+                    <!-- row record -->
+                    #{t.type}
+                </p:column>
+
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Company Name</f:facet>
+                    <!-- row record -->
+                    #{t.company_name}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Category</f:facet>
+                    <!-- row record -->
+                    #{t.category}
+                </p:column>
+
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Email 1</f:facet>
+                    <!-- row record -->
+                    #{t.email1}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Action</f:facet>
+                    <!-- row record -->
+                    <p:commandButton value="Edit" style="color: white; background-color: #7BC043">
+                        <f:ajax listener="#{contact_listBean.displayContact_list(t,contact_listBean.contact_listObj)}" execute="@form" render="@form"/>
+                    </p:commandButton>
+                    &nbsp;
+                    <p:commandButton value="Delete" style="color: white; background-color: #FF0000" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <f:ajax listener="#{contact_listBean.deleteContactList(t)}" execute="@form" render="@form"/>
+                    </p:commandButton>
+                    &nbsp;
+                </p:column>
+
+            </h:dataTable>
+
+        </h:form>
+    </h:body>
+</html>
+

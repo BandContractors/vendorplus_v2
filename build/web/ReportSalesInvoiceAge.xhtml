@@ -1,0 +1,141 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Sales Invoice Aging</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{navigationBean.checkAccessDenied('58', 'View')}"/>
+        <f:viewAction action="#{accJournalBean.initReportSalesInvoiceAge(invoiceAge, accJournalBean.invoiceAgeList, accJournalBean.invoiceAgeListSummary)}"/>
+    </f:metadata>
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="formReport">
+            <h:panelGrid id="pnlgHeader" columns="1" styleClass="clsPanelReportFilterTitle">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys['Sales']} #{langsys['Invoice']} #{langsys['Aging']} #{langsys['Report']}"/>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgFilter" columns="2" styleClass="clsPanelReportFilter">
+                <h:panelGrid columns="2">
+                    <p:outputLabel value="#{langsys['Age']} #{langsys['Category']}"/>
+                    <h:selectOneMenu value="#{invoiceAge.days_category}" style="width: 200px;">
+                        <f:selectItem itemLabel=""/>
+                        <f:selectItem itemLabel="#{accJournalBean.invoiceAgeCategoryArray[0]}" itemValue="A"/>
+                        <f:selectItem itemLabel="#{accJournalBean.invoiceAgeCategoryArray[1]}" itemValue="B"/>
+                        <f:selectItem itemLabel="#{accJournalBean.invoiceAgeCategoryArray[2]}" itemValue="C"/>
+                    </h:selectOneMenu>
+                    <p:outputLabel value=""/>
+                    <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{accJournalBean.reportSalesInvoiceAge(invoiceAge.days_category)}" process="pnlgFilter" update="tblDetail tblSummary"/>
+                    </p:commandButton>
+                </h:panelGrid>
+                <p:dataTable id="tblSummary" tableStyle="width:auto;" var="s" value="#{accJournalBean.invoiceAgeListSummary}" 
+                             rowStyleClass="#{s.days_category eq 'C' ? 'red' :s.days_category eq 'B' ? 'amber' : s.days_category eq 'A' ? 'green' : 'white'}">
+                    <p:column headerText="#{langsys['Age']} #{langsys['Category']}">
+                        <h:outputLabel value="#{accJournalBean.invoiceAgeCategoryArray[0]}" rendered="#{s.days_category eq 'A'}"/>
+                        <h:outputLabel value="#{accJournalBean.invoiceAgeCategoryArray[1]}" rendered="#{s.days_category eq 'B'}"/>
+                        <h:outputLabel value="#{accJournalBean.invoiceAgeCategoryArray[2]}" rendered="#{s.days_category eq 'C'}"/>
+                    </p:column>
+                    <p:column headerText="#{langsys['Currency']}">
+                        <h:outputLabel value="#{s.currency_code} "/>
+                    </p:column>
+                    <p:column headerText="#{langsys['Balance']}" style="text-align: right;">
+                        <h:outputText value="#{s.balance}">
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="%" style="text-align: right;">
+                        <h:outputText value="#{s.perc}">
+                            <f:convertNumber pattern="###,###.#" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+            </h:panelGrid>
+            <p:dataTable id="tblDetail" tableStyle="width:auto;" var="l" value="#{accJournalBean.invoiceAgeList}" 
+                         paginator="true" rows="50" 
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
+                         rowsPerPageTemplate="50,100,400,800,1000,2000" 
+                         rowStyleClass="#{l.days_category eq 'C' ? 'red' :l.days_category eq 'B' ? 'amber' : l.days_category eq 'A' ? 'green' : 'white'}">
+                <f:facet name="header">
+                    #{accJournalBean.invoiceAgeList.size()} #{langsys['Records']} #{langsys['Found']}
+                    <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
+                    <p:columnToggler datasource="tblDetail" trigger="toggler" />
+                </f:facet>
+                <f:facet name="{Exporters}">
+                    <h:commandLink>
+                        <p:graphicImage name="images/excel.png" width="24"/>
+                        <p:dataExporter type="xls" target="tblDetail" fileName="Sale_Invoice_Aging" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/pdf.png" width="24"/>
+                        <p:dataExporter type="pdf" target="tblDetail" fileName="Sale_Invoice_Aging"/>
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/csv.png" width="24"/>
+                        <p:dataExporter type="csv" target="tblDetail" fileName="Sale_Invoice_Aging" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/xml.png" width="24"/>
+                        <p:dataExporter type="xml" target="tblDetail" fileName="Sale_Invoice_Aging" />
+                    </h:commandLink>
+                </f:facet>
+                <p:column headerText="#{langsys['Customer']}">
+                    <h:outputLabel value="#{l.transactor_names} "/>
+                </p:column>
+                <p:column headerText="#{langsys['Invoice']} #{langsys['Number']}">
+                    <p:outputLabel value="#{l.transaction_number}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Currency']}">
+                    <h:outputText value="#{l.currency_code}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Invoice']} #{langsys['Date']}">
+                    <h:outputText value="#{utilityBean.formatDate(l.transaction_date)}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Days']} #{langsys['Old']}" style="text-align: right;">
+                    <h:outputText value="#{l.age_days}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Invoice']} #{langsys['Amount']}" style="text-align: right;">
+                    <h:outputText value="#{l.grand_total}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Paid']} #{langsys['Amount']}" style="text-align: right;">
+                    <h:outputText value="#{l.total_paid}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Balance']}" style="text-align: right;">
+                    <h:outputText value="#{l.balance}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Age']} #{langsys['Category']}">
+                    <h:outputText value="#{accJournalBean.invoiceAgeCategoryArray[0]}" rendered="#{l.days_category eq 'A'}"/>
+                    <h:outputText value="#{accJournalBean.invoiceAgeCategoryArray[1]}" rendered="#{l.days_category eq 'B'}"/>
+                    <h:outputText value="#{accJournalBean.invoiceAgeCategoryArray[2]}" rendered="#{l.days_category eq 'C'}"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </h:body>
+</html>
+

@@ -1,0 +1,325 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Sales Package</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function doClearClick() {
+                document.getElementById("TransactionPackageForm:cmdbClear").click();
+            }
+        </script> 
+
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{accCurrencyBean.refreshCurrencyListActive()}"/>
+        <f:viewAction action="#{transactionPackageBean.initClearAllCEC('PARENT',trans,transactionPackageItemBean.transPackageItemList,transPackage, transactionPackageItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor)}" />
+        <f:viewAction action="#{transBean.initCurrencyCode(generalUserSetting.currentTransactionTypeId,trans)}"/>
+          <f:viewAction action="#{transactionPackageBean.refreshTranssDraft(generalUserSetting.currentStore.storeId,generalUserSetting.currentUser.userDetailId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId)}"/>
+        <f:viewAction action="#{transBean.initTransType(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId)}"/>
+        <f:viewAction action="#{utilityBean.clearList(alert_generalBean.alertList)}"/>
+        <f:viewAction action="#{utilityBean.clearList(itemBean.item_unitList)}"/>
+    </f:metadata>
+    <f:event listener="#{statusBean.initClearStatus()}" type="preRenderView" />
+    <f:event listener="#{transBean.initRefreshDraft(generalUserSetting.currentStore.storeId,generalUserSetting.currentUser.userDetailId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor)}" type="preRenderView" />
+    <f:event listener="#{navigationBean.checkCurrentPage('PACKAGING','','')}" type="preRenderView" />
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="TransactionPackageForm" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
+                    return false;">  
+            <h:panelGrid styleClass="clsGridMainHeader" columns="4">
+                <h:selectOneMenu styleClass="clsMenu" id="menuTransactionReason" value="#{trans.transactionReasonId}">
+                    <f:selectItem itemValue="#{transBean.transReasonObj.transactionReasonId}" itemLabel="#{generalUserSetting.getCurrentStore().getStoreName()}/#{transBean.transReasonObj.transactionReasonName}"/>
+                </h:selectOneMenu>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Prices']} #{langsys['are']} VAT #{langsys['inclusive']}:#{companySetting.EIsVatInclusive}"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Stock']}:#{langsys['No']} #{langsys['effect']}"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Ledger']}:#{langsys['No']} #{langsys['effect']}"/>
+            </h:panelGrid>
+                <h:panelGrid id="pnlDraft">
+                <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="background-color: red;" rendered="#{transactionPackageBean.transsDraft.size()>0}">
+                    <h:outputLabel  value="#{langsys['Select']} #{langsys['Draft']} #{langsys['Sale']}:"/>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuDraft" value="#{trans.transactionId}" style="width: 220px;">
+                        <f:selectItem itemValue="0" itemLabel=""/>
+                        <f:selectItems value="#{transactionPackageBean.transsDraft}" var="dr" itemLabel="#{langsys['No']}:#{dr.transactionId} #{langsys['Total']}:#{accJournalBean.returnBalanceString(dr.grandTotal)} #{dr.currencyCode}" itemValue="#{dr.transactionId}"/>
+                    </h:selectOneMenu>
+                    <p:commandButton id="cmdbLoadDraft" value="#{langsys['Load']} #{langsys['Draft']} #{langsys['Sale']}" onclick="PF('statusDialog4').show()" onsuccess="PF('statusDialog4').hide()">
+                        <p:dialog widgetVar="statusDialog4" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{transactionPackageBean.loadDraftTransPackage('Draft',trans, transactionPackage, transactionPackageItemBean.transPackageItemList, transactorBean,userDetailBean,transactionPackageBean)}" process="@form" update="pnlDraft pnlHeader gridTransItem  pgrdSpecific dtblTransactionItem pgrdTotals pgrdMsgs  gridTransItem growl1"/>
+                    </p:commandButton>
+                    <p:commandButton id="cmdbDeleteDraft" value="#{langsys['Delete']} #{langsys['Draft']} #{langsys['Sale']}" onclick="PF('statusDialog3').show()" onsuccess="PF('statusDialog3').hide()">
+                        <p:dialog widgetVar="statusDialog3" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{transactionPackageBean.deleteTranPackagesFromHist(trans.transactionId,transactionPackage.transactionPackageId)}" process="@form" update="pnlDraft pnlHeader gridTransItem pgrdSpecific  dtblTransactionItem pgrdTotals pgrdMsgs"/>
+                    </p:commandButton>
+                </h:panelGrid>
+            </h:panelGrid>
+            <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="5">
+                <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transBean.transTypeObj.transactionNumberLabel)}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 100px" value=""/>
+                <h:outputLabel  value="#{langsys['Currency']}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 100px" value=""/>
+                <h:outputLabel  value="#{transBean.transTypeObj.transactionDateLabel}"/>
+
+                <h:inputText style="width: 120px;height: 24px;" styleClass="clsInput" id="itxtTransactionNo" value="#{trans.transactionNumber}" autocomplete="off">
+                </h:inputText>
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 100px" value=""/>
+                <h:selectOneMenu style="width: 80px;height: 30px;" styleClass="clsMenu" id="menuCurrency" value="#{trans.currencyCode}">
+                    <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
+                    <f:ajax event="change" execute="@this" render="@this"/>
+                </h:selectOneMenu>
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 100px" value=""/>
+                <p:calendar styleClass="clsInput" id="calTransactionDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}" size="8" />
+
+            </h:panelGrid>
+            <h:panelGrid id="gridTransItem" styleClass="clsGridMainInput" columns="7">
+                <p:commandLink actionListener="#{itemBean.openChildItem('Stock',transItem.itemId)}" value="#{langsys['Item']} #{langsys['Description']}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 50px" value="#{langsys['Unit']}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 50px" value=""/>
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 50px" value="#{langsys['Qty']}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 50px" value=""/>
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 100px" value="#{langsys['Unit']} #{langsys['Price']}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 100px" value="#{langsys['Amount']}"/>
+
+                <p:autoComplete id="autcItem" widgetVar="WautcItem" value="#{itemBean.selectedItem}"  
+                                completeMethod="#{itemBean.getItemObjectListForSale}" 
+                                var="itm" 
+                                itemLabel="#{itm.description}" 
+                                itemValue="#{itm}" 
+                                converter="ItemConverter" style="text-align: left" 
+                                forceSelection="true" queryDelay="0" 
+                                onkeypress="if (event.keyCode == 13)
+                                            return false;" >
+                    <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="text-align: left" >  
+                        #{itm.description} 
+                    </p:column>
+                    <p:column headerText="#{langsys['Alias']}" style="text-align: left" >  
+                        #{itm.alias_name} 
+                    </p:column>
+                    <p:column headerText="#{langsys['Item']} #{langsys['Code']}" style="text-align: left" >  
+                        #{itm.itemCode} 
+                    </p:column>
+                    <p:column headerText="#{langsys['Retail']} #{langsys['Sale']} #{langsys['Price']}" style="text-align: left">  
+                        <h:outputText value="#{itm.unitRetailsalePrice}">
+                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="#{langsys['Wholesale']} #{langsys['Price']}" style="text-align: left" rendered="#{generalUserSetting.currentTransactionReasonId==16 or generalUserSetting.currentTransactionReasonId==109}">
+                        <h:outputText value="#{itm.unitWholesalePrice}">
+                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="#{langsys['Special']} #{langsys['Price']}" style="text-align: left" rendered="#{generalUserSetting.currentTransactionReasonId==110}">
+                        <h:outputText value="#{itm.unit_special_price}">
+                            <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="#{langsys['Currency']}" style="text-align: left">
+                        <h:outputText value="#{itm.currencyCode}">
+                        </h:outputText>
+                    </p:column>
+                    <p:ajax event="itemSelect" listener="#{itemBean.refreshItemtransactionPackageUnitList(itemBean.selectedItem,transactionPackageItem,1)}" process="@this menuUnit" update="menuUnit"/>
+                    <p:ajax event="change" listener="#{itemBean.refreshItemtransactionPackageUnitList(itemBean.selectedItem,transactionPackageItem,1)}" rendered="#{itemBean.selectedItem!=null}" process="@this menuUnit" update="menuUnit"/>
+                    <p:ajax event="itemSelect" listener="#{transactionPackageItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,transactionPackageItem,itemBean.selectedItem,1.0)}" process="@this" update="menuUnit,itxtUnitPrice,itxtQty,itxtAmount,pgrdSpecific"/>
+                    <p:ajax event="change" listener="#{transactionPackageItemBean.updateModelTransItemCEC(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentSaleType,trans,transactionPackageItem,itemBean.selectedItem,1.0)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="menuUnit,itxtUnitPrice,itxtQty,itxtAmount,pgrdSpecific"/>
+                </p:autoComplete>
+                <p:selectOneMenu id="menuUnit" styleClass="clsMenu" value="#{transactionPackageItem.unitId}">
+                    <f:selectItems value="#{itemBean.item_unitList}" var="iu" itemLabel="#{iu.unit_symbol}" itemValue="#{iu.unit_id}"/>
+                    <p:ajax listener="#{itemBean.changeItemUnitSales(itemBean.selectedItem,transactionPackageItem,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,generalUserSetting.currentStore.storeId,trans)}" process="@this autcItem" update="itxtAmount itxtUnitPrice"/>
+                </p:selectOneMenu>
+                <h:commandButton value="+" style="width: 34px;height: 30px;">
+                    <f:ajax listener="#{transactionPackageItemBean.addQtyTransItemCEC(transactionPackageItem)}" execute="@this itxtQty" render="itxtQty itxtAmount"/>
+                </h:commandButton>
+                <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 50px;height: 24px;" value="#{transactionPackageItem.itemQty}" autocomplete="off">
+                    <f:ajax event="blur" listener="#{transactionPackageItem.setAmount(transactionPackageItem.itemQty*transactionPackageItem.unitPrice)}" render="itxtAmount"/>
+                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                </h:inputText>
+
+                <h:commandButton value="-" style="width: 34px;height: 30px;">
+                    <f:ajax listener="#{transactionPackageItemBean.subtractQtyTransItemCEC(transactionPackageItem)}" execute="@this itxtQty" render="itxtQty itxtAmount"/>
+                </h:commandButton>
+                <h:inputText id="itxtUnitPrice" styleClass="clsInputTransItem" style="width: 100px;height: 24px;" disabled="#{itemBean.selectedItem.isGeneral==0}" value="#{transactionPackageItem.unitPrice}" autocomplete="off">
+                    <f:ajax event="blur" listener="#{transactionPackageItem.setAmount(transactionPackageItem.itemQty*transactionPackageItem.unitPrice)}" render="itxtAmount"/>
+                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                </h:inputText> 
+                <h:inputText id="itxtAmount" styleClass="clsInputTransItem" style="width: 100px;height: 24px;" disabled="true" value="#{transactionPackageItem.amount}">
+                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                </h:inputText> 
+
+            </h:panelGrid>
+
+            <h:panelGrid id="pgrdSpecific">
+                <h:panelGrid id="pgrdSpecific2" columns="3" rendered="#{itemBean.selectedItem.isGeneral==1}">
+                    <p:commandLink  onclick="PF('dlgSpecific').show();" value="#{langsys['Name']}:" />
+                    <p:commandLink  onclick="PF('dlgSpecific').show();" value="#{langsys['Code']}:" />
+                    <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['More']} #{langsys['Description']}"/>
+                    <h:inputTextarea id="itxtDescSppecific" styleClass="clsInput" rows="2" cols="34" value="#{transactionPackageItem.descSpecific}"/>
+                    <h:inputTextarea id="itxtCodeSpecific" styleClass="clsInput" rows="2" cols="34" value="#{transactionPackageItem.codeSpecific}"/>
+                    <h:inputTextarea styleClass="clsInput" id="itxaDescMore" rows="2" cols="34" value="#{transactionPackageItem.descMore}"/>
+                </h:panelGrid>
+            </h:panelGrid>
+            <h:panelGrid id="pgrdItemCommands" columns="2">
+                <h:commandButton styleClass="clsButtonMedium" value="#{langsys['Add']} #{langsys['Item']} (ALT+A)" accesskey="a">
+                    <f:ajax listener="#{transactionPackageItemBean.addTransactionPackageItem(generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transactionPackage,transactionPackageItem, statusBean, transactionPackageItemBean.transPackageItemList,itemBean.selectedItem)}"
+                            execute="@form" render="gridTransItem pgrdSpecific dtblTransactionItem pgrdTotals pgrdMsgs"/>
+                </h:commandButton>
+                <h:commandButton styleClass="clsButtonMedium" value="#{langsys['Clear']} #{langsys['Item']} (ALT+R)" accesskey="r">
+                    <f:ajax listener="#{transactionPackageItemBean.clearAll(trans,transactionPackageItemBean.transPackageItemList,transactionPackageItem,transactionPackage, itemBean.selectedItem,transactorBean.selectedTransactor,1,null)}" execute="@form" render="gridTransItem pgrdSpecific"/>
+                </h:commandButton>
+            </h:panelGrid>
+
+            <p:dataTable rowIndexVar="rowIndex" id="dtblTransactionItem" value="#{transactionPackageItemBean.transPackageItemList}" var="ati" 
+                         styleClass="cls-table" tableStyle="width:auto;"
+                         rowStyleClass="#{ati.isTaxSynced eq 0 ? 'red' : null}">
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">
+                        #
+                    </f:facet>
+                    <!-- row record -->
+                    #{rowIndex+1}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Item']} #{langsys['Description']}</f:facet>
+                    <!-- row record -->
+                    <p:outputLabel value="#{transactionPackageItemBean.showItemDescriptionCEC(ati)}" escape="false"/>
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Unit']}</f:facet>
+                    <!-- row record -->
+                    #{ati.unitSymbol}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Qty']}</f:facet>
+                    <!-- row record -->
+                    <h:commandButton id="cmdbAddQty" value="+" style="width: 34px;">
+                        <f:ajax listener="#{transactionPackageItemBean.addQtyTransPackageItemCEC(generalUserSetting.currentTransactionTypeId, trans,transactionPackage, transactionPackageItemBean.transPackageItemList,ati)}" execute="dtblTransactionItem" render="dtblTransactionItem TransactionPackageForm:pgrdTotals TransactionPackageForm:pgrdMsgs"/>
+                    </h:commandButton>
+                    <h:inputText value="#{ati.itemQty}" style="width: 50px;">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:ajax event="change" listener="#{transactionPackageItemBean.editTransPackageItemCEC(generalUserSetting.currentTransactionTypeId, trans,transactionPackage, transactionPackageItemBean.transPackageItemList,ati)}" execute="dtblTransactionItem" render="dtblTransactionItem TransactionPackageForm:pgrdTotals TransactionPackageForm:pgrdMsgs"/>
+                    </h:inputText>
+                    <h:commandButton id="cmdbRemoveQty" value="-" style="width: 34px;">
+                        <f:ajax listener="#{transactionPackageItemBean.subtractQtyTransPackageItemCEC(generalUserSetting.currentTransactionTypeId, trans,transactionPackage, transactionPackageItemBean.transPackageItemList,ati)}" execute="dtblTransactionItem" render="dtblTransactionItem TransactionPackageForm:pgrdTotals TransactionPackageForm:pgrdMsgs"/>
+                    </h:commandButton>
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Unit']} #{langsys['Price']}</f:facet>
+                    <!-- row record -->
+                    <h:outputLabel value="#{ati.unitPrice}">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputLabel>
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Unit']} VAT</f:facet>
+                    <!-- row record -->
+                    <h:outputLabel value="#{ati.unitVat}">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputLabel>
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Unit']} #{langsys['Discount']}</f:facet>
+                    <!-- row record -->
+                    <h:outputLabel value="#{ati.unitTradeDiscount}">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputLabel>
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Amount']}</f:facet>
+                    <!-- row record -->
+                    <h:outputLabel value="#{ati.amount}">
+                        <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputLabel>
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Action']}</f:facet>
+                    <!-- row record -->
+                    <h:commandButton id="cmdbRemoveItem" value="-">
+                        <f:ajax listener="#{transactionPackageItemBean.removeTransItemCEC(generalUserSetting.currentTransactionTypeId, trans, transactionPackage, transactionPackageItemBean.transPackageItemList,ati)}" execute="@form" render="dtblTransactionItem TransactionFormSales:pgrdTotals"/>
+                    </h:commandButton>
+                </p:column> 
+            </p:dataTable>
+
+            <h:panelGrid id="pgrdTotals" styleClass="clsGridMainInput" columns="5">
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Subtotal']}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px; display: none;" value="#{langsys['Discount']}"/>
+                <p:commandLink id="cmdlCashDiscount"  onclick="PF('dlgCashDiscount').show();" style="width: 150px; display: none;" value="#{langsys['Cash']} #{langsys['Discount']} (#{utilityBean.formatDoubleToString(trans.cash_dicsount_perc)}%)" disabled="#{companySetting.getBoolIsAllowDiscount()}"/>
+                <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px; display: none;" value="VAT"/>
+                <p:commandLink id="cmdlCashDiscount2" onclick="PF('dlgCashDiscount2').show();" value="#{langsys['TOTAL']} (#{trans.currencyCode})" disabled="#{companySetting.getBoolIsAllowDiscount()}"/>
+
+                <h:inputText id="itxtSubTotal" value="#{transactionPackage.subTotal}" styleClass="clsInputTransItem" style="width: 150px;height: 24px;" disabled="true">
+                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                </h:inputText>
+                <h:inputText id="itxtTotalTradeDiscount" value="#{transactionPackage.totalTradeDiscount}" styleClass="clsInputTransItem" style="width: 150px;height: 24px;display: none;" autocomplete="off" disabled="true"> 
+                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                </h:inputText>
+                <h:inputText id="itxtCashDiscount" value="#{trans.cashDiscount}" styleClass="clsInputTransItem" style="width: 150px;height: 24px;display: none;" autocomplete="off" disabled="#{companySetting.getBoolIsAllowDiscount()}">
+                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                    <f:ajax event="blur" listener="#{transactionPackageBean.setTransTotalsAndUpdateCEC(generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transactionPackage, transactionPackageItemBean.transPackageItemList)}" render="cmdlCashDiscount itxtGrandTotal itxtTotalVat"/>
+                </h:inputText>
+                <h:inputText id="itxtTotalVat" value="#{transactionPackage.totalTax}" styleClass="clsInputTransItem" style="width: 150px;height: 24px;display: none;" disabled="true">
+                    <f:convertNumber pattern="###,###.###" locale="#{utilityBean.convertLocaleToString()}"/>
+                </h:inputText>
+                <h:inputText id="itxtGrandTotal" value="#{transactionPackage.grandTotal}" styleClass="clsInputTransItem" style="width: 180px;background-color: yellow;font-weight: bold;font-size: 20px;height: 24px;" disabled="true">
+                    <f:convertNumber pattern="#{accCurrencyBean.getNumberFormatByCurrency(trans.currencyCode)}" locale="#{utilityBean.convertLocaleToString()}"/>
+                </h:inputText>
+            </h:panelGrid>
+
+            <h:panelGrid id="pgrdCommands" styleClass="clsGridMainCommands" columns="1">
+                <h:panelGrid styleClass="clsGridMainCommands1" columns="7">
+                    <h:selectBooleanCheckbox value="#{transactionPackageBean.autoPrintAfterSave}"/>
+                    <h:outputLabel value="#{langsys['Print']}#{langsys['After']}#{langsys['Save']}" style="color: white"/>
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{transactionPackageBean.saveTransPackageCECNew('1','PARENT',generalUserSetting.currentStore.storeId, generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transactionPackage, transactionPackageItemBean.transPackageItemList,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail)}" process="@form" update="pnlHeader gridTransItem pgrdSpecific dtblTransactionItem pgrdTotals pgrdMsgs growl1 pnlgOutput itxtSubTotal pnlDraft"/>
+                    </p:commandButton>
+                    <p:commandButton id="cmdbClear" styleClass="clsButtonBig" value="#{langsys['CLEAR']} (ALT+C)" accesskey="c">
+                        <p:ajax listener="#{transactionPackageBean.clearAll2(trans,transactionPackage, transactionPackageItemBean.transPackageItemList,transactionPackageItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor,null,null)}" process="@form" update="pnlHeader gridTransItem pgrdSpecific dtblTransactionItem pgrdTotals pgrdMsgs pnlgOutput pnlDraft"/>
+                    </p:commandButton>
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbSaveDraft" value="#{langsys['NEW']} #{langsys['DRAFT']}" onclick="PF('statusDialog2').show()" onsuccess="PF('statusDialog2').hide()">
+                        <p:dialog widgetVar="statusDialog2" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{transactionPackageBean.saveTransPackageCECNew('100','PARENT',generalUserSetting.currentStore.storeId, generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,trans, transactionPackage, transactionPackageItemBean.transPackageItemList,transactorBean.selectedSchemeTransactor,transBean.authorisedByUserDetail)}" process="@form" update="pnlHeader gridTransItem pgrdSpecific dtblTransactionItem pgrdTotals pgrdMsgs growl1 pnlgOutput itxtSubTotal pnlDraft"/>
+                    </p:commandButton>
+                    <h:panelGrid columns="1">
+                        <h:outputLabel value="#{langsys['Print']}.#{langsys['File']}" style="color: white;"/>
+                        <h:selectOneMenu styleClass="clsMenu" value="#{transBean.overridePrintVersion}">
+                            <f:selectItem itemLabel="" itemValue="0"/>
+                            <f:selectItem itemLabel="#{langsys['Print']} #{langsys['File']} 1" itemValue="1"/>
+                            <f:selectItem itemLabel="#{langsys['Print']} #{langsys['File']} 2" itemValue="2"/>
+                            <f:ajax event="change" render="pnlgOutput"/>
+                        </h:selectOneMenu>
+                    </h:panelGrid>
+                </h:panelGrid>
+            </h:panelGrid>
+            <h:panelGrid id="pgrdMsgs" styleClass="clsGridMainMessages" columns="1">
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transactionPackageBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
+            <p:growl id="growl1"/>
+            <!-- PRINTOUT STARTS HERE -->
+            <h:panelGrid id="pnlgOutput" style="width: 100%">
+                <ui:include src="#{transBean.getPrintFileName('PARENT',transBean.transTypeObj,transBean.overridePrintVersion)}"/>
+            </h:panelGrid>
+            <!-- PRINTOUT ENDS HERE -->
+        </h:form>
+    </h:body>
+</html>

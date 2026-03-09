@@ -1,0 +1,242 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+    </h:head>
+    <h:body>
+        <h:form id="vTransactionForm">  
+            <ui:composition>
+                <p:panel style="text-align: center;">
+                    <p:commandButton id="cmdbvPrint" value="PRINT" icon="ui-icon-print" type="button">
+                        <p:printer target="vTransactionGrid" rendered="false"/>
+                    </p:commandButton>
+                </p:panel>
+                <p:panel id="vTransactionGrid" style="text-align: center;border-style: none;-webkit-print-color-adjust: exact;"> 
+                    <table cellspacing="0" border="0">
+                        <tr>
+                            <td colspan="5" align="center"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 33pt;color:#808000;font-weight: bold;text-decoration: underline;">#{companySetting.getLICENSE_CLIENT_NAME()}</h:outputLabel></td>
+                        </tr>
+                        <tr>
+                            <td colspan="6" align="center"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 7pt;color:#808000;font-weight: bold;text-decoration: underline;">#{companySetting.getSloghan()}</h:outputLabel></td>
+                        </tr>
+                        <tr>
+                            <td height="22" align="left"><br/></td>
+                            <td align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#808000;font-weight: bold;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','BOX_ADDRESS').parameter_value}</h:outputLabel></td>
+                            <td rowspan="9" align="center" valign="middle">
+                                <img src="#{companySetting.getLogoUrl()}" width="96" height="190"/>
+                            </td>
+                            <td colspan="4" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 8pt;color:#808000;font-weight: bold;text-decoration: none;">#{companySetting.getPhysicalAddress()}</h:outputLabel></td>
+                        </tr>
+                        <tr>
+                            <td height="17" align="left"><br/></td>
+                            <td align="left"><a href="mailto:#{companySetting.getEmail()}"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;text-decoration: underline;">#{companySetting.getEmail()}</h:outputLabel></a></td>
+                            <td align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#808000;font-weight: bold;text-decoration: none;">Mobile</h:outputLabel></td>
+                            <td colspan="3" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#808000;font-weight: bold;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value}</h:outputLabel></td>
+                        </tr>
+                        <tr>
+                            <td height="23" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">VAT No.:</h:outputLabel></td>
+                            <td align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','VAT_NUMBER').parameter_value}</h:outputLabel></td>
+                            <td align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#808000;font-weight: bold;text-decoration: none;">Telephone</h:outputLabel></td>
+                            <td colspan="3" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#808000;font-weight: bold;text-decoration: none;">#{companySetting.getPhone()}</h:outputLabel></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" height="21" align="center" bgcolor="#003300"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 16pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">TAX INVOICE N° #{generalUserSetting.outputDetailChild.trans.transactionNumber}</h:outputLabel></td>
+                            <td align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#808000;font-weight: bold;text-decoration: none;">Fax</h:outputLabel></td>
+                            <td colspan="3" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#808000;font-weight: bold;text-decoration: none;">#{companySetting.getFax()}</h:outputLabel></td>
+                        </tr>
+                        <tr>
+                            <td height="20" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">TIN No.:</h:outputLabel></td>
+                            <td align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">#{companySetting.getTaxIdentity()}</h:outputLabel></td>
+                            <td align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">DATE</h:outputLabel></td>
+                            <td colspan="3" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: underline;">#{utilityBean.formatDate(generalUserSetting.outputDetailChild.trans.transactionDate)}</h:outputLabel></td>
+                        </tr>
+                        <tr>
+                            <td height="21" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">HD N°</h:outputLabel></td>
+                            <td align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">#{generalUserSetting.outputDetailChild.trans.transactionNumber}</h:outputLabel></td>
+                            <td align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">ITEMS FOR</h:outputLabel></td>
+                            <td colspan="3" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: normal;text-decoration: none;">#{generalUserSetting.outputDetailChild.trans.transactionComment}</h:outputLabel></td>
+                        </tr>
+                        <tr>
+                            <td height="17" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#333333;font-weight: bold;text-decoration: none;">CUSTOMER:</h:outputLabel></td>
+                            <td align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">#{transactorBean.getTransactor(generalUserSetting.outputDetailChild.trans.transactorId).transactorNames}</h:outputLabel></td>
+                            <td align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">SITE</h:outputLabel></td>
+                            <td colspan="3" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: normal;text-decoration: none;">#{siteBean.getSiteById(generalUserSetting.outputDetailChild.trans.site_id).site_name}</h:outputLabel></td>
+                        </tr>
+                        <tr>
+                            <td height="22" align="left"><b><font face="Tahoma" size="1"><br/></font></b></td>
+                            <td align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">#{transactorBean.getTransactor(generalUserSetting.outputDetailChild.trans.transactorId).physicalAddress}</h:outputLabel><br/></td>
+                            <td colspan="3" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: underline;">Declared:#{utilityBean.formatDate(generalUserSetting.outputDetailChild.trans.from_date)} Returned:#{utilityBean.formatDate(generalUserSetting.outputDetailChild.trans.to_date)}</h:outputLabel></td>
+                            <td align="right"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: underline;">(#{generalUserSetting.outputDetailChild.trans.duration_value} #{generalUserSetting.outputDetailChild.trans.duration_type.toUpperCase()}S)</h:outputLabel></td>
+                        </tr>
+                        <tr>
+                            <td height="22" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#333333;font-weight: bold;text-decoration: none;">CONTACTS</h:outputLabel></td>
+                            <td align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">#{transactorBean.getTransactor(generalUserSetting.outputDetailChild.trans.transactorId).cpName}</h:outputLabel></td>
+                            <td colspan="3" align="center"><b><u><font face="Times New Roman" size="1" color="#003300"><br/></font></u></b></td>
+                        </tr>
+                        <tr>
+                            <td height="20" align="left"></td>
+                            <td align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">#{transactorBean.getTransactor(generalUserSetting.outputDetailChild.trans.transactorId).cpPhone}</h:outputLabel></td>
+                            <td align="left"></td>
+                            <td align="left"></td>
+                            <td style="border-top: 2px solid #000000; border-left: 2px solid #000000; border-right: 2px solid #000000" align="center"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 8pt;color:#003300;font-weight: bold;text-decoration: none;"> #{generalUserSetting.outputDetailChild.trans.currencyCode} A #{generalUserSetting.outputDetailChild.trans.duration_type}</h:outputLabel></td>
+                            <td align="left"></td>
+                            <td align="center"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">#{generalUserSetting.outputDetailChild.trans.currencyCode}</h:outputLabel></td>
+                        </tr>
+                        <tr>
+                            <td style="border-top: 2px solid #000000; border-bottom: 2px solid #000000; border-left: 2px solid #000000; border-right: 2px solid #000000" height="18" align="left" valign="top"><h:outputLabel style="font-family:Tahoma, Geneva, sans-serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">No</h:outputLabel></td>
+                            <td style="border-top: 2px solid #000000; border-bottom: 2px solid #000000; border-left: 2px solid #000000; border-right: 2px solid #000000" align="left" valign="top"><h:outputLabel style="font-family:Tahoma, Geneva, sans-serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">          DESCRIPTION</h:outputLabel></td>
+                            <td style="border-top: 2px solid #000000; border-bottom: 2px solid #000000; border-left: 2px solid #000000; border-right: 2px solid #000000" align="left" valign="top"><h:outputLabel style="font-family:Tahoma, Geneva, sans-serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">QTY</h:outputLabel></td>
+                            <td style="border-top: 2px solid #000000; border-bottom: 2px solid #000000; border-left: 2px solid #000000; border-right: 2px solid #000000" align="left" valign="top"><h:outputLabel style="font-family:Tahoma, Geneva, sans-serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">CHARGE REASON</h:outputLabel></td>
+                            <td style="border-top: 2px solid #000000; border-bottom: 2px solid #000000; border-left: 2px solid #000000; border-right: 2px solid #000000" align="left" valign="top"><h:outputLabel style="font-family:Tahoma, Geneva, sans-serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">UNIT PRICE</h:outputLabel></td>
+                            <td style="border-top: 2px solid #000000; border-bottom: 2px solid #000000; border-left: 2px solid #000000; border-right: 2px solid #000000" align="left" valign="top"><h:outputLabel style="font-family:Tahoma, Geneva, sans-serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">N° #{generalUserSetting.outputDetailChild.trans.duration_type.toUpperCase()}S <br/> PASSED</h:outputLabel></td>
+                            <td style="border-top: 2px solid #000000; border-bottom: 2px solid #000000; border-left: 2px solid #000000; border-right: 2px solid #000000" align="center" valign="top"><h:outputLabel style="font-family:Tahoma, Geneva, sans-serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">TOTAL</h:outputLabel></td>
+                        </tr>
+                        <ui:repeat var="ti" value="#{generalUserSetting.outputDetailChild.trans_items}">
+                            <tr>
+                                <td style="border-top: 2px solid #000000; border-bottom: 1px solid #000000; border-left: 2px solid #000000; border-right: 1px solid #000000" height="19" align="left" valign="top"><h:outputLabel style="font-family:Tahoma, Geneva, sans-serif; font-size: 9pt;color:#003300;font-weight: normal;text-decoration: none;">#{ti.item_no}</h:outputLabel></td>
+                                <td style="border-top: 2px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="left" valign="top"><h:outputLabel style="font-family:Tahoma, Geneva, sans-serif; font-size: 9pt;color:#003300;font-weight: normal;text-decoration: none;" value="#{transItemBean.showItemDescriptionCEC(ti)}" escape="false"/></td>
+                                <td style="border-top: 2px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="left" valign="top">
+                                    <h:outputText value="#{ti.itemQty}" style="font-family:Tahoma, Geneva, sans-serif; font-size: 9pt;color:#003300;font-weight: normal;text-decoration: none;">
+                                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    </h:outputText>
+                                </td>
+                                <td style="border-top: 2px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="left" valign="top"><h:outputLabel style="font-family:Tahoma, Geneva, sans-serif; font-size: 9pt;color:#003300;font-weight: normal;text-decoration: none;">#{ti.narration}</h:outputLabel></td>
+                                <td style="border-top: 2px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="right" valign="top">
+                                    <h:outputText value="#{ti.unitPriceExcVat}" style="font-family:Tahoma, Geneva, sans-serif; font-size: 9pt;color:#003300;font-weight: normal;text-decoration: none;">
+                                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    </h:outputText>
+                                </td>
+                                <td style="border-top: 2px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="right" valign="top">
+                                    <h:outputText value="#{ti.duration_value}" style="font-family:Tahoma, Geneva, sans-serif; font-size: 9pt;color:#003300;font-weight: normal;text-decoration: none;">
+                                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    </h:outputText>
+                                </td>
+                                <td style="border-top: 2px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 2px solid #000000" align="right" valign="top">
+                                    <h:outputText value="#{ti.amountExcVat}" style="font-family:Tahoma, Geneva, sans-serif; font-size: 9pt;color:#003300;font-weight: normal;text-decoration: none;">
+                                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    </h:outputText>
+                                </td>
+                            </tr>
+                        </ui:repeat>
+                        <ui:repeat var="itn" value="#{generalUserSetting.outputDetailChild.total_items_list}">
+                            <tr>
+                                <td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 2px solid #000000; border-right: 1px solid #000000" height="20" align="left" valign="top"></td>
+                                <td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="left" valign="top"></td>
+                                <td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="left" valign="top"></td>
+                                <td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="right" valign="top"></td>
+                                <td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="right" valign="top"></td>
+                                <td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 2px solid #000000" align="right" valign="top"></td>
+                                <td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 2px solid #000000" align="right" valign="top"></td>
+                            </tr>
+                        </ui:repeat>
+                        <tr>
+                            <td height="18" align="right"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 6pt;color:#800000;font-weight: normal;text-decoration: none;">X RATE</h:outputLabel></td>
+                            <td align="left" sdnum="1033;0;#,##0"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 6pt;color:#800000;font-weight: normal;text-decoration: none;">#{generalUserSetting.outputDetailChild.trans.currencyCode}</h:outputLabel></td>
+                            <td style="border-left: 1px solid #000000" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">TOTAL</h:outputLabel></td>
+                            <td align="left"><br/></td>
+                            <td align="left"><br/></td>
+                            <td colspan="2" style="border-bottom: 2px solid #000000; border-left: 2px solid #000000; border-right: 2px solid #000000" align="right" valign="top">
+                                <h:outputText value="#{generalUserSetting.outputDetailChild.trans.subTotal}" style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputText>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="23" align="right"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 12pt;color:#008000;font-weight: bold;text-decoration: none;">#{accCurrencyBean.localCurrency.currencyCode}</h:outputLabel></td>
+                            <td align="left" sdnum="1033;0;#,##0">
+                                <h:outputText value="#{generalUserSetting.outputDetailChild.trans.xrate}" style="font-family:'Times New Roman', Times, serif; font-size: 12pt;color:#008000;font-weight: bold;text-decoration: none;">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputText>
+                            </td>
+                            <td style="border-left: 1px solid #000000" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">DISCOUNT</h:outputLabel></td>
+                            <td align="right" sdnum="1033;0;0%">
+                                <h:outputText value="#{utilityBean.formatDoubleToString(generalUserSetting.outputDetailChild.trans.cash_dicsount_perc)}%" style="font-family:'Times New Roman', Times, serif; font-size: 6pt;color:#800000;font-weight: bold;text-decoration: none;">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputText>
+                            </td>
+                            <td align="left"><b><font color="#800080"><br/></font></b></td>
+                            <td colspan="2" style="border-bottom: 2px solid #000000; border-left: 2px solid #000000; border-right: 2px solid #000000" align="right" valign="top">
+                                <h:outputText value="#{generalUserSetting.outputDetailChild.trans.cashDiscount}" style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputText>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="12" align="right"><b><font face="Roman" size="3" color="#008000"><br/></font></b></td>
+                            <td align="left" sdnum="1033;0;#,##0"><b><font face="Roman" size="3" color="#008000"><br/></font></b></td>
+                            <td style="border-left: 1px solid #000000" align="left"><b><font face="Times New Roman"><br/></font></b></td>
+                            <td align="right" sdnum="1033;0;0%"><font face="Times New Roman" color="#003300"><br/></font></td>
+                            <td align="left"><b><font color="#800080"><br/></font></b></td>
+                            <td colspan="2" style="border-left: 2px solid #000000; border-right: 2px solid #000000" align="right" valign="top"></td>
+                        </tr>
+                        <tr>
+                            <td height="14" align="right"><b><font face="Roman" size="3" color="#008000"><br/></font></b></td>
+                            <td align="left" sdnum="1033;0;#,##0"><b><font face="Roman" size="3" color="#008000"><br/></font></b></td>
+                            <td style="border-left: 1px solid #000000" align="left"><b><font face="Times New Roman"><br/></font></b></td>
+                            <td align="right" sdnum="1033;0;0%"><font face="Times New Roman" color="#003300"><br/></font></td>
+                            <td align="left"><b><font color="#800080"><br/></font></b></td>
+                            <td colspan="2" style="border-left: 2px solid #000000; border-right: 2px solid #000000" align="right" valign="top"></td>
+                        </tr>
+                        <tr>
+                            <td height="21" align="center"><b><u><font face="Tahoma" size="1" color="#008000"><br/></font></u></b></td>
+                            <td align="left" sdnum="1033;0;#,##0"><b><u><font face="Roman" size="4" color="#008000"><br/></font></u></b></td>
+                            <td style="border-left: 1px solid #000000" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">VAT</h:outputLabel></td>
+                            <td align="right" sdnum="1033;0;0%">
+                                <h:outputText value="#{utilityBean.formatDoubleToString(generalUserSetting.outputDetailChild.trans.vatPerc)}%" style="font-family:'Times New Roman', Times, serif; font-size: 6pt;color:#800000;font-weight: bold;text-decoration: none;">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputText>
+                            </td>
+                            <td align="left"><b><font color="#800080"><br/></font></b></td>
+                            <td colspan="2" style="border-left: 2px solid #000000; border-right: 2px solid #000000" align="right" valign="top">
+                                <h:outputText value="#{generalUserSetting.outputDetailChild.trans.totalVat}" style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputText>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td height="20" align="right"><b><font face="Times New Roman" size="1"><br/></font></b></td>
+                            <td align="center"><u><font face="Times New Roman" size="4" color="#800000"><br/></font></u></td>
+                            <td style="border-left: 1px solid #000000" align="left"><b><font face="Bookman Old Style" color="#993300"><br/></font></b></td>
+                            <td colspan="2" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 11pt;color:#003300;font-weight: bold;text-decoration: none;">GRAND TOTAL</h:outputLabel></td>
+                            <td colspan="2" style="border-left: 2px solid #000000; border-right: 2px solid #000000" align="right">
+                                <h:outputText value="#{generalUserSetting.outputDetailChild.trans.grandTotal}" style="font-family:'Times New Roman', Times, serif; font-size: 12pt;color:#003300;font-weight: bold;text-decoration: none;">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputText>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border-right: 1px solid #000000" colspan="2" height="16" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 6pt;color:#003300;font-weight: normal;text-decoration: underline;">ITEMS ARE THE PROPERTY OF #{companySetting.getLICENSE_CLIENT_NAME()}</h:outputLabel></td>
+                            <td style="border-bottom: 1px solid #000000; border-left: 1px solid #000000" align="left"><b><font size="1"><br/></font></b></td>
+                            <td style="border-bottom: 1px solid #000000" align="left"><b><font size="1"><br/></font></b></td>
+                            <td style="border-bottom: 1px solid #000000" align="left"><b><font size="1"><br/></font></b></td>
+                            <td colspan="2" style="border-top: 2px solid #000000; border-bottom: 2px solid #000000; border-left: 2px solid #000000; border-right: 2px solid #000000" align="center"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">#{generalUserSetting.outputDetailChild.trans.currencyCode}</h:outputLabel></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" height="23" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: none;">Thanks for using our item.</h:outputLabel></td>
+                            <td colspan="5" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 10pt;color:#003300;font-weight: bold;text-decoration: underline;">NOTE: Make all cheques payable to</h:outputLabel></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" height="19" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 8pt;color:#003300;font-weight: normal;text-decoration: none;">AUTHORIZED BY </h:outputLabel><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 8pt;color:#003300;font-weight: bold;text-decoration: none;">#{generalUserSetting.outputDetailChild.trans_user_detail.firstName} #{generalUserSetting.outputDetailChild.trans_user_detail.secondName}</h:outputLabel></td>
+                            <td colspan="5" align="left"><h:outputLabel style="font-family:'Times New Roman', Times, serif; font-size: 8pt;color:#003300;font-weight: bold;text-decoration: none;"> #{companySetting.getLICENSE_CLIENT_NAME()}</h:outputLabel></td>
+                        </tr>
+                        <tr>
+                            <td height="22" align="left"></td>
+                            <td align="left"></td>
+                            <td align="left"></td>
+                            <td align="left"></td>
+                            <td align="left"></td>
+                            <td align="left"></td>
+                            <td align="left"></td>
+                        </tr>
+                    </table>
+                </p:panel>
+            </ui:composition>
+        </h:form>
+    </h:body>
+</html>
+

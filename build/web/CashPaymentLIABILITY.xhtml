@@ -1,0 +1,153 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Liability Payment</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+            function confirmCancel()
+            {
+                return confirm('Are you sure you want to Cancel this payment record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{accCurrencyBean.refreshCurrencyListActive()}"/>
+        <f:viewAction action="#{navigationBean.checkAccessDenied(utilityBean.convertIntAsString(105), 'View')}"/>
+        <f:viewAction action="#{navigationBean.checkLicenseExpired()}"/>
+        <f:viewAction action="#{payBean.initClearPayReceipt()}"/>
+        <f:viewAction action="#{payBean.initClearPayPayTranss(pay,payBean.selectedBillTransactor,payTransBean.payTranss,payBean,trans)}" />
+        <f:viewAction action="#{payBean.initCurrencyCode(15,pay)}"/>
+    </f:metadata>
+    <f:event listener="#{navigationBean.checkCurrentPage('CASH PAYMENT','','')}" type="preRenderView" />
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="formPay" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
+                    return false;">
+
+            <h:panelGrid styleClass="clsGridMainHeader" columns="3">
+                <h:outputLabel styleClass="clsLabelTop" id="olblPaymentHeader" value="#{langsys['Liability']} #{langsys['Payment']}"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Pay']} #{langsys['against']} #{langsys['Liability']}"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Ledger']}:#{langsys['Cash']}↓ #{langsys['Liability']}↑"/>
+            </h:panelGrid>
+            <h:panelGrid id="pnlSearch" styleClass="clsGridMainInput" style="background-color: #b3f2b3;width: 100%;">
+                <h:panelGrid columns="8">
+                    <h:outputLabel  value="#{langsys['Currency']}:"/>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuCurrency" value="#{pay.currencyCode}">
+                        <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
+                        <f:ajax event="change" execute="@this" render="pnlInput pnlButtons"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel  value="#{langsys['Liability']} #{langsys['Account']}:"/>
+                    <h:selectOneMenu styleClass="clsMenu" style="width: 300px;" id="menuAccount2" value="#{payTrans.account_code}">
+                        <f:selectItem itemValue="" itemLabel=""/>
+                        <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('2-00-000')}" var="ca" itemLabel="#{ca.accountName} (#{ca.accountCode})" itemValue="#{ca.accountCode}"/>
+                        <f:ajax event="change" render="pnlButtons"/>
+                        <p:ajax event="blur" listener="#{accLedgerBean.refreshPayableAccBalance(payTrans.account_code,pay.billTransactorId,pay)}" update="itxtLiabBal"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel  value="#{langsys['Partner']}:"/>
+                    <p:autoComplete id="autcTransactor" value="#{payBean.selectedBillTransactor}" 
+                                    completeMethod="#{transactorBean.getTransactorObjectList}" 
+                                    var="trct" 
+                                    itemLabel="#{trct.transactorNames}" 
+                                    itemValue="#{trct}" 
+                                    converter="TransactorConverter" style="text-align: left;" 
+                                    forceSelection="true" 
+                                    >
+                        <p:column headerText="#{langsys['Partner']}" style="text-align: left" >  
+                            #{trct.transactorNames} 
+                        </p:column>
+                        <p:column headerText="#{langsys['Reference']} #{langsys['No.']}" style="text-align: left" >  
+                            #{trct.transactorRef} 
+                        </p:column>
+                        <p:column headerText="#{langsys['Type']}" style="text-align: left" >  
+                            #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
+                        </p:column> 
+                        <p:column headerText="#{langsys['Contact']} #{langsys['Person']}" style="text-align: left">  
+                            #{trct.cpName} 
+                        </p:column> 
+                        <p:ajax event="itemSelect" listener="#{pay.setBillTransactorId(payBean.selectedBillTransactor.transactorId)}"/>
+                        <p:ajax event="change" listener="#{pay.setBillTransactorId(payBean.selectedBillTransactor.transactorId)}" rendered="#{payBean.selectedBillTransactor!=null}"/>
+                        <p:ajax event="blur" listener="#{accLedgerBean.refreshPayableAccBalance(payTrans.account_code,pay.billTransactorId,pay)}" update="itxtLiabBal"/>
+                    </p:autoComplete>
+                    <h:outputLabel  value="#{langsys['Account']} #{langsys['Balance']}:"/>
+                    <h:inputText disabled="true" style="color: coral;font-weight: bold;width: 160px;" id="itxtLiabBal" value="#{accJournalBean.returnBalanceString(pay.accountBalance)}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:inputText>
+                </h:panelGrid>
+            </h:panelGrid>
+            <h:panelGrid id="pnlInput" columns="1">
+                <h:panelGrid id="pnlInputDetails" styleClass="clsGridMainInput" columns="6">
+                    <h:outputLabel  value="#{langsys['Amount']} #{langsys['Paid']}:"/>
+                    <h:inputText id="itxtPaidAmount" value="#{pay.paidAmount}" style="width: 233px;">
+                        <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        <f:ajax event="change" execute="@form" render="@form"/>
+                    </h:inputText>
+                    <h:outputLabel  value="#{langsys['Payment']} #{langsys['Date']}:"/>
+                    <p:calendar styleClass="clsInput" id="calPaymentDate"  pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{pay.payDate}" size="11" disabled="#{generalUserSetting.isAllowedToBackDate==0}"/>
+                    <h:outputLabel  value="#{langsys['Payment']} #{langsys['Method']}:"/>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuPayMethod" value="#{pay.payMethodId}" style="width: 150px;">
+                        <f:selectItem itemValue="" itemLabel=""/>
+                        <f:selectItems value="#{payMethodBean.getPayMethodsActiveIn('1,2,3,4,5,11')}" var="pm" itemLabel="#{pm.payMethodName}" itemValue="#{pm.payMethodId}"/>
+                        <f:ajax event="change" execute="@this menuCurrency" render="menuAccount"/>
+                    </h:selectOneMenu>
+
+                    <h:outputLabel  value="#{langsys['Paid']} #{langsys['from']} #{langsys['Account']}:"/>
+                    <h:selectOneMenu styleClass="clsMenu" style="width: 240px;" id="menuAccount" value="#{pay.accChildAccountId}">
+                        <f:selectItem itemValue="" itemLabel=""/>
+                        <f:selectItems value="#{accChildAccountBean.getAccChildAccountsForCashPayment(pay.currencyCode, pay.payMethodId,generalUserSetting.getCurrentStore().storeId,generalUserSetting.getCurrentUser().userDetailId)}" var="ca" itemLabel="#{ca.childAccountCode} (#{ca.childAccountName})" itemValue="#{ca.accChildAccountId}"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel  value="#{langsys['Reference']} #{langsys['No.']}:"/>
+                    <h:inputText id="itxtPayRefNo" value="#{pay.payRefNo}" styleClass="clsInputTransItem" style="width: 150px;"/>
+                    <h:outputLabel  value="#{langsys['Status']}:"/>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuStatus" value="#{pay.status}" style="width: 150px;">
+                        <f:selectItem itemLabel="#{langsys['Cleared']}" itemValue="1"/>
+                        <f:selectItem itemLabel="#{langsys['Not']} #{langsys['Cleared']}" itemValue="0"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel  value="#{langsys['Status']} #{langsys['Description']}:"/>
+                    <h:inputText id="itxtStatusDesc" value="#{pay.statusDesc}" styleClass="clsInputTransItem" style="width: 233px;"/>
+                </h:panelGrid>
+            </h:panelGrid>
+            <h:panelGrid id="pnlButtons" styleClass="clsGridMainCommands" columns="1">
+                <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
+                    <p:commandButton styleClass="clsButtonBig" value="#{langsys['SAVE']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{payBean.saveCashPaymentLIABILITY(pay,payTransBean.payTranss,15,105,payTrans)}" process="@form" update="@this pnlSearch pnlInput pnlgMessage pnlReceipt"/>
+                    </p:commandButton>
+                    <p:commandButton styleClass="clsButtonBig" value="#{langsys['CLEAR']} (ALT+C)" accesskey="c">
+                        <p:ajax listener="#{payBean.clearPayPayTranss(pay,payTransBean.payTranss)}" process="@form" update="pnlSearch pnlInput pnlgMessage pnlReceipt"/>
+                    </p:commandButton>
+                </h:panelGrid>
+            </h:panelGrid>
+
+            <h:panelGrid id="pnlgMessage" styleClass="clsGridMainMessages" columns="1">
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{payBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
+            <!-- RECEIPT/VOUCHER STARTS HERE -->
+            <p:panel id="pnlReceipt">
+                <ui:include src="#{transBean.getPrintFileName('PARENT',transactionTypeBean.getTransactionType(15),transBean.overridePrintVersion)}"/>
+            </p:panel>
+            <!-- RECEIPT/VOUCHER ENDS HERE -->
+        </h:form>
+    </h:body>
+</html>
+

@@ -1,0 +1,251 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Sales Invoice</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/> 
+    </h:head>
+
+    <h:body>
+        <h:form>
+            <ui:composition>
+                <p:commandButton id="cmdbvPrint" styleClass="clsButtonBigLonger" value="#{langsys['Print']} #{langsys['Sales']} #{langsys['Invoice']} #{langsys['Below']} (ALT+P)" icon="ui-icon-print" type="button" accesskey="p">
+                    <p:printer target="vTransactionGrid" rendered="false"/>
+                </p:commandButton>
+                <h:panelGrid id="vTransactionGrid" style="border: solid black;"> 
+                    <h:panelGrid columns="3" style="width:100%;margin: 0px;">
+                        <h:panelGrid style="width: 350px; margin: 0px;" columns="2">
+                            <p:graphicImage value="#{companySetting.getLogoUrl()}" style="float: left;" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'Yes')}" />
+                            <h:outputLabel value="#{companySetting.getPhysicalAddress()}"/>
+                        </h:panelGrid>
+                        <h:panelGrid style="width: 350px;text-align: center;" columns="1">
+                            <h:outputLabel style="font-size: 20px;font-weight: bold;" value="#{companySetting.getLICENSE_CLIENT_NAME()}"/>
+                            <h:outputLabel style="font-size: 16px;" value="#{companySetting.getBranchCode()}" rendered="#{companySetting.getShowBranchInvoice().equals('Yes')}"/>
+                            <h:outputLabel style="font-size: 16px;" value="#{storeBean.getStore(salesInvoiceBean.getCurrentTransaction().storeId).storeName}" rendered="#{companySetting.getShowStoreInvoice().equals('Yes')}"/>
+                        </h:panelGrid>
+                        <h:panelGrid style="margin: 0px;" columns="1">
+                            <h:outputLabel value=" #{langsys['Telephone']}:#{companySetting.getPhone()} " rendered="#{companySetting.getPhone().length()>0}"/>
+                            <h:outputLabel value=" TIN:#{companySetting.getTaxIdentity()} " rendered="#{companySetting.getTaxIdentity().length()>0}"/>
+                            <h:outputLabel value=" #{langsys['Email']}:#{companySetting.getEmail()} " rendered="#{companySetting.getEmail().length()>0}"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="1" style="text-align: center;width:100%;margin: 0px;background-color: gray;color: white;-webkit-print-color-adjust: exact;">
+                        <h:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionOutputLabel)}" style="font-size:30px;font-weight: bold;"/>
+                        <h:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionNumberLabel)}:#{salesInvoiceBean.getCurrentTransaction().transactionNumber}" style="font-weight: bold;"/>
+                    </h:panelGrid>
+
+                    <h:panelGrid styleClass="clsGridMainInput" columns="4" style="width: 100%">
+                        <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionRefLabel)}:"/>
+                        <h:inputText styleClass="clsInput" id="itxtvvTransactionId" disabled="true" value="#{salesInvoiceBean.getCurrentTransaction().transactionRef}" style="border: none;"/>
+                        <h:outputLabel  value="#{langsys['From']}:"/>
+                        <h:inputText styleClass="clsInput" id="itxtvFromStore" disabled="true" value="#{storeBean.getStore(salesInvoiceBean.getCurrentTransaction().storeId).storeName}" style="border: none;"/>
+
+                        <h:outputLabel  value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}:"/>
+                        <h:inputText styleClass="clsInput" id="itxtvCustomerName" disabled="true" value="#{transactorBean.getTransactor(salesInvoiceBean.getCurrentTransaction().transactorId).transactorNames}" style="border: none;"/>
+                        <h:outputLabel  value="#{langsys['Bill']} #{langsys['For']}:"/>
+                        <h:inputText styleClass="clsInput" id="itxtvCustomerName2" disabled="true" value="#{transactorBean.getTransactor(salesInvoiceBean.getCurrentTransaction().billTransactorId).transactorNames}" style="border: none;"/>
+                        
+                        <h:outputLabel  value="#{langsys['Client']} #:"/>
+                        <h:inputText styleClass="clsInput" id="itxtvCustomerNo" disabled="true" value="#{transactorBean.getTransactor(salesInvoiceBean.getCurrentTransaction().transactorId).transactorRef}" style="border: none;"/>
+                        <h:outputLabel  value="#{langsys['Tax']} #{langsys['Identity']}:"/>
+                        <h:inputText styleClass="clsInput" id="itxtvTaxIdentity" disabled="true" value="#{transactorBean.getTransactor(salesInvoiceBean.getCurrentTransaction().transactorId).taxIdentity}" style="border: none;"/>
+
+                        <h:outputLabel  value="#{langsys['Scheme']} #{langsys['Name']}:" rendered="#{salesInvoiceBean.getCurrentTransaction().schemeTransactorId>0}"/>
+                        <h:inputText styleClass="clsInput" disabled="true" value="#{transactorBean.getTransactor(salesInvoiceBean.getCurrentTransaction().schemeTransactorId).transactorNames}" rendered="#{salesInvoiceBean.getCurrentTransaction().schemeTransactorId>0}" style="border: none;"/>
+                        <h:outputLabel  value="#{langsys['Principal']} #{langsys['Scheme']} #{langsys['Member']}:" rendered="#{salesInvoiceBean.getCurrentTransaction().schemeTransactorId>0}"/>
+                        <h:inputText styleClass="clsInput" disabled="true" value="#{salesInvoiceBean.getCurrentTransaction().princSchemeMember}" rendered="#{salesInvoiceBean.getCurrentTransaction().schemeTransactorId>0}" style="border: none;"/>
+                    </h:panelGrid>
+
+                    <p:dataTable rowIndexVar="rowIndex" id="dtblvTransactionItem" value="#{transItemBean.getTransItemsByTransactionId2(generalUserSetting.getCurrentTransactionId())}" var="ti2" 
+                                 styleClass="cls-table" tableStyle="width:auto;" 
+                                 >  
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#</f:facet>
+                            <!-- row record -->
+                            #{rowIndex+1}
+                        </p:column>
+
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Item']} #{langsys['Description']}</f:facet>
+                            <!-- row record -->
+                            <p:outputLabel value="#{transItemBean.showItemDescriptionCEC(ti2)}" escape="false"/> [#{salesInvoiceBean.getVatRatedCode(ti2.vatRated)}]
+                        </p:column>
+
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Unit']}</f:facet>
+                            <!-- row record -->
+                            #{unitBean.getUnit(itemBean.getItem(ti2.itemId).unitId).unitSymbol}
+                        </p:column>
+
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Qty']}</f:facet>
+                            <!-- row record -->
+                            <h:outputLabel value="#{ti2.itemQty}" style="font-size: 14px;">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputLabel>
+                        </p:column>
+
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Unit']} #{langsys['Price']}</f:facet>
+                            <!-- row record -->
+                            <h:outputLabel value="#{ti2.unitPriceExcVat}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputLabel>
+                        </p:column>
+
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Unit']} VAT</f:facet>
+                            <!-- row record -->
+                            <h:outputLabel value="#{ti2.unitVat}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputLabel>
+                        </p:column>
+
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Unit']} #{langsys['Item']} #{langsys['Discount']}</f:facet>
+                            <!-- row record -->
+                            <h:outputLabel value="#{ti2.unitTradeDiscount}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputLabel>
+                        </p:column>
+
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Amount']}(#{salesInvoiceBean.getCurrentTransaction().getCurrencyCode()})</f:facet>
+                            <!-- row record -->
+                            <h:outputLabel value="#{ti2.amountIncVat}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputLabel>
+                        </p:column>
+                    </p:dataTable>
+
+                    <h:panelGrid columns="2" style="width:100%;margin: 0px;-webkit-print-color-adjust: exact;">
+                        <h:panelGrid style="margin: 0px;text-align: right;float: left" columns="2">
+                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Payment']} #{langsys['Method']}"/>
+                            <h:inputText styleClass="clsInput" id="itxtvPayMethod" disabled="true" value="#{payMethodBean.getPayMethod(salesInvoiceBean.getCurrentPay().payMethodId).payMethodName}" style="width: 150px;border: none;"/>
+                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Amount']} #{langsys['Tendered']}"/>
+                            <h:inputText id="itxtvAmountTendered" value="#{salesInvoiceBean.getCurrentTransaction().amountTendered}" styleClass="clsInputTransItem" style="width: 150px;border: none;" disabled="true">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:inputText>
+                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Spent']} #{langsys['Points']}#{langsys['Amount']}"/>
+                            <h:inputText id="itxtvSpendPointsAmount" value="#{salesInvoiceBean.getCurrentPay().pointsSpentAmount}" styleClass="clsInputTransItem" style="width: 150px;border: none;" disabled="true">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:inputText>
+                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Change']} #{langsys['Amount']}"/>
+                            <h:inputText id="itxtvChange" value="#{salesInvoiceBean.getCurrentTransaction().changeAmount}" styleClass="clsInputTransItem" style="width: 150px;border: none;" disabled="true">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:inputText>
+                        </h:panelGrid>
+                        <h:panelGrid style="margin: 0px;text-align: right;float: right;" columns="2">
+                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Subtotal']}"/>
+                            <h:inputText id="itxtvSubTotal" value="#{salesInvoiceBean.getCurrentTransaction().subTotal}" styleClass="clsInputTransItem" style="width: 150px;border: none;" disabled="true">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:inputText>
+                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Discount']}"/>
+                            <h:inputText id="itxtvTotalTradeDiscount" value="#{salesInvoiceBean.getCurrentTransaction().totalTradeDiscount}" styleClass="clsInputTransItem" style="width: 150px;border: none;" autocomplete="off" disabled="true"> 
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:inputText>
+                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="VAT"/>
+                            <h:inputText id="itxtvTotalVat" value="#{salesInvoiceBean.getCurrentTransaction().totalVat}" styleClass="clsInputTransItem" style="width: 150px;border: none;" disabled="true">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:inputText>
+                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['Cash']} #{langsys['Discount']}"/>
+                            <h:inputText id="itxtvCashDiscount" value="#{salesInvoiceBean.getCurrentTransaction().cashDiscount}" styleClass="clsInputTransItem" style="width: 150px;border: none;" disabled="true">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:inputText>
+                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{langsys['TOTAL']}"/>
+                            <h:inputText id="itxtvGrandTotal" value="#{salesInvoiceBean.getCurrentTransaction().grandTotal}" styleClass="clsInputTransItem" style="width: 150px;border: none;" disabled="true">
+                                <f:convertNumber pattern="###,###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:inputText>
+                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value=""/>
+                            <h:outputLabel styleClass="clsLabelTransItem" style="width: 150px" value="#{salesInvoiceBean.getCurrentTransaction().getCurrencyCode()}">
+                            </h:outputLabel>
+                        </h:panelGrid>
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="2" style="width:100%;-webkit-print-color-adjust: exact;">
+                        <h:panelGrid id="pgrdvSalesInvoicePointsCard" style="margin: 0px;text-align: right;float: left;" columns="2" rendered="#{salesInvoiceBean.getCurrentPointscard().cardNumber.length()>0}">
+                            <h:outputLabel style="font-size: 14px;" value="#{langsys['Card']} #{langsys['No.']}"/>
+                            <h:inputText style="font-size: 14px;border: none;" id="olblvSalesInvoiceCardNo" value="#{salesInvoiceBean.getCurrentPointscard().cardNumber}" disabled="true"/>
+                            <h:outputLabel style="font-size: 14px;" value="#{langsys['Card']} #{langsys['Holder']}:"/>
+                            <h:inputText  style="font-size: 14px;border: none;" id="olblvSalesInvoiceCardHolder" value="#{salesInvoiceBean.getCurrentPointscard().cardHolder}" disabled="true"/>
+                            <h:outputLabel style="font-size: 14px;" value="#{langsys['Points']} #{langsys['Spent']}:"/>
+                            <h:inputText  style="font-size: 14px;border: none;" id="olblvSalesInvoicePointsSpent" value="#{salesInvoiceBean.getCurrentPay().pointsSpent}" disabled="true">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:inputText >
+                            <h:outputLabel style="font-size: 14px;" value="#{langsys['Points']} #{langsys['Awarded']}:"/>
+                            <h:inputText  style="font-size: 14px;border: none;" id="olblvSalesInvoicePointsAwarded" value="#{salesInvoiceBean.getCurrentTransaction().pointsAwarded}" disabled="true">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:inputText >
+                            <h:outputLabel style="font-size: 14px;" value="#{langsys['Points']} #{langsys['Balance']}:"/>
+                            <h:inputText  style="font-size: 14px;border: none;" id="olblSalesInvoicePointsBalance" value="#{salesInvoiceBean.getCurrentPointscard().pointsBalance}" disabled="true">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:inputText >
+                        </h:panelGrid>
+
+                        <h:panelGrid id="pgrdSalesInvoiceVAT" style="margin: 0px;float: right;">
+                            <h:panelGrid rendered="#{companySetting.EShowVatAnalysisInvoice.equals('Yes')}" columns="4">
+                                <h:outputLabel style="font-size: 14px;" value="VAT #{langsys['Rated']}"/>
+                                <h:outputLabel style="font-size: 14px;" value="(%)"/>
+                                <h:outputLabel style="font-size: 14px;" value="Vatable #{langsys['Amount']}"/>
+                                <h:outputLabel style="font-size: 14px;" value="VAT"/>
+
+                                <h:outputLabel style="font-size: 14px;" value="#{langsys['Standard']}[S]"/>
+                                <h:outputLabel style="font-size: 14px;" value="#{salesInvoiceBean.getCurrentTransaction().vatPerc}">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
+                                <h:outputLabel style="font-size: 14px;" value="#{salesInvoiceBean.getCurrentTransaction().totalStdVatableAmount}">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
+                                <h:outputLabel style="font-size: 14px;" value="#{salesInvoiceBean.getCurrentTransaction().totalVat}">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
+
+                                <h:outputLabel style="font-size: 14px;" value="#{langsys['Zero']}[Z]"/>
+                                <h:outputLabel style="font-size: 14px;" value="0"/>
+                                <h:outputLabel style="font-size: 14px;" value="#{salesInvoiceBean.getCurrentTransaction().totalZeroVatableAmount}">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
+                                <h:outputLabel style="font-size: 14px;" value="0"/>
+
+                                <h:outputLabel style="font-size: 14px;" value="#{langsys['Exempt']}[E]"/>
+                                <h:outputLabel style="font-size: 14px;" value="n/a"/>
+                                <h:outputLabel style="font-size: 14px;" value="#{salesInvoiceBean.getCurrentTransaction().totalExemptVatableAmount}">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
+                                <h:outputLabel style="font-size: 14px;" value="0"/>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </h:panelGrid>
+
+                    <h:panelGrid id="IpgrdSalesInvoiceFooter1" style="width: 100%; margin: 0px;" columns="3">
+                        <h:outputLabel value="#{salesInvoiceBean.getCurrentTransUserDetail().firstName} #{salesInvoiceBean.getCurrentTransUserDetail().secondName}"/>
+                        <h:outputLabel value="#{salesInvoiceBean.getCurrentUserDetail().firstName} #{salesInvoiceBean.getCurrentUserDetail().secondName}"/>
+                        <h:outputLabel value="#{utilityBean.formatDateTime(salesInvoiceBean.getCurrentTransaction().addDate)}"/>
+                        <h:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(2).transactionUserLabel)}}" style="border-top-style: dotted;"/>
+                        <h:outputLabel value="#{langsys['Added']} #{langsys['by']}" style="border-top-style: dotted;"/>
+                        <h:outputLabel value="#{langsys['Date']}" style="border-top-style: dotted;"/>
+                    </h:panelGrid>
+
+                    <h:panelGrid id="IpgrdvSalesInvoiceFooter2" style="width: 100%; margin: 0px;" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getIsShowDeveloper(),'Yes')}">
+                        <h:outputLabel style="font-size: 10px;" value="#{langsys['System']} #{langsys['powered']} #{langsys['by']} Band Contractors Ltd | #{langsys['Email']}:#{companySetting.getDeveloperEmail()} | #{langsys['Phone']}:#{companySetting.getDeveloperPhone()}"/>
+                    </h:panelGrid>
+                </h:panelGrid> 
+            </ui:composition>
+        </h:form>
+    </h:body>
+</html>
+

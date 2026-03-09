@@ -1,0 +1,162 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Asset Item Detail</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:event listener="#{navigationBean.checkAccessDenied('66', 'View')}" type="preRenderView" />
+    <f:event listener="#{itemBean.initClearItem(item,itemBean.itemsList)}" type="preRenderView" />
+    <f:event listener="#{itemBean.initClearItem(item,itemBean.itemsSummary)}" type="preRenderView" />
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="formReport">
+            <h:panelGrid id="pnlgHeader" columns="1" styleClass="clsPanelReportFilterTitle">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Report Listing Item Details set for Assets"/>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgFilter" columns="6" styleClass="clsPanelReportFilter">
+                <p:outputLabel value="Item Type"/>
+                <p:outputLabel value="Category"/>
+                <p:outputLabel value="Subcategory"/>
+                <p:outputLabel value="Currency"/>
+                <p:outputLabel value="General?"/>
+                <p:outputLabel value="Suspended?"/>
+
+                <h:selectOneMenu id="menuItemType" value="#{item.itemType}">
+                    <f:selectItem itemLabel="" itemValue=""/>
+                    <f:selectItem itemLabel="PRODUCT" itemValue="PRODUCT"/>
+                    <f:selectItem itemLabel="SERVICE" itemValue="SERVICE"/>
+                </h:selectOneMenu>
+                <h:selectOneMenu id="menuCategory" value="#{item.categoryId}">
+                    <f:selectItem itemLabel="" itemValue="0"/>
+                    <f:selectItems value="#{categoryBean.categories}" var="c" itemLabel="#{c.categoryName}" itemValue="#{c.categoryId}"/>
+                    <f:ajax event="change" render="menuSubCategory"/>
+                </h:selectOneMenu>
+                <h:selectOneMenu id="menuSubCategory" value="#{item.subCategoryId}">
+                    <f:selectItem itemLabel="" itemValue="0"/>
+                    <f:selectItems value="#{subCategoryBean.getSubCategoriesByCategoryId(item.categoryId)}" var="s" itemLabel="#{s.subCategoryName}" itemValue="#{s.subCategoryId}"/>
+                </h:selectOneMenu>
+                <h:selectOneMenu id="menuCurrency" value="#{item.currencyCode}">
+                    <f:selectItem itemLabel="" itemValue=""/>
+                    <f:selectItems value="#{accCurrencyBean.accCurrenciesAll}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
+                    <f:ajax event="change" execute="@this" render="@this"/>
+                </h:selectOneMenu>
+                <h:selectOneMenu id="menuIsGeneral" value="#{item.isGeneral}">
+                    <f:selectItem itemLabel=""/>
+                    <f:selectItem itemLabel="Yes" itemValue="11"/>
+                    <f:selectItem itemLabel="No" itemValue="10"/>
+                </h:selectOneMenu>
+                <h:selectOneMenu id="menuIsSuspended" value="#{item.isSuspended}">
+                    <f:selectItem itemLabel="" itemValue=""/>
+                    <f:selectItem itemLabel="Yes" itemValue="Yes"/>
+                    <f:selectItem itemLabel="No" itemValue="No"/>
+                </h:selectOneMenu>
+
+                <p:outputLabel value=""/>
+                <p:commandButton id="cmdbSearch" value="SEARCH (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{itemBean.reportItemDetailAsset(item.itemType,item.categoryId,item.subCategoryId,item.currencyCode,item.isSuspended,item.isGeneral)}" process="pnlgFilter" update="pnlgMessage tblDetail"/>
+                </p:commandButton>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgMessage">
+                <p:outputLabel value="#{itemBean.actionMessage}" style="color: red;"/>
+            </h:panelGrid>
+            <p:dataTable id="tblDetail" tableStyle="width:auto;" var="itm" value="#{itemBean.itemsList}" 
+                         paginator="true" rows="50" 
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
+                         rowsPerPageTemplate="50,100,200,400,500">
+                <f:facet name="header">
+                    #{itemBean.itemsList.size()} #{langsys['Records']} #{langsys['Found']}
+                    <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
+                    <p:columnToggler datasource="tblDetail" trigger="toggler" />
+                </f:facet>
+                <f:facet name="{Exporters}">
+                    <h:commandLink>
+                        <p:graphicImage name="images/excel.png" width="24"/>
+                        <p:dataExporter type="xls" target="tblDetail" fileName="Item_Detail_Asset" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/pdf.png" width="24"/>
+                        <p:dataExporter type="pdf" target="tblDetail" fileName="Item_Detail_Asset"/>
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/csv.png" width="24"/>
+                        <p:dataExporter type="csv" target="tblDetail" fileName="Item_Detail_Asset" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/xml.png" width="24"/>
+                        <p:dataExporter type="xml" target="tblDetail" fileName="Item_Detail_Asset" />
+                    </h:commandLink>
+                </f:facet>
+                <p:column headerText="Item Type">
+                    <h:outputLabel value="#{itm.itemType} "/>
+                </p:column>
+                <p:column headerText="Item Code">
+                    <h:outputLabel value="#{itm.itemCode} "/>
+                </p:column>
+                <p:column headerText="Description">
+                    <p:outputLabel value="#{itm.description}"/>
+                </p:column>
+                <p:column headerText="Unit">
+                    <h:outputText value="#{itm.unitSymbol}"/>
+                </p:column>
+                <p:column headerText="Reorder Level">
+                    <h:outputText value="#{itm.reorderLevel}"/>
+                </p:column>
+                <p:column headerText="Asset Type">
+                    <h:outputText value="#{itm.assetType}"/>
+                </p:column>
+                <p:column headerText="Currency">
+                    <h:outputText value="#{itm.currencyCode}"/>
+                </p:column>
+                <p:column headerText="Unit Hire Price" style="text-align: right;">
+                    <h:outputText value="#{itm.unit_hire_price}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Asset">
+                    <h:outputText value="#{utilityBean.returnYesNoString(itm.isAsset)}"/>
+                </p:column>
+                <p:column headerText="Sale">
+                    <h:outputText value="#{utilityBean.returnYesNoString(itm.isSale)}"/>
+                </p:column>
+                <p:column headerText="Buy">
+                    <h:outputText value="#{utilityBean.returnYesNoString(itm.isBuy)}"/>
+                </p:column>
+                <p:column headerText="Hire">
+                    <h:outputText value="#{utilityBean.returnYesNoString(itm.is_hire)}"/>
+                </p:column>
+                <p:column headerText="Track">
+                    <h:outputText value="#{utilityBean.returnYesNoString(itm.isTrack)}"/>
+                </p:column>
+                <p:column headerText="General">
+                    <h:outputText value="#{utilityBean.returnYesNoString(itm.isGeneral)}"/>
+                </p:column>
+                <p:column headerText="Category">
+                    <h:outputText value="#{itm.categoryName}"/>
+                </p:column>
+                <p:column headerText="Subcategory">
+                    <h:outputText value="#{itm.subCategoryName}"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </h:body>
+</html>
+

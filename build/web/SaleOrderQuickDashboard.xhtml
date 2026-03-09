@@ -1,0 +1,176 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <title>Dashboard Order</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+            function doPrintHiddenClick() {
+                document.getElementById("TransactionFormSales:cmdbvPrint").click();
+            }
+            function doSearchClick() {
+                document.getElementById("TransactionFormSales:cmdbSearch").click();
+            }
+            function doPrintHiddenClickOrder() {
+                document.getElementById("TransactionFormSales:cmdbvPrintOrder").click();
+            }
+        </script> 
+        <f:loadBundle basename="#{menuItemBean.menuItemObj.LANG_BASE_NAME_SYS}" var="langsys" />
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{accCurrencyBean.refreshCurrencyListActive()}"/>
+        <f:viewAction action="#{navigationBean.checkAccessDenied(utilityBean.convertIntAsString(16), 'View')}"/>
+        <f:viewAction action="#{navigationBean.checkLicenseExpired()}"/>
+        <f:viewAction action="#{transBean.initClearAllCEC('PARENT',trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,transactorBean.selectedBillTransactor,userDetailBean.selectedUserDetail,transactorBean.selectedSchemeTransactor)}" />
+        <f:viewAction action="#{transBean.initCurrencyCode(11,trans)}"/>
+        <f:viewAction action="#{transBean.initTransType(11,16)}"/>
+        <f:viewAction action="#{transBean.initQuickOrderManageFilterDashboard(trans)}"/>
+        <f:viewAction action="#{transBean.refreshTransListQuickOrderDashboard(trans)}"/>
+        <f:viewAction action="#{transBean.setOutputNumber(0)}"/>
+        <f:viewAction action="#{transItemBean.initCategoriesQuickOrder()}"/>
+        <f:viewAction action="#{transBean.initStoresByStore(generalUserSetting.currentStore.storeId)}"/>
+        <f:viewAction action="#{transBean.initUserDetail(generalUserSetting.currentUser.userDetailId)}"/>
+    </f:metadata>
+    <h:body>
+
+        <h:form id="TransactionFormSales" styleClass="clsMainFrom" style="width:100%;border: 1px solid;" onkeypress="if (event.keyCode == 13)
+                    return false;">  
+            <h:panelGrid id="pnlHeader" styleClass="clsGridMainHeader" columns="5" style="width:100%;float:left;">
+                <h:panelGrid id="pnlStatus" columns="5" style="border-bottom-style: solid;border-bottom: 1;border-bottom-color: white;">
+                    <h:commandButton style="border-radius: 5px;border: none;width: 90px;height:45px;font-size: 16px;background-color:#{transBean.setBgColorByStatus(trans.is_processed)};" value="#{langsys['Processed']}">
+                        <f:ajax listener="#{transBean.updateStatus(trans,'PROCESSED')}" execute="@this" render="pnlStatus"/>
+                    </h:commandButton>
+                    <h:commandButton style="border-radius: 5px;border: none;width: 90px;height:45px;font-size: 16px;background-color:#{transBean.setBgColorByStatus(trans.is_invoiced)};" value="#{langsys['Invoiced']}">
+                        <f:ajax listener="#{transBean.updateStatus(trans,'INVOICED')}" execute="@this" render="pnlStatus"/>
+                    </h:commandButton>
+                    <h:commandButton style="border-radius: 5px;border: none;width: 90px;height:45px;font-size: 16px;background-color:#{transBean.setBgColorByStatus(trans.is_paid)};" value="#{langsys['Paid']}">
+                        <f:ajax listener="#{transBean.updateStatus(trans,'PAID')}" execute="@this" render="pnlStatus"/>
+                    </h:commandButton>
+                    <h:commandButton style="border-radius: 5px;border: none;width: 90px;height:45px;font-size: 16px;background-color:#{transBean.setBgColorByStatus(trans.is_cancel)};" value="#{langsys['Cancelled']}">
+                        <f:ajax listener="#{transBean.updateStatus(trans,'CANCELLED')}" execute="@this" render="pnlStatus"/>
+                    </h:commandButton>
+                </h:panelGrid>
+                <h:panelGrid id="pnlTodayYesturday" columns="2" style="border-bottom-style: solid;border-bottom: 1;border-bottom-color: white;">
+                    <h:commandButton style="border-radius: 5px;border: none;width: 90px;height:45px;font-size: 16px;background-color:#{transBean.setBgColorIfEqual('1',transBean.todayoryest,0)};" value="#{langsys['Today']}">
+                        <f:ajax listener="#{transBean.updateTodayYesturday(1)}" execute="@this" render="pnlTodayYesturday"/>
+                    </h:commandButton>
+                    <h:commandButton style="border-radius: 5px;border: none;width: 90px;height:45px;font-size: 16px;background-color:#{transBean.setBgColorIfEqual('2',transBean.todayoryest,0)};" value="#{langsys['Yesterday']}">
+                        <f:ajax listener="#{transBean.updateTodayYesturday(2)}" execute="@this" render="pnlTodayYesturday"/>
+                    </h:commandButton>
+                </h:panelGrid>
+                <h:panelGrid id="pnlItemCategory">
+                    <p:commandButton value="#{transBean.getDisplayCategory(trans.category)}" icon="fa fa-fw fa-list" style="min-height: 50px;width: 140px;height:auto;font-size: 16px;word-wrap: break-word !important;white-space:normal;background-color:#{utilityBean.setColorByValueFromZero(trans.category.categoryId,'greater','#007fff','#E2E2E2')};" oncomplete="PF('sbarCategory').show()" />
+                </h:panelGrid>
+                <h:panelGrid id="pnlStore">
+                    <p:commandButton value="#{transBean.getDisplayStore(trans.storeId)}" icon="fa fa-fw fa-list" style="min-height: 50px;width: 140px;height:auto;font-size: 16px;word-wrap: break-word !important;white-space:normal;background-color:#{utilityBean.setColorByValueFromZero(trans.storeId,'greater','#007fff','#E2E2E2')};" oncomplete="PF('sbarStore').show()" />
+                </h:panelGrid>
+                <h:panelGrid columns="2" style="float: right;">
+                    <p:commandButton icon="fa fa-fw fa-refresh" style="width: 120px;height: 55px;color: white;background-color: black;" id="cmdbSearch" value="#{langsys['REFRESH']}" actionListener="#{transBean.refreshTransListQuickOrderDashboard(trans)}" process="@form" update="dtblTransList"/>
+                    <p:commandButton icon="fa fa-fw fa-home" style="width: 120px;height: 55px;color: white;background-color: black;" id="cmdbNew" value="#{langsys['HOME']}"  action="#{navigationBean.redirectToHome()}" />
+                    <p:poll interval="5" listener="#{transBean.refreshTransListQuickOrderDashboard(trans)}" process="@form" update="dtblTransList"/>
+                </h:panelGrid>
+            </h:panelGrid>
+            <h:panelGrid id="pnlMessage" columns="4">
+                <h:outputLabel id="olblItemAddedStstus" class="clsSuccessStatus" value="#{statusBean.itemAddedStatus}" rendered="#{statusBean.showItemAddedStatus==1}"/>
+                <h:outputLabel id="olblItemNotAddedStstus" class="clsFailStatus" value="#{statusBean.itemNotAddedStatus}" rendered="#{statusBean.showItemNotAddedStatus==1}"/>
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
+            <p:growl id="growl1" showDetail="true"/>
+            <h:panelGrid id="pnlOrders" columns="1">
+                <p:dataTable rowIndexVar="rowIndex" id="dtblTransList" value="#{transBean.transList}" var="t" 
+                             tableStyle="width:auto;" 
+                             rowStyleClass="#{(t.is_paid) eq 1 ? 'green' : (t.is_invoiced) eq 1 ? 'amber' : 'red'}"
+                             >  
+                    <p:column>
+                        <!-- column header -->
+                        <f:facet name="header">
+                            #{langsys['Order']}
+                        </f:facet>
+                        <!-- row record -->
+                        <p:commandLink value="#{t.delivery_mode} #{t.transactionNumber}" actionListener="#{transBean.viewOrderOutput(t)}" style="color: white;text-decoration:#{t.is_cancel eq 1 ? 'line-through':'none'};" process="@form" update="@form"/>
+                    </p:column>
+                    <p:column>
+                        <!-- column header -->
+                        <f:facet name="header">
+                            #{langsys['Item']}
+                        </f:facet>
+                        <!-- row record -->
+                        <h:outputText value="#{t.transItemsString}" style="text-decoration:#{t.is_cancel eq 1 ? 'line-through':'none'};"/>
+                    </p:column>
+                    <p:column>
+                        <!-- column header -->
+                        <f:facet name="header">#{langsys['Ordered']} #{langsys['By']}</f:facet>
+                        <!-- row record -->
+                        <h:outputText value="#{t.transactionUserDetailName} (#{t.storeName})" style="text-decoration:#{t.is_cancel eq 1 ? 'line-through':'none'};"/>
+                    </p:column>
+                    <p:column>
+                        <!-- column header -->
+                        <f:facet name="header">#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}</f:facet>
+                        <!-- row record -->
+                        <h:outputText value="#{t.transactorName} #{t.location_name}" style="text-decoration:#{t.is_cancel eq 1 ? 'line-through':'none'};"/>
+                    </p:column>
+                    <p:column>
+                        <!-- column header -->
+                        <f:facet name="header">#{langsys['Sent']} #{langsys['To']}</f:facet>
+                        <!-- row record -->
+                        <h:outputText value="#{t.store2Name}" style="text-decoration:#{t.is_cancel eq 1 ? 'line-through':'none'};"/>
+                    </p:column>
+                    <p:column>
+                        <!-- column header -->
+                        <f:facet name="header">#{langsys['Date']}</f:facet>
+                        <!-- row record -->
+                        <h:outputText value="#{utilityBean.formatDateTime(t.addDate)}" style="text-decoration:#{t.is_cancel eq 1 ? 'line-through':'none'};"/>
+                    </p:column>
+                </p:dataTable>
+            </h:panelGrid>
+            <p:sidebar widgetVar="sbarCategory" position="right" baseZIndex="10000">
+                <h1 style="font-weight:bolder">#{langsys['Item']} #{langsys['Category']} #{langsys['Filter']}</h1>
+                <h:panelGrid columns="2">
+                    <h:panelGrid id="pnlCategories" columns="1">
+                        <c:forEach var="cat" items="#{transItemBean.categoryList}">
+                            <h:commandButton style="min-height: 60px;border-radius: 5px;border: none;width: 120px;height:auto;font-size: 20px;word-wrap: break-word !important;white-space:normal;color: black;" value="#{cat.categoryName}">
+                                <f:ajax listener="#{trans.setCategory(cat)}" execute="@this" render="TransactionFormSales:pnlItemCategory TransactionFormSales:pnlCategories"/>
+                            </h:commandButton>
+                        </c:forEach>
+                    </h:panelGrid>
+                    <h:panelGrid columns="1">
+                        <p:commandButton actionListener="#{trans.setCategory(null)}" value="#{langsys['CLEAR']}" oncomplete="PF('sbarCategory').hide()" update="TransactionFormSales:pnlItemCategory TransactionFormSales:pnlCategories" style="height: 60px;width: 120px;background-color: black;color: white;"/>
+                        <p:commandButton value="#{langsys['CLOSE']}" oncomplete="PF('sbarCategory').hide()" style="height: 60px;width: 120px;background-color: black;color: white;"/>
+                    </h:panelGrid>
+                </h:panelGrid>
+            </p:sidebar>
+            <p:sidebar widgetVar="sbarStore" position="right" baseZIndex="10000">
+                <h1 style="font-weight:bolder">#{companySetting.getStoreEquivName()} (From/To)</h1>
+                <h:panelGrid columns="2">
+                    <h:panelGrid id="pnlStores" columns="1">
+                        <c:forEach var="st" items="#{transBean.storeList}">
+                            <h:commandButton style="width: 100px;min-height:40px;font-size: 12px;word-wrap: break-word;white-space:normal;border: none;border-radius: 5px;" value="#{st.storeName}">
+                                <f:ajax listener="#{trans.setStoreId(st.storeId)}" render="TransactionFormSales:pnlStore TransactionFormSales:pnlStores"/>
+                            </h:commandButton>
+                        </c:forEach>
+                    </h:panelGrid>
+                    <h:panelGrid columns="1">
+                        <p:commandButton actionListener="#{trans.setStoreId(0)}" value="#{langsys['CLEAR']}" oncomplete="PF('sbarStore').hide()" update="TransactionFormSales:pnlStore TransactionFormSales:pnlStores" style="height: 60px;width: 120px;background-color: black;color: white;"/>
+                        <p:commandButton value="#{langsys['CLOSE']}" oncomplete="PF('sbarStore').hide()" style="height: 60px;width: 120px;background-color: black;color: white;"/>
+                    </h:panelGrid>
+                </h:panelGrid>
+            </p:sidebar>
+        </h:form>
+    </h:body>
+</html>
+

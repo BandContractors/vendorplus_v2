@@ -1,0 +1,136 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>View Transfer</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+            function confirmUpdate()
+            {
+                return confirm('Are you sure you want to UPDATE this Transaction?');
+            }
+            function doPrintHiddenClick() {
+                document.getElementById("formTransaction:cmdbvPrint").click();
+            }
+        </script> 
+    </h:head>
+    <h:body>
+        <p:dialog header="" widgetVar="dlgIT" modal="true" height="100%" width="100%" dynamic="true" maximizable="true">
+            <h:form id="formTransactionIT" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
+                        return false;"> 
+                <p:panel id="pnlTransaction">
+                    <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="width: 100%">
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['VIEW']}" rendered="#{transBean.actionType.equals('View')}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['EDIT']}" rendered="#{transBean.actionType.equals('Edit')}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(13).transactionOutputLabel)} - #{transactionReasonBean.getTransactionReason(transBean.transObj.transactionReasonId).transactionReasonName} : #{transBean.transObj.transactionNumber}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Stock']}:#{langsys['From']}↓ #{langsys['To']}↑"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Ledger']}:#{langsys['No']} #{langsys['effect']}"/>
+                    </h:panelGrid>
+                    <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="6">
+                        <h:outputLabel  value="#{langsys['Transfer']} #{langsys['From']}:"/>
+                        <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{storeBean.getStore(transBean.transObj.storeId).storeName}" style="width: 170px;"/>
+                        <h:outputLabel  value="#{langsys['Transfer']} #{langsys['To']}:"/>
+                        <h:inputText styleClass="clsInput" id="itxtToStore" disabled="true" value="#{storeBean.getStore(transBean.transObj.store2Id).storeName}" style="width: 170px;"/>
+                        <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(13).transactionDateLabel)}:"/>
+                        <h:inputText id="itxtTransactionDate" value="#{utilityBean.formatDate(transBean.transObj.transactionDate)}" disabled="true"/>
+                        <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(13).transactionRefLabel)}:"/>
+                        <h:inputText styleClass="clsInput" id="itxtTransactionRef" value="#{transBean.transObj.transactionRef}" autocomplete="off" style="width: 170px;" disabled="true"/>
+                    </h:panelGrid>
+                    <p:dataTable rowIndexVar="rowIndex" id="dtblTransactionItem" value="#{transBean.transItemList}" var="ati" 
+                                 styleClass="cls-table" tableStyle="width:auto;" 
+                                 >  
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#</f:facet>
+                            <!-- row record -->
+                            #{rowIndex+1}
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Item']} #{langsys['Description']}</f:facet>
+                            <!-- row record -->
+                            <p:outputLabel value="#{transItemBean.showItemDescriptionCEC(ati)}" escape="false"/>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Unit']}</f:facet>
+                            <!-- row record -->
+                            #{ati.unitSymbol}
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Transferred']} #{langsys['Qty']}</f:facet>
+                            <!-- row record -->
+                            <h:inputText value="#{ati.itemQty}" style="width: 50px;" disabled="true" autocomplete="off">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:inputText>
+                        </p:column>
+                    </p:dataTable>
+                    <h:panelGrid style="background-color: yellow;width: 100%"/>
+                    <h:panelGrid id="pgrdTermsConditions" styleClass="clsGridMainInput" columns="3">
+                        <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Delivery']} #{langsys['Date']}"/>
+                        <h:outputLabel styleClass="clsLabelTransItem" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(13).transactionUserLabel)}"/>
+                        <h:outputLabel styleClass="clsLabelTransItem" value="#{langsys['Authorised']} #{langsys['Date']}"/>
+                        <h:inputText id="itxtDeliveryDate" value="#{utilityBean.formatDate(transBean.transObj.deliveryDate)}" disabled="true"/>
+                        <h:inputText disabled="true" style="width: 170px;" value="#{userDetailBean.getUserDetail(transBean.transObj.transactionUserDetailId).userName}"/>
+                        <h:inputText id="itxtExpiryDate" value="#{utilityBean.formatDate(transBean.transObj.authoriseDate)}" disabled="true"/>
+                    </h:panelGrid>
+                    <h:panelGrid id="pgrdApprove">
+                        <h:panelGrid rendered="#{transBean.isApproveNeeded(transBean.transObj)}" id="pgrdApprove2" styleClass="clsGridApprove" columns="6" style="background-color: lightsalmon">
+                            <h:outputLabel  value="#{langsys['User']} #{langsys['Name']}:"/>
+                            <h:inputText styleClass="clsInput" id="itxtUserName" value="#{transBean.transObj.approveUserName}" autocomplete="off"> </h:inputText>
+                            <h:outputLabel  value="#{langsys['Password']}:"/>
+                            <h:inputSecret styleClass="clsInput" id="itxtPassword" value="#{transBean.transObj.approveUserPassword}" autocomplete="off"></h:inputSecret>
+                            <h:commandButton value="#{langsys['Approve']} #{langsys['DISCOUNT']}">
+                                <f:ajax listener="#{login.userApprove(transBean.transObj.approveUserName,generalUserSetting.getCurrentStore().storeId,transBean.transObj.approveUserPassword,'DISCOUNT', 'Add')}" execute="itxtUserName itxtPassword" render="olblDiscountApprove"/>
+                            </h:commandButton>
+                            <h:commandButton value="#{langsys['Approve']} #{langsys['SPEND']} #{langsys['POINT']}(S)">
+                                <f:ajax listener="#{login.userApprove(transBean.transObj.approveUserName,generalUserSetting.getCurrentStore().storeId,transBean.transObj.approveUserPassword,'SPEND POINT', 'Add')}" execute="itxtUserName itxtPassword" render="olblPointsApprove"/>
+                            </h:commandButton>
+
+                            <h:outputLabel  value=""/>
+                            <h:outputLabel  value=""/>
+                            <h:outputLabel  value=""/>
+                            <h:outputLabel  value=""/>
+                            <h:outputLabel id="olblDiscountApprove" style="background-color: black;color: white" value="#{generalUserSetting.getCurrentApproveDiscountStatus()}"/>
+                            <h:outputLabel id="olblPointsApprove" style="background-color: black;color: white" value="#{generalUserSetting.getCurrentApprovePointsStatus()}"/>  
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <h:panelGrid styleClass="clsGridMainMessages" columns="1">
+                        <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>
+                        <h:messages id="msgsMainMessage" style="color: red"/><br/>
+                    </h:panelGrid>
+                </p:panel>
+                <h:panelGrid columns="2">
+                    <h:outputLabel value="#{langsys['Print']} #{langsys['File']}" style="color: black;"/>
+                    <h:selectOneMenu styleClass="clsMenu" value="#{transBean.overridePrintVersion}">
+                        <f:selectItem itemLabel="" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Print']} #{langsys['File']} 1" itemValue="1"/>
+                        <f:selectItem itemLabel="#{langsys['Print']} #{langsys['File']} 2" itemValue="2"/>
+                        <f:ajax event="change" render="pnlgOutput"/>
+                    </h:selectOneMenu>
+                </h:panelGrid>
+                <p:growl/>
+                <!-- INVOICE STARTS HERE -->
+                <h:panelGrid id="pnlgOutput" style="width: 100%">
+                    <ui:include src="#{transBean.getPrintFileName('PARENT',transactionTypeBean.getTransactionType(4),transBean.overridePrintVersion)}"/>
+                </h:panelGrid>
+                <!-- INVOICE ENDS HERE -->
+            </h:form>
+        </p:dialog>
+    </h:body>
+</html>
+

@@ -1,0 +1,156 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Stock Value</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{navigationBean.checkAccessDenied('121', 'View')}"/>
+        <f:viewAction action="#{utilityBean.clearList(alert_generalBean.alertList)}"/>
+        <f:viewAction action="#{stockBean.initClearStock(stock,stockBean.stocksList,stockBean.stocksSummary)}"/>
+    </f:metadata>
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="formReport">
+            <h:panelGrid id="pnlgHeader" columns="1" styleClass="clsPanelReportFilterTitle">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys['Stock']} #{langsys['Pricing']} #{langsys['and']}/#{langsys['or']} #{langsys['Quantity']} #{langsys['Errors']} #{langsys['Risk']} #{langsys['Report']}"/>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgFilter" columns="6" styleClass="clsPanelReportFilter">
+                <p:outputLabel value="#{langsys['Stock']} #{langsys['Type']}"/>
+                <p:outputLabel value="#{companySetting.getStoreEquivName()}"/>
+                <p:outputLabel value="#{langsys['Category']}"/>
+                <p:outputLabel value="#{langsys['General']}?"/>
+                <p:outputLabel value="#{langsys['Suspended']}?"/>
+                <p:outputLabel value=""/>
+
+                <h:selectOneMenu id="menuStockType" value="#{stock.stock_type}" >
+                    <f:selectItem itemLabel="" itemValue=""/>
+                    <f:selectItem itemLabel="#{langsys['Merchandise']}" itemValue="Merchandise"/>
+                    <f:selectItem itemLabel="#{langsys['Finished']} #{langsys['Goods']}" itemValue="Finished Goods"/>
+                    <f:selectItem itemLabel="#{langsys['Raw Material']}" itemValue="Raw Material"/>
+                    <f:selectItem itemLabel="#{langsys['Consumption']}" itemValue="Consumption"/>
+                    <f:selectItem itemLabel="#{langsys['Services']}" itemValue="Services"/>
+                </h:selectOneMenu>
+                <h:selectOneMenu id="menuFromStore" value="#{stock.storeId}" >
+                    <f:selectItem itemLabel="" itemValue="0"/>
+                    <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
+                </h:selectOneMenu>
+                <h:selectOneMenu id="menuCategory" value="#{category.categoryId}">
+                    <f:selectItem itemLabel="" itemValue="0"/>
+                    <f:selectItems value="#{categoryBean.categories}" var="c" itemLabel="#{c.categoryName}" itemValue="#{c.categoryId}"/>
+                </h:selectOneMenu>
+                <h:selectOneMenu id="menuIsGeneral" value="#{item.isGeneral}">
+                    <f:selectItem itemLabel=""/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="11"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="10"/>
+                </h:selectOneMenu>
+                <h:selectOneMenu id="menuIsSuspended" value="#{item.isSuspended}">
+                    <f:selectItem itemLabel="" itemValue=""/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="Yes"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="No"/>
+                </h:selectOneMenu>
+                <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{stockBean.reportStockPricingQtyError(stock.storeId,category.categoryId,item.isGeneral,item.isSuspended,stock.stock_type)}" process="pnlgFilter" update="pnlgMessage tblDetail"/>
+                </p:commandButton>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgMessage">
+                <p:outputLabel value="#{stockBean.actionMessage}" style="color: red;"/>
+            </h:panelGrid>
+            <p:dataTable id="tblDetail" tableStyle="width:auto;" var="itm" value="#{stockBean.stocksList}" 
+                         paginator="true" rows="50" 
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
+                         rowsPerPageTemplate="100,400,800,1000,2000">
+                <f:facet name="header">
+                    #{stockBean.stocksList.size()} #{langsys['Records']} #{langsys['Found']}
+                    <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
+                    <p:columnToggler datasource="tblDetail" trigger="toggler" />
+                </f:facet>
+                <f:facet name="{Exporters}">
+                    <h:commandLink>
+                        <p:graphicImage name="images/excel.png" width="24"/>
+                        <p:dataExporter type="xls" target="tblDetail" fileName="Risk_Stock_Price_Qty_Error" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/pdf.png" width="24"/>
+                        <p:dataExporter type="pdf" target="tblDetail" fileName="Risk_Stock_Price_Qty_Error"/>
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/csv.png" width="24"/>
+                        <p:dataExporter type="csv" target="tblDetail" fileName="Risk_Stock_Price_Qty_Error" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/xml.png" width="24"/>
+                        <p:dataExporter type="xml" target="tblDetail" fileName="Risk_Stock_Price_Qty_Error" />
+                    </h:commandLink>
+                </f:facet>
+                <p:column headerText="#{langsys['Stock']} #{langsys['Type']}">
+                    <h:outputLabel value="#{itm.stock_type} "/>
+                </p:column>
+                <p:column headerText="#{companySetting.getStoreEquivName()}">
+                    <h:outputLabel value="#{itm.storeName} "/>
+                </p:column>
+                <p:column headerText="#{langsys['Item']} #{langsys['Name']}">
+                    <p:outputLabel value="#{itm.description}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Batch']}">
+                    <h:outputText value="#{itm.batchno}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Specific']} #{langsys['Name']}">
+                    <p:outputLabel value="#{itm.descSpecific}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Specific']} #{langsys['Code']}">
+                    <p:outputLabel value="#{itm.codeSpecific}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Unit']}">
+                    <h:outputText value="#{itm.unitSymbol}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Qty']}">
+                    <h:outputText value="#{itm.currentqty}" style="color:#{itm.currentqty ge itm.unitCost ? 'red':'black'}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Unit']} #{langsys['Cost']} #{langsys['Price']}">
+                    <h:outputText value="#{itm.unitCost}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Retail']} #{langsys['Price']}">
+                    <h:outputText value="#{itm.unitRetailsalePrice}" style="color:#{itm.unitCost ge itm.unitRetailsalePrice ? 'red':'black'}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Wholesale']} #{langsys['Price']}">
+                    <h:outputText value="#{itm.unitWholesalePrice}" style="color:#{itm.unitWholesalePrice gt 0 and itm.unitCost ge itm.unitWholesalePrice ? 'red':'black'}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Special']} #{langsys['Price']}">
+                    <h:outputText value="#{itm.unitSpecialPrice}" style="color:#{itm.unitSpecialPrice gt 0 and itm.unitCost ge itm.unitSpecialPrice ? 'red':'black'}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Currency']}">
+                    <h:outputText value="#{itm.currencyCode}"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </h:body>
+</html>
+

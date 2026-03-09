@@ -1,0 +1,115 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Provider List</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:event listener="#{navigationBean.checkAccessDenied('71', 'View')}" type="preRenderView" />
+    <f:event listener="#{transactorBean.initClearTransactor(transactor,transactorBean.transactorList,null)}" type="preRenderView" />
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+
+        <h:form id="formReport" style="text-align: center;">
+            <h:panelGrid id="id0" columns="1" styleClass="clsPanelReportFilterTitle">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys['Provider']} #{langsys['List']} #{langsys['Report']}"/>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgFilter" columns="6" styleClass="clsPanelReportFilter">
+                <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{transactorBean.reportTransactors('PROVIDER')}" process="pnlgFilter" update="pnlgMessage tblDetail"/>
+                </p:commandButton>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgMessage">
+                <p:outputLabel value="#{transactorBean.actionMessage}" style="color: red;"/>
+            </h:panelGrid>
+
+            <p:dataTable tableStyle="width:auto;" id="tblDetail" var="rts" value="#{transactorBean.transactorList}" 
+                         paginator="true" rows="50" 
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
+                         rowsPerPageTemplate="100,400,800,1000,2000">
+                <f:facet name="header">
+                    #{transactorBean.transactorList.size()} #{langsys['Records']} #{langsys['Found']}
+                    <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
+                    <p:columnToggler datasource="tblDetail" trigger="toggler" />
+                </f:facet>
+                <f:facet name="{Exporters}">
+                    <h:commandLink>
+                        <p:graphicImage name="images/excel.png" width="24"/>
+                        <p:dataExporter type="xls" target="tblDetail" fileName="Provider_List" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/pdf.png" width="24"/>
+                        <p:dataExporter type="pdf" target="tblDetail" fileName="Provider_List"/>
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/csv.png" width="24"/>
+                        <p:dataExporter type="csv" target="tblDetail" fileName="Provider_List" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/xml.png" width="24"/>
+                        <p:dataExporter type="xml" target="tblDetail" fileName="Provider_List" />
+                    </h:commandLink>
+                </f:facet>
+                <p:column headerText="#{langsys['Id']}" style="text-align: left;">
+                    <h:outputText value="#{rts.transactorId}">
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Reference']} #{langsys['No.']}" style="text-align: left;">
+                    <h:outputText value="#{rts.transactorRef}">
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['File']} #{langsys['Reference']}" style="text-align: left;">
+                    <h:outputText value="#{rts.fileReference}">
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Category']}" style="text-align: left;">
+                    <h:outputText value="#{rts.category}">
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Provider']} #{langsys['Names']}" style="text-align: left;">
+                    <h:outputText value="#{rts.transactorNames}">
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Phone']}" style="text-align: left;">
+                    <h:outputText value="#{rts.phone}">
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Email']}" style="text-align: left;">
+                    <h:outputText value="#{rts.email}">
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Tax']} #{langsys['Identity']}" style="text-align: left;">
+                    <h:outputText value="#{rts.taxIdentity}">
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['ID']} #{langsys['Type']}" style="text-align: left;">
+                    <h:outputText value="#{rts.idType}">
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['ID']} #{langsys['Number']}" style="text-align: left;">
+                    <h:outputText value="#{rts.idNumber}">
+                    </h:outputText>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </h:body>
+</html>
+

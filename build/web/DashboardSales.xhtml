@@ -1,0 +1,369 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <title>Sales Dashboard</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script>
+        <script type="text/javascript" src="resources/js/Chart.js"></script>
+        <script type="text/javascript" src="resources/js/Chart.min.js"></script>
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{navigationBean.checkAccessDenied('72', 'View')}"/>
+        <f:viewAction action="#{dashboardBean.initSalesDashboard()}"/>
+    </f:metadata>
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="formReport">
+            <h:panelGrid id="pnlgHeader" styleClass="clsPanelReportFilterTitle">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys['Sales']} #{langsys['Trend']} #{langsys['Dashboard']}"/>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgFilter" columns="8" styleClass="clsPanelReportFilter">
+                <p:outputLabel value="#{companySetting.getStoreEquivName()}:"/>
+                <p:selectOneMenu id="menuFromStore" value="#{dashboardBean.store_id}" style="width: 200px;">
+                    <f:selectItem itemLabel="#{langsys['Select']}" itemValue="0"/>
+                    <f:selectItems value="#{dashboardBean.storeList}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
+                </p:selectOneMenu>
+                <p:outputLabel value="#{langsys['Calendar']} #{langsys['Year']}:"/>
+                <p:selectOneMenu id="menuCalendarYear" value="#{dashboardBean.selectedYear}">
+                    <f:selectItem itemLabel="#{dashboardBean.currentYear}" itemValue="#{dashboardBean.currentYear}" />
+                    <f:selectItem itemLabel="#{dashboardBean.currentYear-1}" itemValue="#{dashboardBean.currentYear-1}" />
+                    <f:selectItem itemLabel="#{dashboardBean.currentYear-2}" itemValue="#{dashboardBean.currentYear-2}" />
+                    <f:selectItem itemLabel="#{dashboardBean.currentYear-3}" itemValue="#{dashboardBean.currentYear-3}" />
+                    <f:selectItem itemLabel="#{dashboardBean.currentYear-4}" itemValue="#{dashboardBean.currentYear-4}" />
+                    <f:selectItem itemLabel="#{dashboardBean.currentYear-5}" itemValue="#{dashboardBean.currentYear-5}" />
+                    <f:selectItem itemLabel="#{dashboardBean.currentYear-6}" itemValue="#{dashboardBean.currentYear-6}" />
+                    <f:selectItem itemLabel="#{dashboardBean.currentYear-7}" itemValue="#{dashboardBean.currentYear-7}" />
+                    <f:selectItem itemLabel="#{dashboardBean.currentYear-8}" itemValue="#{dashboardBean.currentYear-8}" />
+                    <f:selectItem itemLabel="#{dashboardBean.currentYear-9}" itemValue="#{dashboardBean.currentYear-9}" />
+                    <f:selectItem itemLabel="#{dashboardBean.currentYear-10}" itemValue="#{dashboardBean.currentYear-10}" />
+                </p:selectOneMenu>
+                <p:outputLabel value="#{langsys['Past']} #{langsys['Years']} #{langsys['to']} #{langsys['Display']}:"/>
+                <p:selectOneMenu id="menuDisplayYears" value="#{dashboardBean.selectedDisplayYears}" title="#{langsys['Number']} #{langsys['of']} #{langsys['years']} #{langsys['to']} #{langsys['display']} #{langsys['backwards']} #{langsys['from']} #{langsys['the']} #{langsys['selected']} #{langsys['calander']} #{langsys['year']}">
+                    <f:selectItem itemLabel="5" itemValue="5"/>
+                    <f:selectItem itemValue="10" itemLabel="10"/>
+                    <f:selectItem itemValue="15" itemLabel="15"/>
+                    <f:selectItem itemValue="20" itemLabel="20"/>
+                </p:selectOneMenu>
+                <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{dashboardBean.searchSalesDashboard()}" process="pnlgFilter" update="growl1 pnlgCharts1 pnlgCharts2 pnlgCharts3"/>
+                </p:commandButton>
+                <p:commandButton id="cmdbReset" value="#{langsys['RESET']}">
+                    <p:ajax listener="#{dashboardBean.initSalesDashboard()}" process="pnlgFilter" update="pnlgFilter growl1 pnlgCharts1 pnlgCharts2 pnlgCharts3"/>
+                </p:commandButton>
+            </h:panelGrid>
+            <p:growl id="growl1"/>
+            <h:panelGrid columns="1" id="pnlgCharts1">
+                <h:panelGrid id="pnlgCharts">
+                    <canvas id="chart1"  width="400" height="300"/>
+                    <script>
+                        var ctx = document.getElementById("chart1");
+                        var chart1 = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: [#{dashboardBean.yearsSalesByYear}],
+                                datasets: [{
+                                        label: 'Yearly Sales Amount',
+                                        data: [#{dashboardBean.amountSalesByYear}],
+                                        backgroundColor: 'green',
+                                        borderColor: 'green',
+                                        borderWidth: 1
+                                    }]
+                            },
+                            options: {
+                                legend: {
+                                    display: true
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Sales for the past #{dashboardBean.selectedDisplayYears} years from #{dashboardBean.selectedYear}'
+                                },
+                                tooltips: {
+                                    mode: 'label',
+                                    label: 'mylabel',
+                                    callbacks: {
+                                        label: function (tooltipItem, data) {
+                                            return tooltipItem.yLabel.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                        }}
+                                },
+                                scales: {
+                                    xAxes: [{
+                                            gridLines: {display: false},
+                                            ticks: {
+                                                maxRotation: 0,
+                                                padding: 0,
+                                                callback: function (value, index, values) {
+                                                    return value.split(/\b\s+/);
+                                                }
+                                            }
+                                        }],
+                                    yAxes: [{
+                                            ticks: {
+                                                beginAtZero: true,
+                                                callback: function (value, index, values) {
+                                                    if (parseInt(value) >= 1000) {
+                                                        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                                    } else {
+                                                        return value;
+                                                    }
+                                                }
+                                            }
+                                        }]
+                                }
+                            }
+                        });
+                    </script>
+                </h:panelGrid>
+            </h:panelGrid>
+            <h:panelGrid columns="1" id="pnlgCharts2">
+                <h:panelGrid id="pnlgYears" columns="20">
+                    <c:forEach var="y" items="#{dashboardBean.yearsList}">
+                        <h:commandButton style="min-height: 30px;border-radius: 5px;border: none;width: 80px;height:auto;font-size: 16px;word-wrap: break-word !important;white-space:normal;color: black;background-color:#{transBean.setBgColorIfEqual(y,dashboardBean.clickedYear,2)};" value="#{y}">
+                            <f:ajax listener="#{dashboardBean.refreshSalesByYearClick(y)}" execute="@form" render="formReport:pnlgYears formReport:pnlgChart2 formReport:pnlgChart22 formReport:pnlgCharts3"/>
+                        </h:commandButton>
+                    </c:forEach>
+                </h:panelGrid>
+                <h:panelGrid columns="2">
+                    <h:panelGrid id="pnlgChart2" style="text-align: center;">
+                        <canvas id="chart2"  width="400" height="300"/>
+                        <script>
+                            var ctx = document.getElementById("chart2");
+                            var chart1 = new Chart(ctx, {
+                                type: 'bar',
+                                data: {
+                                    labels: [#{dashboardBean.monthSalesByMonth}],
+                                    datasets: [{
+                                            label: 'Monthly Sales Amount',
+                                            data: [#{dashboardBean.amountSalesByMonth}],
+                                            backgroundColor: 'green',
+                                            borderColor: 'green',
+                                            borderWidth: 1
+                                        }]
+                                },
+                                options: {
+                                    legend: {
+                                        display: true
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Monthly sales for the selected year #{dashboardBean.clickedYear}'
+                                    },
+                                    tooltips: {
+                                        mode: 'label',
+                                        label: 'mylabel',
+                                        callbacks: {
+                                            label: function (tooltipItem, data) {
+                                                return tooltipItem.yLabel.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                            }}
+                                    },
+                                    scales: {
+                                        xAxes: [{
+                                                gridLines: {display: false},
+                                                ticks: {
+                                                    maxRotation: 0,
+                                                    padding: 0,
+                                                    callback: function (value, index, values) {
+                                                        return value.split(/\b\s+/);
+                                                    }
+                                                }
+                                            }],
+                                        yAxes: [{
+                                                ticks: {
+                                                    beginAtZero: true,
+                                                    callback: function (value, index, values) {
+                                                        if (parseInt(value) >= 1000) {
+                                                            return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                                        } else {
+                                                            return value;
+                                                        }
+                                                    }
+                                                }
+                                            }]
+                                    }
+                                }
+                            });</script>
+                    </h:panelGrid>
+                    <h:panelGrid id="pnlgChart22">
+                        <canvas id="chart22"  width="600" height="300"/>
+                        <script>
+                            var ctx = document.getElementById("chart22");
+                            var chart1 = new Chart(ctx, {
+                                type: 'bar',
+                                data: {
+                                    labels: [#{dashboardBean.avgMonthSalesByMonth}],
+                                    datasets: [{
+                                            label: 'Average Amount',
+                                            yAxisID: 'y-axis-1',
+                                            data: [#{dashboardBean.avgAmountSalesByMonth}],
+                                            backgroundColor: 'green',
+                                            borderColor: 'green',
+                                            borderWidth: 1
+                                        },
+                                        {
+                                            label: 'Average Qty',
+                                            yAxisID: 'y-axis-2',
+                                            data: [#{dashboardBean.avgMonthQtyByMonth}],
+                                            backgroundColor: 'gold',
+                                            borderColor: 'gold',
+                                            borderWidth: 1
+                                        }]
+                                },
+                                options: {
+                                    legend: {
+                                        display: true
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Monthly average sales value per transaction for the selected year #{dashboardBean.clickedYear}'
+                                    },
+                                    tooltips: {
+                                        mode: 'label',
+                                        label: 'mylabel',
+                                        callbacks: {
+                                            label: function (tooltipItem, data) {
+                                                return tooltipItem.yLabel.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                            }}
+                                    },
+                                    scales: {
+                                        xAxes: [{
+                                                gridLines: {display: false},
+                                                ticks: {
+                                                    maxRotation: 0,
+                                                    padding: 0,
+                                                    callback: function (value, index, values) {
+                                                        return value.split(/\b\s+/);
+                                                    }
+                                                }
+                                            }],
+                                        yAxes: [{
+                                                type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                                                display: true,
+                                                position: 'left',
+                                                id: 'y-axis-1',
+                                                ticks: {
+                                                    beginAtZero: true,
+                                                    callback: function (value, index, values) {
+                                                        if (parseInt(value) >= 1000) {
+                                                            return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                                        } else {
+                                                            return value;
+                                                        }
+                                                    }
+                                                }
+                                            }, {
+                                                type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                                                display: true,
+                                                position: 'right',
+                                                id: 'y-axis-2',
+                                                ticks: {
+                                                    beginAtZero: true,
+                                                    callback: function (value, index, values) {
+                                                        if (parseInt(value) >= 1000) {
+                                                            return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                                        } else {
+                                                            return value;
+                                                        }
+                                                    }
+                                                },
+                                                gridLines: {
+                                                    drawOnChartArea: false
+                                                }
+                                            }]
+                                    }
+                                }
+                            });</script>
+                    </h:panelGrid>
+                </h:panelGrid>
+            </h:panelGrid>
+            <h:panelGrid columns="1" id="pnlgCharts3">
+                <h:panelGrid id="pnlgMonths" columns="12">
+                    <c:forEach var="m" items="#{dashboardBean.monthNoList}">
+                        <h:commandButton style="min-height: 30px;border-radius: 5px;border: none;width: 80px;height:auto;font-size: 16px;word-wrap: break-word !important;white-space:normal;color: black;background-color:#{transBean.setBgColorIfEqual(m,dashboardBean.clickedMonthNo,2)};" value="#{utilityBean.convertMonthNoToName(m,1)}">
+                            <f:ajax listener="#{dashboardBean.refreshSalesByMonthClick(m)}" execute="@form" render="formReport:pnlgMonths formReport:pnlgChart21"/>
+                        </h:commandButton>
+                    </c:forEach>
+                </h:panelGrid>
+                <h:panelGrid id="pnlgChart21">
+                    <canvas id="chart21"  width="800" height="300"/>
+                    <script>
+                        var ctx = document.getElementById("chart21");
+                        var chart1 = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: [#{dashboardBean.daySalesByDay}],
+                                datasets: [{
+                                        label: 'Daily Sales Amount',
+                                        data: [#{dashboardBean.amountSalesByDay}],
+                                        backgroundColor: 'green',
+                                        borderColor: 'green',
+                                        borderWidth: 1
+                                    }]
+                            },
+                            options: {
+                                legend: {
+                                    display: true
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Daily sales for #{dashboardBean.clickedMonthName} #{dashboardBean.clickedYear}'
+                                },
+                                tooltips: {
+                                    mode: 'label',
+                                    label: 'mylabel',
+                                    callbacks: {
+                                        label: function (tooltipItem, data) {
+                                            return tooltipItem.yLabel.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                        }}
+                                },
+                                scales: {
+                                    xAxes: [{
+                                            gridLines: {display: false},
+                                            ticks: {
+                                                maxRotation: 0,
+                                                padding: 0,
+                                                callback: function (value, index, values) {
+                                                    return value.split(/\b\s+/);
+                                                }
+                                            }
+                                        }],
+                                    yAxes: [{
+                                            ticks: {
+                                                beginAtZero: true,
+                                                callback: function (value, index, values) {
+                                                    if (parseInt(value) >= 1000) {
+                                                        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                                    } else {
+                                                        return value;
+                                                    }
+                                                }
+                                            }
+                                        }]
+                                }
+                            }
+                        });
+                    </script>
+                </h:panelGrid>
+            </h:panelGrid>
+        </h:form>
+    </h:body>
+
+</html>
+

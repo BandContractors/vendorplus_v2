@@ -1,0 +1,160 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>View Production</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+            function confirmUpdate()
+            {
+                return confirm('Are you sure you want to UPDATE this Transaction?');
+            }
+            function doPrintHiddenClick() {
+                document.getElementById("formTransaction:cmdbvPrint").click();
+            }
+        </script> 
+    </h:head>
+    <h:body>
+        <p:dialog header="" widgetVar="dlgPIR" modal="true" height="100%" width="84%" dynamic="true" maximizable="true">
+            <h:form id="formTransactionPIR" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
+                        return false;"> 
+                <p:panel id="pnlTransaction">
+                    <h:panelGrid styleClass="clsGridMainHeader" columns="4" style="width: 100%">
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['VIEW']}" rendered="#{transProductionBean.actionType.equals('View')}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['EDIT']}" rendered="#{transProductionBean.actionType.equals('Edit')}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(70).transactionOutputLabel)} : #{transProductionBean.transProdObj.transaction_number}"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Stock']}(#{langsys['Product']}↑↓ #{langsys['Raw Material']}↑↓)"/>
+                        <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Ledger']}:INV-ACC↓↑ COS-ACC↓↑"/>
+                    </h:panelGrid>
+                    <h:panelGrid id="pnlHeader" styleClass="clsGridMainInput" columns="4">
+                        <h:outputLabel  value="#{langsys['From']}:"/>
+                        <h:inputText styleClass="clsInput" id="itxtFromStore" disabled="true" value="#{storeBean.getStore(transProductionBean.transProdObj.storeId).storeName}" style="width: 200px;"/>  
+                        <h:outputLabel  value="#{langsys[menuItemBean.menuItemObj.CUSTOMER_NAME]}:"/>
+                        <h:inputText styleClass="clsInput" disabled="true" value="#{transProductionBean.transProdObj.transactor_names}" style="width: 500px;"/>
+
+                        <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(70).transactionDateLabel)}:"/>
+                        <h:inputText id="itxtTransactionDate" value="#{utilityBean.formatDate(transProductionBean.transProdObj.transactionDate)}" disabled="true" style="width: 200px;"/>
+                        <h:outputLabel value="#{langsys['Product']}:"/>
+                        <h:inputText disabled="true" value="#{transItemBean.showItemDescriptionCEC(transProductionBean.transProdObj.outputItemName, transProductionBean.transProdObj.codeSpecific, transProductionBean.transProdObj.descSpecific, transProductionBean.transProdObj.descMore)}" style="width: 500px;"/>
+
+                        <h:outputLabel value="#{langsys['Unit']} #{langsys['Cost']}:"/>
+                        <h:inputText value="#{transProductionBean.transProdObj.outputUnitCost}" style="width: 200px;" disabled="true">
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:inputText>
+                        <h:outputLabel value="#{langsys['Produced']} #{langsys['Qty']}:"/>
+                        <h:inputText value="#{utilityBean.formatDoubleToString(transProductionBean.transProdObj.outputQty)} #{transProductionBean.transProdObj.outputItemUnit} #{transProductionBean.getPCsProduced(transProductionBean.transProdObj)}" style="width: 500px;" disabled="true"/>
+
+                        <h:outputLabel value="#{langsys['Total']} #{langsys['Cost']}:"/>
+                        <h:inputText value="#{transProductionBean.transProdObj.outputTotalCost}" style="width: 200px;" disabled="true">
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:inputText>
+                        <h:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(70).transactionUserLabel)}:"/>
+                        <h:inputText disabled="true" value="#{userDetailBean.getUserDetail(transProductionBean.transProdObj.transactionUserDetailId).userName}" style="width: 500px;"/>
+
+                        <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(70).transactionNumberLabel)}:"/>
+                        <h:inputText styleClass="clsInput" disabled="true" value="#{transProductionBean.transProdObj.transaction_number}" style="width: 200px;"/>
+                        <h:outputLabel  value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(70).transactionRefLabel)}:"/>
+                        <h:inputText styleClass="clsInput" disabled="true" value="#{transProductionBean.transProdObj.transactionRef}" style="width: 500px;"/>
+
+                    </h:panelGrid>
+                    <h:panelGrid id="pnlProduct" styleClass="clsGridMainInput" columns="8">
+
+                    </h:panelGrid>
+                    <p:dataTable rowIndexVar="rowIndex" id="dtblTransactionItem" value="#{transProductionBean.transItemList}" var="ati" 
+                                 styleClass="cls-table" tableStyle="width:auto;" 
+                                 >  
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#</f:facet>
+                            <!-- row record -->
+                            #{rowIndex+1}
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Item']} #{langsys['Description']}</f:facet>
+                            <!-- row record -->
+                            #{transItemBean.showItemDescriptionCEC(ati.inputItemName,ati.codeSpecific,ati.descSpecific,ati.descMore)}
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Unit']}</f:facet>
+                            <!-- row record -->
+                            #{ati.inputItemUnit}
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Batch']} #{langsys['No.']}</f:facet>
+                            <!-- row record -->
+                            <p:outputLabel value="#{ati.batchno}"/>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Qty']} #{langsys['Before']} #{langsys['Production']}</f:facet>
+                            <!-- row record -->
+                            <h:outputLabel value="#{ati.input_qty_bfr_prod}" rendered="#{ati.input_qty_bfr_prod>0}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputLabel>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Unit']} #{langsys['Qty']} #{langsys['Used']}</f:facet>
+                            <!-- row record -->
+                            <h:inputText value="#{ati.input_unit_qty}" style="width: 60px;" disabled="true" autocomplete="off" rendered="#{ati.input_unit_qty>0}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:inputText>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Total']} #{langsys['Qty']} #{langsys['Used']}</f:facet>
+                            <!-- row record -->
+                            <h:inputText value="#{ati.inputQty}" style="width: 80px;" disabled="true" autocomplete="off">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:inputText>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Qty']} #{langsys['After']} #{langsys['Production']}</f:facet>
+                            <!-- row record -->
+                            <h:outputLabel value="#{ati.input_qty_afr_prod}" rendered="#{ati.input_qty_afr_prod>0}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputLabel>
+                        </p:column>
+                        <p:column>
+                            <!-- column header -->
+                            <f:facet name="header">#{langsys['Currency']}</f:facet>
+                            <!-- row record -->
+                            <h:outputLabel value="#{itemBean.getItem(ati.inputItemId).currencyCode}" style="width: 50px;"/>
+                        </p:column>
+                    </p:dataTable>
+                    <h:panelGrid style="background-color: yellow;width: 100%"/>
+                    <h:panelGrid id="pgrdOther" styleClass="clsGridMainInput" columns="3">
+
+                    </h:panelGrid>
+                    <h:panelGrid styleClass="clsGridMainCommands" columns="1" style="width: 100%">
+
+                    </h:panelGrid>
+
+                    <h:panelGrid styleClass="clsGridMainMessages" columns="1">
+                        <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transProductionBean.actionMessage}"/>
+                        <h:messages id="msgsMainMessage" style="color: red"/><br/>
+                    </h:panelGrid>
+
+                    <p:growl/>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+    </h:body>
+</html>
+

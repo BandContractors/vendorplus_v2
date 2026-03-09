@@ -1,0 +1,176 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Currency</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  type="text/javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{navigationBean.checkAccessDenied(utilityBean.convertIntAsString(88), 'View')}"/>
+        <f:viewAction action="#{accCurrencyBean.initClearAccCurrency(accCurrency)}"/>
+        <f:viewAction action="#{accCurrencyBean.initIsoCurrencyList()}"/>
+        <f:viewAction action="#{accCurrencyBean.refreshAcc_currency_tax_lists()}"/>
+    </f:metadata>
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="form" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
+                    return false;">
+            <h:panelGrid styleClass="clsGridMainHeader" columns="1">
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="#{langsys['Currency']}"/>
+            </h:panelGrid>
+            <h:panelGrid styleClass="clsGridMainInput" columns="1">
+                <h:panelGrid columns="2">
+                    <h:outputLabel  value="#{langsys['Select']} ISO #{langsys['Currency']}:" rendered="#{accCurrency.accCurrencyId==0}"/>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuIsoCurrency" value="#{accCurrencyBean.isoCurrencyId}" rendered="#{accCurrency.accCurrencyId==0}">
+                        <f:selectItem itemLabel="" itemValue="0"/>
+                        <f:selectItems value="#{accCurrencyBean.isoCurrencyList}" var="ic" itemLabel="#{ic.currencyCode} (#{ic.currencyName})" itemValue="#{ic.accCurrencyId}"/>
+                        <f:ajax event="change" listener="#{accCurrencyBean.setCurrencyFromIso(accCurrencyBean.isoCurrencyId,accCurrency)}" execute="@this" render="@form"/>
+                    </h:selectOneMenu>
+                </h:panelGrid>
+                <h:panelGrid styleClass="clsGridMainInput" columns="6">
+                    <h:outputLabel  value="#{langsys['Currency']} #{langsys['Name']}:"/>
+                    <h:inputText styleClass="clsInput" id="itxtAccCurrencyName" value="#{accCurrency.currencyName}" autocomplete="off" disabled="true" style="width: 200px;"/>
+                    <h:outputLabel  value="#{langsys['Currency']} #{langsys['Code']}:"/>
+                    <h:inputText styleClass="clsInput" id="itxtAccCurrencyCode" value="#{accCurrency.currencyCode}" autocomplete="off" disabled="true" style="width: 200px;"/>
+                    <h:outputLabel  value="#{langsys['Currency']} #{langsys['No.']}:"/>
+                    <h:inputText styleClass="clsInput" id="itxtAccCurrencyNo" value="#{accCurrency.currencyNo}" autocomplete="off" disabled="true" style="width: 150px;"/>
+
+                    <h:outputLabel  value="#{langsys['Is']} #{langsys['Local']} #{langsys['Currency']}?"/>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuIsLocal" value="#{accCurrency.isLocalCurrency}" style="width: 200px;">
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel  value="#{langsys['Is']} #{langsys['Active']}?"/>
+                    <h:selectOneMenu styleClass="clsMenu" id="menuIsActive" value="#{accCurrency.isActive}" disabled="false" style="width: 200px;">
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel  value="#{langsys['Rounding']} #{langsys['Decimal']} #{langsys['Places']}:"/>
+                    <h:selectOneMenu styleClass="clsMenu" value="#{accCurrency.decimal_places}" style="width: 150px;">
+                        <f:selectItem itemLabel="3" itemValue="3"/>
+                        <f:selectItem itemLabel="2" itemValue="2"/>
+                        <f:selectItem itemLabel="1" itemValue="1"/>
+                        <f:selectItem itemLabel="0" itemValue="0"/>
+                    </h:selectOneMenu>
+
+                    <h:outputLabel  value="#{langsys['Buying']}:"/>
+                    <h:inputText styleClass="clsInput" id="itxtBuying" value="#{accCurrency.buying}" autocomplete="off" style="width: 200px;"/>
+                    <h:outputLabel  value="#{langsys['Selling']}:"/>
+                    <h:inputText styleClass="clsInput" id="itxtSelling" value="#{accCurrency.selling}" autocomplete="off" style="width: 200px;"/>
+                    <h:outputLabel  value="#{langsys['Rounding']} #{langsys['Mode']}:"/>
+                    <h:selectOneMenu styleClass="clsMenu" value="#{accCurrency.rounding_mode}" style="width: 150px;">
+                        <f:selectItem itemLabel="#{langsys['HALF']} #{langsys['UP']}" itemValue="4"/>
+                        <f:selectItem itemLabel="#{langsys['HALF']} #{langsys['DOWN']}" itemValue="5"/>
+                        <f:selectItem itemLabel="#{langsys['HALF']} #{langsys['EVEN']}" itemValue="6"/>
+                        <f:selectItem itemLabel="#{langsys['UP']}" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['DOWN']}" itemValue="1"/>
+                        <f:selectItem itemLabel="#{langsys['CEILING']}" itemValue="2"/>
+                        <f:selectItem itemLabel="#{langsys['FLOOR']}" itemValue="3"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel  value="#{langsys['Currency']} #{langsys['Unit']} (e.g Dollar):"/>
+                    <h:inputText styleClass="clsInput" id="itxtCurUnit" value="#{accCurrency.currency_unit}" autocomplete="off" style="width: 200px;"/>
+                    <h:outputLabel  value="#{langsys['Decimal']} #{langsys['Unit']} (e.g Cent):"/>
+                    <h:inputText styleClass="clsInput" id="itxtDecUnit" value="#{accCurrency.decimal_unit}" autocomplete="off" style="width: 200px;"/>
+                    <h:outputLabel  value="#{langsys['Tax']} #{langsys['Code']}:"/>
+                    <h:selectOneMenu id="menuCurTax" value="#{accCurrency.currency_code_tax}" style="width: 150px;">
+                        <f:selectItem itemLabel="" itemValue=""/>
+                        <f:selectItems value="#{accCurrencyBean.acc_currency_tax_lists}" var="ct" itemLabel="#{ct.currency_code_tax}(#{ct.currency_name_tax})" itemValue="#{ct.currency_code_tax}"/>
+                    </h:selectOneMenu>
+                </h:panelGrid>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainCommands" columns="1">
+                <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
+                    <h:commandButton styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']} (ALT+S)" accesskey="s">
+                        <f:ajax listener="#{accCurrencyBean.saveAccCurrency(accCurrency)}" execute="@form" render="@form" />
+                    </h:commandButton>
+                    <h:commandButton styleClass="clsButtonBig" id="cmdbClear" value="#{langsys['CLEAR']} (ALT+C)" accesskey="c">
+                        <f:ajax listener="#{accCurrencyBean.clearAccCurrency(accCurrency)}" execute="@form" render="@form" />
+                    </h:commandButton>
+                </h:panelGrid>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainMessages" columns="1">
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{accCurrencyBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
+            <p:growl/>
+
+            <p:dataTable id="dtblCurrency" value="#{accCurrencyBean.getAccCurrenciesAll()}" var="itm" 
+                         tableStyle="width:auto;">
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Currency']} #{langsys['Code']}</f:facet>
+                    <!-- row record -->
+                    #{itm.currencyCode}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Currency']} #{langsys['Name']}</f:facet>
+                    <!-- row record -->
+                    #{itm.currencyName}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Currency']} #{langsys['No.']}</f:facet>
+                    <!-- row record -->
+                    #{itm.currencyNo}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Local']}</f:facet>
+                    <!-- row record -->
+                    #{utilityBean.returnYesNoString(itm.isLocalCurrency)}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Active']}</f:facet>
+                    <!-- row record -->
+                    #{utilityBean.returnYesNoString(itm.isActive)}
+                </p:column>
+                <p:column headerText="#{langsys['Buying']} (F>L) (L*R)" style="text-align: right;">
+                    <h:outputText value="#{itm.buying}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{langsys['Selling']} (L>F) (F/R)" style="text-align: right;">
+                    <h:outputText value="#{itm.selling}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Tax']} #{langsys['Code']}</f:facet>
+                    <!-- row record -->
+                    #{itm.currency_code_tax}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Action']}</f:facet>
+                    <!-- row record -->
+                    <h:commandLink value="#{langsys['Edit']}">
+                        <f:ajax listener="#{accCurrencyBean.copyAccCurrency(itm,accCurrency)}" execute="@form" render="@form"/>
+                    </h:commandLink>
+                    &nbsp;
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </h:body>
+</html>
+

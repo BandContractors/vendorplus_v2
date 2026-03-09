@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Cash Receipt</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+    </h:head>
+    <h:body>
+        <!-- RECEIPT/VOUCHER STARTS HERE -->
+        <p:panel style="text-align: center;">
+            <p:commandButton id="cmdbvPrint" value="#{langout['PRINT']}" icon="ui-icon-print" type="button">
+                <p:printer target="vTransactionGrid" rendered="false"/>
+            </p:commandButton>
+        </p:panel>
+        <h:panelGrid id="vTransactionGrid">
+            <h:panelGrid id="IpgrdSalesInvoice" columns="1">
+                <h:panelGrid style="width: 290px;text-align: center;background-color: black;color: white;-webkit-print-color-adjust: exact;" columns="1" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','OUTPUT_SHOW_CO_NAME').parameter_value.equals('1')}">
+                    <h:outputLabel style="font-size: 20px;font-weight: bold;" value="#{companySetting.getLICENSE_CLIENT_NAME()}"/>
+                </h:panelGrid>
+                <h:panelGrid style="width: 290px;text-align: center;background-color: black;color: white;-webkit-print-color-adjust: exact;" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowBranchInvoice(),'Yes')}">
+                    <h:outputLabel value="#{companySetting.getBranchCode()}"/>
+                </h:panelGrid>
+                <h:panelGrid style="width: 290px;text-align: center;background-color: black;color: white;-webkit-print-color-adjust: exact;" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowStoreInvoice(),'Yes')}">
+                    <h:outputLabel value="(#{generalUserSetting.outputDetailParent.store.storeName})"/>
+                </h:panelGrid>
+
+                <h:panelGrid style="width: 290px;" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'Yes') and companySetting.getLogoUrl().length()>1}">
+                    <p:graphicImage value="#{companySetting.getLogoUrl()}" style="display: block;margin-left: auto;margin-right: auto;"/>
+                </h:panelGrid>
+                <h:panelGrid style="width: 290px; margin: 0px;float:left;" columns="2">
+                    <h:outputLabel value="#{companySetting.getPhysicalAddress()}"/>
+                    <h:panelGrid id="IpgrdSalesInvoiceHeader3" style="margin: 0px;float: right;" columns="1">
+                        <h:outputLabel id="IolblSalesInvoiceTel" value="#{langout['Telephone']}:#{companySetting.getPhone()}" rendered="#{companySetting.getPhone().length()>0}"/>
+                        <h:outputLabel id="IolblSalesInvoiceMob" value="#{langout['Mobile']}:#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value}" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value.length()>0}"/>
+                        <h:outputLabel id="IolblSalesInvoiceTIN" value="TIN:#{companySetting.getTaxIdentity()}" rendered="#{companySetting.getTaxIdentity().length()>0}"/>
+                    </h:panelGrid>
+                </h:panelGrid>
+
+                <h:panelGrid style="width: 290px; margin: 0px;" columns="1">
+                    <h:outputLabel  style="font-size: 12px;" value="#{langout['Website']}: #{companySetting.getWebsite()}" rendered="#{companySetting.getWebsite().length()>0}"/>
+                    <h:outputLabel  style="font-size: 12px;" value="#{langout['Email']}: #{companySetting.getEmail()}" rendered="#{companySetting.getEmail().length()>0}"/>
+                </h:panelGrid>
+
+                <h:panelGrid id="IpgrdSalesInvoiceHeader434" style="width: 290px; margin: 0px;background-color: black;color: white;font-size: 20px;font-weight: bold;text-align: center;-webkit-print-color-adjust: exact; ">
+                    <h:outputLabel style="font-size: 12px;" value="#{langout['CASH']} #{langout['RECEIPT']}"/>
+                </h:panelGrid>
+
+                <h:panelGrid id="IpgrdSalesInvoiceHeader4" style="width: 290px; margin: 0px;" columns="2">
+                    <h:outputLabel style="font-size: 12px;" value="#{langout['No.']}:"/>
+                    <h:outputLabel id="IolblSalesInvoiceNo" style="font-size: 20px;font-weight: bold;" value="#{generalUserSetting.outputDetailParent.pay.pay_number}"/>
+                    <h:outputLabel style="font-size: 12px;" value="#{langout['Date']}:"/>
+                    <h:outputLabel id="IolblSalesInvoiceDate" style="font-size: 12px;" value="#{utilityBean.formatDateTime(generalUserSetting.outputDetailParent.pay.addDate)}"/>
+                </h:panelGrid>
+
+                <h:panelGrid id="IpgrdSalesInvoiceHeader5" style="width: 290px; margin: 0px;" columns="1">
+                    <h:outputLabel style="font-size: 16px;font-weight: bold;border-bottom-style: solid;" value="#{langout['Received']} #{langout['From']}"/>
+                    <h:outputLabel style="font-size: 16px;" value="#{generalUserSetting.outputDetailParent.bill_transactor.transactorNames}" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==21 or generalUserSetting.outputDetailParent.pay.payReasonId==22 or generalUserSetting.outputDetailParent.pay.payReasonId==90}"/>
+                    <h:outputText style="font-size: 16px;" value="#{generalUserSetting.outputDetailParent.acc_child_account2.childAccountName}"  rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==23}"/>
+                    <h:outputText style="font-size: 16px;" value="#{generalUserSetting.outputDetailParent.acc_child_account2.childAccountName}"  rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==24}"/>
+                    <h:outputLabel style="font-size: 16px;font-weight: bold;border-bottom-style: solid;" value="#{langout['Received']} #{langout['For']}"/>
+                    <h:outputLabel style="font-size: 16px;" value="#{langout['Goods']}/#{langout['Services']}" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==21 or generalUserSetting.outputDetailParent.pay.payReasonId==22}"/>
+                    <h:outputLabel style="font-size: 16px;" value="#{langout['Share']} #{langout['Capital']} #{langout['Contribution']}" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==23}"/>
+                    <h:outputLabel style="font-size: 16px;" value="#{langout['Current']}/#{langout['Long']}-#{langout['Term']} #{langout['Loan']}" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==24}"/>
+                    <h:outputLabel style="font-size: 16px;" value="#{langout[menuItemBean.menuItemObj.CUSTOMER_NAME]} #{langout['Deposit']} (#{langout['Prepayment']})" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==90}"/>
+                    <h:outputLabel style="font-size: 16px;" value="#{langout['Other']} #{langout['Revenue']} #{langout['Received']}" rendered="#{generalUserSetting.outputDetailParent.pay.payReasonId==115}"/>
+                </h:panelGrid>
+
+                <h:panelGrid id="IpgrdSalesInvoiceTotals" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="2">
+                    <h:outputLabel style="font-size: 16px; font-weight: bold;" value="#{langout['AMOUNT']}(#{generalUserSetting.outputDetailParent.pay.currencyCode})"/>
+                    <h:outputLabel style="font-size: 16px; font-weight: bold;" id="IolblSalesInvoiceAmountTendered" value="#{generalUserSetting.outputDetailParent.pay.paidAmount}">
+                        <f:convertNumber pattern="#{accCurrencyBean.getNumberFormatByCurrency(generalUserSetting.outputDetailParent.pay.currencyCode)}" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputLabel>
+                    <h:outputLabel style="font-size: 16px;" value="#{langout['Payment']} #{langout['Method']}"/>
+                    <h:outputLabel value=": #{payMethodBean.getPayMethod(generalUserSetting.outputDetailParent.pay.payMethodId).payMethodName}"/>
+                    <h:outputLabel style="font-size: 16px;" value="#{langout['Payment']} #{langout['Reference']}"/>
+                    <h:outputLabel value=": #{generalUserSetting.outputDetailParent.pay.payRefNo}"/>
+                </h:panelGrid>
+
+                <h:panelGrid id="IpgrdSalesInvoiceFooter1" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="2">
+                    <h:outputLabel style="font-size: 16px;" value="#{langout['Received']} #{langout['By']}:"/>
+                    <h:outputLabel value="#{generalUserSetting.outputDetailParent.trans_user_detail.firstName} #{generalUserSetting.outputDetailParent.trans_user_detail.secondName}"/>
+                </h:panelGrid>
+
+                <h:panelGrid id="IpgrdSalesInvoiceFooter2" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="1" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getIsShowDeveloper(),'Yes')}">
+                    <h:outputLabel style="font-size: 10px;" value="#{langout['System']} #{langout['powered']} #{langout['by']} Band Contractors Ltd"/>
+                    <h:outputLabel style="font-size: 10px;" value="#{companySetting.getDeveloperEmail()} | #{companySetting.getDeveloperPhone()}"/>
+                </h:panelGrid>
+            </h:panelGrid>
+        </h:panelGrid>
+        <!-- RECEIPT/VOUCHER ENDS HERE -->
+    </h:body>
+</html>
+

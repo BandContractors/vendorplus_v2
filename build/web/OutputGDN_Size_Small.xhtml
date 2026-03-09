@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Goods Delivery Note</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+    </h:head>
+    <h:body>
+        <h:form id="vTransactionForm">
+            <ui:composition>
+                <p:panel style="text-align: center;">
+                    <p:commandButton id="cmdbvPrintOrder" value="#{langout['PRINT']}" icon="ui-icon-print" type="button">
+                        <p:printer target="vTransactionGrid" rendered="false"/>
+                    </p:commandButton>
+                </p:panel>
+                <h:panelGrid id="vTransactionGrid">
+                    <h:panelGrid id="IpgrdSalesInvoice" columns="1">
+
+                        <h:panelGrid id="IpgrdSalesInvoiceHeader1" style="width: 290px;text-align: center;border-bottom-style: dotted;" columns="1">
+                            <h:outputLabel id="IolblSalesInvoiceCompany" style="font-size: 20px;font-weight: bold;" value="#{companySetting.getLICENSE_CLIENT_NAME()}"/>
+                            <p:panel style="width: 290px;text-align: center; border-style: none !important;">
+                                <h:outputLabel id="IolblSalesInvoiceBranch" value="#{companySetting.getBranchCode()} " rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowBranchInvoice(),'Yes')}"/>
+                                <h:outputLabel id="IolblSalesInvoiceStore" value="#{generalUserSetting.outputDetailParent.store.storeName}" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowStoreInvoice(),'Yes')}"/>
+                            </p:panel>
+                        </h:panelGrid>
+                        <h:panelGrid style="width: 290px; margin: 0px;text-align: center;-webkit-print-color-adjust: exact; ">
+                            <h:outputLabel style="font-size: 20px;background-color: gray;color: white;font-weight: bold;text-align: center;" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionOutputLabel)}"/>
+                        </h:panelGrid>
+                        <h:panelGrid style="width: 290px; margin: 0px;float:left;" columns="2">
+                            <h:outputLabel value="#{companySetting.getPhysicalAddress()}"/>
+                            <h:panelGrid id="IpgrdSalesInvoiceHeader3" style="margin: 0px;float: right;" columns="1">
+                                <h:outputLabel id="IolblSalesInvoiceTel" value="#{langout['Telephone']}:#{companySetting.getPhone()}" rendered="#{companySetting.getPhone().length()>0}"/>
+                                <h:outputLabel id="IolblSalesInvoiceMob" value="#{langout['Mobile']}:#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value}" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value.length()>0}"/>
+                                <h:outputLabel id="IolblSalesInvoiceTIN" value="TIN:#{companySetting.getTaxIdentity()}" rendered="#{companySetting.getTaxIdentity().length()>0}"/>
+                            </h:panelGrid>
+                        </h:panelGrid>
+
+                        <h:panelGrid id="IpgrdSalesInvoiceHeader34" style="width: 290px; margin: 0px;border-bottom-style: dotted;" columns="1">
+                            <h:outputLabel id="IolblSalesInvoiceWebsite" value="#{langout['Website']}: #{companySetting.getWebsite()}" rendered="#{companySetting.getWebsite().length()>0}"/>
+                            <h:outputLabel id="IolblSalesInvoiceEmail" value="#{langout['Email']}: #{companySetting.getEmail()}" rendered="#{companySetting.getEmail().length()>0}"/>
+                        </h:panelGrid>
+
+                        <h:panelGrid id="IpgrdSalesInvoiceHeader4" style="width: 290px; margin: 0px;" columns="2">
+                            <h:outputLabel style="font-size: 12px;" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionNumberLabel)}:"/>
+                            <h:outputLabel id="IolblSalesInvoiceNo" style="font-size: 20px;font-weight: bold;" value="#{generalUserSetting.outputDetailParent.trans.transactionNumber}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_OUT,generalUserSetting.outputDetailParent.transaction_type.transactionDateLabel)}:"/>
+                            <h:outputLabel id="IolblSalesInvoiceDate" style="font-size: 12px;" value="#{utilityBean.formatDateTime(generalUserSetting.outputDetailParent.trans.addDate)}"/>
+                        </h:panelGrid>
+
+                        <h:panelGrid id="IpgrdSalesInvoiceHeader5" style="width: 290px; margin: 0px;" columns="2">
+                            <h:outputLabel style="font-size: 12px;" value="#{langout['Order']}/#{langout['Sales']} #{langout['No.']}:" rendered="#{generalUserSetting.outputDetailParent.trans.transactionRef.length()>0}"/>
+                            <h:outputLabel style="font-size: 14px;font-weight: bold;" value="#{generalUserSetting.outputDetailParent.trans.transactionRef}" rendered="#{generalUserSetting.outputDetailParent.trans.transactionRef.length()>0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{langout[menuItemBean.menuItemObj.CUSTOMER_NAME]}:"/>
+                            <h:outputLabel id="IolblSalesInvoiceCustomer" style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.transactorNames} #{generalUserSetting.outputDetailParent.trans.location_name}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{langout['Phone']}:" rendered="#{generalUserSetting.outputDetailParent.transactor.phone.length()>0}"/>
+                            <h:outputLabel style="font-size: 12px;" value="#{generalUserSetting.outputDetailParent.transactor.phone}" rendered="#{generalUserSetting.outputDetailParent.transactor.phone.length()>0}"/>
+                        </h:panelGrid>
+
+                        <h:panelGrid id="IpgrdSalesInvoiceItems">
+                            <h:dataTable id="IdtblSalesInvoiceItems" value="#{generalUserSetting.outputDetailParent.trans_items}" var="ti" 
+                                         styleClass="cls-table-SalesInvoice-very-small" 
+                                         headerClass="cls-table-header-SalesInvoice" 
+                                         rowClasses="cls-table-odd-row-SalesInvoice,cls-table-even-row-SalesInvoice" 
+                                         columnClasses="cls-table-col1-SalesInvoice,cls-table-col2-SalesInvoice,cls-table-col3-SalesInvoice"
+                                         > 
+                                <h:column>
+                                    <!-- column header -->
+                                    <f:facet name="header">#{langout['ITEM']}</f:facet>
+                                    <!-- row record -->
+                                    <h:outputLabel style="font-size: 12px;" value="#{transItemBean.showItemDescriptionCEC(ti)}" escape="false"/>
+                                </h:column>
+                                <h:column>
+                                    <!-- column header -->
+                                    <f:facet name="header">#{langout['QTY']}</f:facet>
+                                    <!-- row record -->
+                                    <h:outputLabel style="font-size: 10px;" value="#{ti.itemQty}">
+                                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                    </h:outputLabel>
+                                    <h:outputLabel style="font-size: 10px;" value="#{ti.unitSymbol}"/>
+                                </h:column>
+                            </h:dataTable>
+                        </h:panelGrid>
+                        <h:panelGrid id="IpgrdSalesInvoiceFooter12" style="width: 290px; margin: 0px;border-bottom-style: dotted" columns="2">
+                            <h:outputLabel value="#{langout['Delivery']} #{langout['Address']}:"/>
+                            <h:outputLabel value="#{generalUserSetting.outputDetailParent.trans.deliveryAddress}"/>
+                            <h:outputLabel value="#{langout['Delivered']} #{langout['By']}: "/>
+                            <h:outputLabel value="#{generalUserSetting.outputDetailParent.trans.transactor_driver}"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </h:panelGrid>
+            </ui:composition>
+        </h:form>
+    </h:body>
+</html>
+

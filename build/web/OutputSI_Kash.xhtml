@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Sales Invoice</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/> 
+    </h:head>
+
+    <h:body>
+        <h:form>
+            <ui:composition>
+                <p:panel style="text-align: center;">
+                    <p:commandButton id="cmdbvPrint" value="PRINT" icon="ui-icon-print" type="button">
+                        <p:printer target="vTransactionGrid" rendered="false"/>
+                    </p:commandButton>
+                </p:panel>
+                <h:panelGrid id="vTransactionGrid"> 
+                    <h:panelGrid columns="2" style="width:100%;margin: 0px;">
+                        <h:outputLabel value="INV-NO"/>
+                        <h:outputLabel value="INV-DATE"/>
+                    </h:panelGrid>
+                    <h:panelGrid columns="4" style="width:100%;margin: 0px;">
+                        <ui:repeat var="ti" value="#{generalUserSetting.outputDetailParent.trans_items}">
+                            <h:outputLabel style="width: 500px;" value="#{transItemBean.showItemDescriptionCEC(ti)}" escape="false"/>
+                            <h:outputText value="#{ti.itemQty}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                            <h:outputText value="#{ti.unitPriceExcVat}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                            <h:outputText value="#{ti.amountIncVat}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </ui:repeat>
+                    </h:panelGrid>
+                </h:panelGrid> 
+            </ui:composition>
+        </h:form>
+    </h:body>
+</html>
+

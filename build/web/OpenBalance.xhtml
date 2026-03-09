@@ -1,0 +1,283 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Open Balance</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{accCurrencyBean.refreshCurrencyListActive()}"/>
+        <f:viewAction action="#{navigationBean.checkAccessDenied(utilityBean.convertIntAsString(generalUserSetting.currentTransactionReasonId), 'View')}"/>
+        <f:viewAction action="#{navigationBean.checkLicenseExpired()}"/>
+        <f:viewAction action="#{navigationBean.checkCurrentPage('OPENING BALANCE','','')}"/>
+        <f:viewAction action="#{transBean.initClearAll(trans,transItemBean.activeTransItems,transItem,itemBean.selectedItem,transactorBean.selectedTransactor,2,transItemBean.selectedAccCoa)}"/>
+        <f:viewAction action="#{transBean.initTransOpenBalance(generalUserSetting.getCurrentTransactionTypeId(),generalUserSetting.getCurrentTransactionReasonId(),trans,transItem)}"/>
+    </f:metadata>
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="TransactionFormPurchase" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
+                    return false;">
+
+            <h:panelGrid styleClass="clsGridMainHeader" columns="4">
+                <h:selectOneMenu styleClass="clsMenu" id="menuTransactionReason" value="#{trans.transactionReasonId}">
+                    <f:selectItem itemValue="#{generalUserSetting.getCurrentTransactionReasonId()}" itemLabel="#{transactionReasonBean.getTransactionReason(generalUserSetting.getCurrentTransactionReasonId()).transactionReasonName}"/>
+                    <f:ajax execute="@this"/>
+                </h:selectOneMenu>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Record']} #{langsys['Opening']} #{langsys['Balance']}"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Stock']}:#{langsys['No.']} #{langsys['effect']}"/>
+                <h:outputLabel style="background-color:#7BC043;color: white;" value="#{langsys['Ledger']}:#{langsys['Accounts']}↑↓"/>
+            </h:panelGrid>
+            <div class="ui-fluid">
+                <h:panelGrid id="pnlgInput" styleClass="clsGridMainInput">
+                    <h:panelGrid id="gridTransItemC" styleClass="clsGridMainInput" columns="5" rendered="#{generalUserSetting.currentTransactionReasonId==117}">
+                        <h:outputLabel  value="#{langsys['From']}"/>
+                        <h:outputLabel  value="#{langsys['Currency']}"/>
+                        <h:outputLabel  value="#{langsys['Opening']} #{langsys['Date']}"/>
+                        <h:outputLabel value="#{langsys['Customer']}"/>
+                        <h:outputLabel  value="#{langsys['Reference']} #{langsys['No.']}"/>
+
+                        <h:inputText styleClass="clsInput" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}"/>
+                        <h:selectOneMenu styleClass="clsMenu" id="menuCurrencyC" value="#{trans.currencyCode}">
+                            <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
+                            <f:ajax event="change" execute="@this" render="@this"/>
+                        </h:selectOneMenu>
+                        <p:calendar styleClass="clsInput" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}"/> 
+                        <p:autoComplete id="autcTransactorC" value="#{transactorBean.selectedTransactor}" 
+                                        completeMethod="#{transactorBean.getTransactorObjectList}" 
+                                        var="trct" 
+                                        itemLabel="#{trct.transactorNames}" 
+                                        itemValue="#{trct}" 
+                                        converter="TransactorConverter" style="text-align: left" 
+                                        forceSelection="true" queryDelay="0" 
+                                        >
+                            <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
+                                #{trct.transactorNames} 
+                            </p:column> 
+                            <p:column headerText="#{langsys['Reference']} #{langsys['No.']}" style="text-align: left" >  
+                                #{trct.transactorRef} 
+                            </p:column>
+                            <p:column headerText="#{langsys['Type']}" style="text-align: left" >  
+                                #{trct.transactorType} 
+                            </p:column> 
+                            <p:column headerText="#{langsys['Contact']} #{langsys['Person']}" style="text-align: left">  
+                                #{trct.cpName} 
+                            </p:column> 
+                            <p:ajax event="itemSelect" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}"/>
+                            <p:ajax event="change" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}" rendered="#{transactorBean.selectedTransactor!=null} "/>
+                        </p:autoComplete>
+                        <h:inputText styleClass="clsInput" value="#{trans.transactionRef}" autocomplete="off"/>
+
+                        <h:outputLabel value="#{langsys['Account']}"/>
+                        <h:outputLabel value="#{langsys['Amount']} (Dr)"/>
+                        <h:outputLabel value=""/>
+                        <h:outputLabel value=""/>
+                        <h:outputLabel value=""/>
+                        <h:inputText value="#{transItem.accountName}" disabled="true"/>
+                        <h:inputText value="#{transItem.amount}" autocomplete="off">
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:inputText>
+                        <h:outputLabel value=""/>
+                        <h:outputLabel value=""/>
+                        <h:outputLabel value=""/>
+                    </h:panelGrid>
+                    <h:panelGrid id="gridTransItemS" styleClass="clsGridMainInput" columns="5" rendered="#{generalUserSetting.currentTransactionReasonId==118}">
+                        <h:outputLabel  value="#{langsys['From']}"/>
+                        <h:outputLabel  value="#{langsys['Currency']}"/>
+                        <h:outputLabel  value="#{langsys['Opening']} #{langsys['Date']}"/>
+                        <h:outputLabel value="#{langsys['Supplier']}"/>
+                        <h:outputLabel  value="#{langsys['Reference']} #{langsys['No.']}"/>
+
+                        <h:inputText styleClass="clsInput" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}"/>
+                        <h:selectOneMenu styleClass="clsMenu" id="menuCurrencyS" value="#{trans.currencyCode}">
+                            <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
+                            <f:ajax event="change" execute="@this" render="@this"/>
+                        </h:selectOneMenu>
+                        <p:calendar styleClass="clsInput" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}"/> 
+                        <p:autoComplete id="autcTransactorS" value="#{transactorBean.selectedTransactor}" 
+                                        completeMethod="#{transactorBean.getTransactorObjectList}" 
+                                        var="trct" 
+                                        itemLabel="#{trct.transactorNames}" 
+                                        itemValue="#{trct}" 
+                                        converter="TransactorConverter" style="text-align: left" 
+                                        forceSelection="true" queryDelay="0" 
+                                        >
+                            <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
+                                #{trct.transactorNames} 
+                            </p:column> 
+                            <p:column headerText="#{langsys['Reference']} #{langsys['No.']}" style="text-align: left" >  
+                                #{trct.transactorRef} 
+                            </p:column>
+                            <p:column headerText="#{langsys['Type']}" style="text-align: left" >  
+                                #{trct.transactorType} 
+                            </p:column> 
+                            <p:column headerText="#{langsys['Contact']} #{langsys['Person']}" style="text-align: left">  
+                                #{trct.cpName} 
+                            </p:column> 
+                            <p:ajax event="itemSelect" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}"/>
+                            <p:ajax event="change" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}" rendered="#{transactorBean.selectedTransactor!=null} "/>
+                        </p:autoComplete>
+                        <h:inputText styleClass="clsInput" value="#{trans.transactionRef}" autocomplete="off"/>
+
+                        <h:outputLabel value="#{langsys['Account']}"/>
+                        <h:outputLabel value="#{langsys['Amount']} (Cr)"/>
+                        <h:outputLabel value=""/>
+                        <h:outputLabel value=""/>
+                        <h:outputLabel value=""/>
+                        <h:inputText value="#{transItem.accountName}" disabled="true"/>
+                        <h:inputText value="#{transItem.amount}" autocomplete="off">
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:inputText>
+                        <h:outputLabel value=""/>
+                        <h:outputLabel value=""/>
+                        <h:outputLabel value=""/>
+                    </h:panelGrid>
+                    <h:panelGrid id="gridTransItemA" styleClass="clsGridMainInput" columns="4" rendered="#{generalUserSetting.currentTransactionReasonId==119}">
+                        <h:outputLabel  value="#{langsys['From']}"/>
+                        <h:outputLabel  value="#{langsys['Currency']}"/>
+                        <h:outputLabel  value="#{langsys['Opening']} #{langsys['Date']}"/>
+                        <h:outputLabel  value="#{langsys['Reference']} #{langsys['No.']}"/>
+
+                        <h:inputText styleClass="clsInput" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}"/>
+                        <h:selectOneMenu styleClass="clsMenu" id="menuCurrencyA" value="#{trans.currencyCode}">
+                            <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
+                            <f:ajax event="change" execute="@this" render="@this"/>
+                        </h:selectOneMenu>
+                        <p:calendar styleClass="clsInput" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}"/> 
+                        <h:inputText styleClass="clsInput" value="#{trans.transactionRef}" autocomplete="off"/>
+
+                        <h:outputLabel value="#{langsys['Cash']} #{langsys['Account']}"/>
+                        <h:outputLabel value="#{langsys['Child']} #{langsys['Account']}"/>
+                        <h:outputLabel value="#{langsys['Amount']} (Dr)"/>
+                        <h:outputLabel value=""/>
+                        <p:selectOneMenu id="menuCashAccount" value="#{transItem.accountCode}" >
+                            <f:selectItem itemLabel="#{langsys['Select']}" itemValue=""/>
+                            <f:selectItems value="#{accCoaBean.getAccCoaObjectListBeginWith1('1-00-000')}" var="acc" itemLabel="#{acc.accountName}" itemValue="#{acc.accountCode}"/>
+                            <p:ajax event="change" process="@this menuCurrencyA menuChildAccA" update="menuChildAccA"/>
+                        </p:selectOneMenu>
+                        <h:selectOneMenu styleClass="clsMenu" id="menuChildAccA" value="#{transItem.codeSpecific}">
+                            <f:selectItem itemLabel="" itemValue=""/>
+                            <f:selectItems value="#{accChildAccountBean.getAccChildAccountsByCurrencyParent(trans.currencyCode,transItem.accountCode)}" var="ea" itemLabel="#{ea.childAccountName}" itemValue="#{ea.childAccountCode}"/>
+                        </h:selectOneMenu>
+                        <h:inputText value="#{transItem.amount}" autocomplete="off">
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:inputText>
+                        <h:outputLabel value=""/>
+                    </h:panelGrid>
+                    <h:panelGrid id="gridTransItemO" styleClass="clsGridMainInput" columns="5" rendered="#{generalUserSetting.currentTransactionReasonId==120}">
+                        <h:outputLabel  value="#{langsys['From']}"/>
+                        <h:outputLabel  value="#{langsys['Currency']}"/>
+                        <h:outputLabel  value="#{langsys['Opening']} #{langsys['Date']}"/>
+                        <h:outputLabel value="#{langsys['Partner']}"/>
+                        <h:outputLabel  value="#{langsys['Reference']} #{langsys['No.']}"/>
+
+                        <h:inputText styleClass="clsInput" disabled="true" value="#{generalUserSetting.getCurrentStore().getStoreName()}"/>
+                        <h:selectOneMenu styleClass="clsMenu" id="menuCurrencyO" value="#{trans.currencyCode}">
+                            <f:selectItems value="#{accCurrencyBean.currencyList}" var="ac" itemLabel="#{ac.currencyCode}" itemValue="#{ac.currencyCode}"/>
+                            <f:ajax event="change" execute="@this" render="@this"/>
+                        </h:selectOneMenu>
+                        <p:calendar styleClass="clsInput" pattern="#{companySetting.getDateFormat()}" navigator="true" showButtonPanel="true" readonlyInput="true" value="#{trans.transactionDate}"/> 
+                        <p:autoComplete id="autcTransactorO" value="#{transactorBean.selectedTransactor}" 
+                                        completeMethod="#{transactorBean.getTransactorObjectList}" 
+                                        var="trct" 
+                                        itemLabel="#{trct.transactorNames}" 
+                                        itemValue="#{trct}" 
+                                        converter="TransactorConverter" style="text-align: left" 
+                                        forceSelection="true" queryDelay="0" 
+                                        >
+                            <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
+                                #{trct.transactorNames} 
+                            </p:column> 
+                            <p:column headerText="#{langsys['Reference']} #{langsys['No.']}" style="text-align: left" >  
+                                #{trct.transactorRef} 
+                            </p:column>
+                            <p:column headerText="#{langsys['Type']}" style="text-align: left" >  
+                                #{trct.transactorType} 
+                            </p:column> 
+                            <p:column headerText="#{langsys['Contact']} #{langsys['Person']}" style="text-align: left">  
+                                #{trct.cpName} 
+                            </p:column> 
+                            <p:ajax event="itemSelect" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}"/>
+                            <p:ajax event="change" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}" rendered="#{transactorBean.selectedTransactor!=null} "/>
+                        </p:autoComplete>
+                        <h:inputText styleClass="clsInput" value="#{trans.transactionRef}" autocomplete="off"/>
+
+                        <h:outputLabel value="#{langsys['Account']}"/>
+                        <h:outputLabel value="#{langsys['Child']} #{langsys['Account']}"/>
+                        <h:outputLabel value="#{langsys['Amount']} (Dr)"/>
+                        <h:outputLabel value="#{langsys['Amount']} (Cr)"/>
+                        <h:outputLabel value=""/>
+                        <p:autoComplete id="autcItemO" value="#{transItemBean.selectedAccCoa}"  
+                                        completeMethod="#{accCoaBean.getAccCoaObjectListAllActive}" 
+                                        var="itm" 
+                                        itemLabel="#{itm.accountName}" 
+                                        itemValue="#{itm}" 
+                                        converter="AccCoaConverter" style="text-align: left" 
+                                        forceSelection="true" queryDelay="0" 
+                                        >
+                            <p:column headerText="#{langsys['Account']} #{langsys['Name']}" style="text-align: left" >  
+                                #{itm.accountName} 
+                            </p:column> 
+                            <p:column headerText="#{langsys['Account']} #{langsys['Code']}" style="text-align: left" >  
+                                #{itm.accountCode} 
+                            </p:column> 
+                            <p:column headerText="#{langsys['Type']}" style="text-align: left">  
+                                #{accTypeBean.getAccTypeById(itm.accTypeId).accTypeName}
+                            </p:column> 
+                            <p:column headerText="#{langsys['Group']}/#{langsys['Category']}" style="text-align: left"> 
+                                #{accGroupBean.getAccGroupById(itm.accGroupId).accGroupName} / 
+                                #{accCategoryBean.getAccCategoryById(itm.accCategoryId).accCategoryName}
+                            </p:column> 
+                            <p:ajax event="itemSelect" listener="#{transItemBean.updateAccCodeTransItem(transItem,transItemBean.selectedAccCoa)}" process="@this menuCurrencyO menuChildAccO" update="menuChildAccO"/>
+                            <p:ajax event="change" listener="#{transItemBean.updateAccCodeTransItem(transItem,transItemBean.selectedAccCoa)}" rendered="#{transItemBean.selectedAccCoa!=null}" process="@this menuCurrencyO menuChildAccO" update="menuChildAccO"/>
+                        </p:autoComplete>
+                        <h:selectOneMenu styleClass="clsMenu" id="menuChildAccO" value="#{transItem.codeSpecific}">
+                            <f:selectItem itemLabel="" itemValue=""/>
+                            <f:selectItems value="#{accChildAccountBean.getAccChildAccountsByCurrencyParent(trans.currencyCode,transItemBean.selectedAccCoa.accountCode)}" var="ea" itemLabel="#{ea.childAccountName}" itemValue="#{ea.childAccountCode}"/>
+                        </h:selectOneMenu>
+                        <h:inputText value="#{transItem.amountExcVat}" autocomplete="off">
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:inputText>
+                        <h:inputText value="#{transItem.amountIncVat}" autocomplete="off">
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:inputText>
+                        <h:outputLabel value=""/>
+                    </h:panelGrid>
+                </h:panelGrid>
+            </div>
+            <h:panelGrid styleClass="clsGridMainCommands" columns="1">
+                <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbSave" value="#{langsys['SAVE']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{transBean.saveTransCECcallFromOpenBalance('PARENT',generalUserSetting.currentStore.storeId,generalUserSetting.currentTransactionTypeId,generalUserSetting.currentTransactionReasonId,'',trans,transItemBean.activeTransItems,transactorBean.selectedTransactor,null,null,null,null,transItemBean.selectedAccCoa,transItem)}" process="@form" update="pnlgInput pnlMessage growl1"/>
+                    </p:commandButton>
+                    <p:commandButton styleClass="clsButtonBig" id="cmdbClear" value="#{langsys['CLEAR']} (ALT+C)" accesskey="c">
+                        <f:ajax listener="#{transBean.clearAll2(trans,transItemBean.activeTransItems,transItem,null,transactorBean.selectedTransactor,2,null,null,null,null,transItemBean.selectedAccCoa)}" execute="@form" render="@form"/>
+                    </p:commandButton>
+                </h:panelGrid>
+            </h:panelGrid>
+            <h:panelGrid id="pnlMessage" styleClass="clsGridMainMessages" columns="1">
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{transBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
+            <p:growl id="growl1"/>
+        </h:form>
+    </h:body>
+</html>
+

@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Payable Summary</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{utilityBean.clearList(accLedgerBean.accLedgerPayablesAccBal)}"/>
+    </f:metadata>
+    <f:event listener="#{navigationBean.checkAccessDenied('60', 'View')}" type="preRenderView" />
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="formReport">
+            <h:panelGrid id="pnlgHeader" columns="2" styleClass="clsPanelReportFilterTitle">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys['Balances']} #{langsys['for']} #{langsys['all']} #{langsys['Payable']} #{langsys['Accounts']}"/>
+                <p:commandButton id="cmdbSearch" value="#{langsys['SHOW']} #{langsys['REPORT']} (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{accLedgerBean.reportPayableAccBalances()}" process="@form" update="@form"/>
+                </p:commandButton>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgMessage">
+                <p:outputLabel value="#{accLedgerBean.actionMessage}" style="color: red;"/>
+            </h:panelGrid>
+            <p:dataTable id="tblDetail" tableStyle="width:auto;" var="itm" value="#{accLedgerBean.accLedgerPayablesAccBal}" 
+                         paginator="true" rows="50" 
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
+                         rowsPerPageTemplate="50,100,200,400">
+                <f:facet name="header">
+                    <h:outputText value="#{langsys['CURRENT']} #{langsys['TOTAL']} #{langsys['ACCOUNT']} #{langsys['PAYABLE']} #{langsys['AMOUNT']} (#{langsys['Local']} #{langsys['Currency']}) : #{accLedgerBean.calTotalPayableAccBalLc(accLedgerBean.accLedgerPayablesAccBal)} "/>
+                    <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
+                    <p:columnToggler datasource="tblDetail" trigger="toggler" />
+                </f:facet>
+                <f:facet name="{Exporters}">
+                    <h:commandLink>
+                        <p:graphicImage name="images/excel.png" width="24"/>
+                        <p:dataExporter type="xls" target="tblDetail" fileName="ACC_PAY_Balances" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/pdf.png" width="24"/>
+                        <p:dataExporter type="pdf" target="tblDetail" fileName="ACC_PAY_Balances"/>
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/csv.png" width="24"/>
+                        <p:dataExporter type="csv" target="tblDetail" fileName="ACC_PAY_Balances" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/xml.png" width="24"/>
+                        <p:dataExporter type="xml" target="tblDetail" fileName="ACC_PAY_Balances" />
+                    </h:commandLink>
+                </f:facet>
+                <p:column headerText="#{langsys['Payable']} #{langsys['Account']}" style="text-align: left;">
+                    <h:outputText value="#{accCoaBean.getAccCoaByCodeOrId(itm.accountCode, 0).accountName}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Payable']} #{langsys['To']} (#{langsys['Partner']})">
+                    <h:outputText value="#{itm.transactorName}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Partner']} #{langsys['Reference']}">
+                    <h:outputText value="#{itm.transactorRef}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Currency']}">
+                    <h:outputText value="#{itm.currencyCode}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Payable']} #{langsys['Amount']}" style="text-align: right;">
+                    <h:outputText value="#{accJournalBean.returnBalanceString(itm.creditAmount-itm.debitAmount)}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Amount']} #{langsys['in']} #{langsys['Local']} #{langsys['Currency']}" style="text-align: right;">
+                    <h:outputText value="#{accJournalBean.returnBalanceString(itm.creditAmountLc-itm.debitAmountLc)}"/>
+                </p:column>
+            </p:dataTable>
+
+        </h:form>
+    </h:body>
+</html>
+

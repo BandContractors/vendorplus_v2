@@ -1,0 +1,241 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:body>
+        <h:form>
+            <ui:composition>
+                <p:panel style="text-align: center;">
+                    <p:commandButton id="cmdbvPrint" value="#{langout['PRINT']}" icon="ui-icon-print" type="button">
+                        <p:printer target="vTransactionGrid" rendered="false"/>
+                    </p:commandButton>
+                </p:panel>
+                <h:panelGrid id="vTransactionGrid" style="text-align: center;border-style: none;-webkit-print-color-adjust: exact;width: 100%; margin: 0px;"> 
+                    <h:panelGrid columns="2" style="width: 100%; margin: 0px;">
+                        <h:panelGrid columns="1" style="float: left;text-align: left;">
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 18pt;color:red;font-weight: bold;text-decoration: none;" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','OUTPUT_SHOW_CO_NAME').parameter_value.equals('1')}">#{companySetting.getLICENSE_CLIENT_NAME()}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 9pt;color:blue;font-weight: bold;text-decoration: none;">#{companySetting.getSloghan()}</h:outputLabel>
+                        </h:panelGrid>
+                        <h:panelGrid columns="1" style="background-color: #000000;float: right;text-align: right;">
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 18pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">#{generalUserSetting.outputDetailParent.transaction_type.transactionOutputLabel}</h:outputLabel>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <h:panelGrid columns="3" style="width: 100%; margin: 0px;">
+                        <h:panelGrid columns="1" style="float: left;text-align: left;">
+                            <p:graphicImage value="#{companySetting.getLogoUrl()}" style="float: left;" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'Yes')}" />
+                        </h:panelGrid>
+                        <h:panelGrid columns="1" style="text-align: left;">
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langout['Telephone']}:#{companySetting.getPhone()}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langout['Mobile']}:#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">TIN:#{companySetting.getTaxIdentity()}</h:outputLabel>
+                        </h:panelGrid>
+                        <h:panelGrid columns="2" style="float: right;text-align: right;">
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: bold;text-decoration: none;">#{langout['DATE']}:</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{utilityBean.formatDate(generalUserSetting.outputDetailParent.trans.transactionDate)}"/>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: bold;text-decoration: none;">#{langout['INVOICE']} #{langout['NO.']}:</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.transactionNumber}"/>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: bold;text-decoration: none;color: red;" rendered="#{generalUserSetting.outputDetailParent.trans.reference_number_tax.length() gt 0 and generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() eq 0}">#{langout['NOT']} #{langout['APPROVED']}!</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" value="" rendered="#{generalUserSetting.outputDetailParent.trans.reference_number_tax.length() gt 0 and generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() eq 0}"/>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: bold;text-decoration: none;" rendered="#{generalUserSetting.outputDetailParent.trans.reference_number_tax.length() gt 0}">#{langout['Reference']} #{langout['No.']}:</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.reference_number_tax}" rendered="#{generalUserSetting.outputDetailParent.trans.reference_number_tax.length() gt 0}"/>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: bold;text-decoration: none;" rendered="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0 and generalUserSetting.outputDetailParent.trans.transactionTypeId eq 82}">#{langout['Credit']} #{langout['Note']} #{langout['No.']}:</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: bold;text-decoration: none;" rendered="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0 and generalUserSetting.outputDetailParent.trans.transactionTypeId eq 83}">#{langout['Debit']} #{langout['Note']} #{langout['No.']}:</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax}" rendered="#{generalUserSetting.outputDetailParent.trans.transaction_number_tax.length() gt 0}"/>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: bold;text-decoration: none;" rendered="#{generalUserSetting.outputDetailParent.trans.verification_code_tax.length() gt 0}">#{langout['Verification']} #{langout['Code']}:</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.verification_code_tax}" rendered="#{generalUserSetting.outputDetailParent.trans.verification_code_tax.length() gt 0}"/>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: bold;text-decoration: none;" rendered="#{generalUserSetting.outputDetailParent.trans.fdn_ref.length() gt 0}">#{langout['Original']} FDN:</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.fdn_ref}" rendered="#{generalUserSetting.outputDetailParent.trans.fdn_ref.length() gt 0}"/>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: bold;text-decoration: none;">#{langout['CUSTOMER']} #{langout['NO.']}:</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.transactor.transactorRef}"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <h:panelGrid columns="1" style="width: 100%; margin: 0px;text-align: left;">
+                        <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 9pt;color:#000000;font-weight: normal;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','PHYSICAL_ADDRESS1').parameter_value}</h:outputLabel>
+                        <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 9pt;color:#000000;font-weight: normal;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','PHYSICAL_ADDRESS2').parameter_value}</h:outputLabel>
+                        <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 9pt;color:#000000;font-weight: normal;text-decoration: none;">#{langout['Email']}:#{companySetting.getEmail()} #{langout['Website']}:#{companySetting.getWebsite()}</h:outputLabel>
+                    </h:panelGrid>
+                    <h:panelGrid columns="1" style="width: 100%; margin: 0px;text-align: left;" bgcolor="#3B4E87">
+                        <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">#{langout['NOTE']} #{langout['TO']}</h:outputLabel>
+                    </h:panelGrid>
+                    <h:panelGrid columns="1" style="width: 100%; margin: 0px;text-align: left;">
+                        <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 12pt;color:#000000;font-weight: normal;text-decoration: none;">#{generalUserSetting.outputDetailParent.bill_transactor.transactorNames}</h:outputLabel>
+                        <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{generalUserSetting.outputDetailParent.bill_transactor.physicalAddress}</h:outputLabel>
+                        <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{generalUserSetting.outputDetailParent.bill_transactor.email} #{generalUserSetting.outputDetailParent.bill_transactor.phone}</h:outputLabel>
+                        <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.taxIdentity.length()>0}">TIN:#{generalUserSetting.outputDetailParent.bill_transactor.taxIdentity}</h:outputLabel>
+                        <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 12pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{generalUserSetting.outputDetailParent.bill_transactor.transactorId!=generalUserSetting.outputDetailParent.transactor.transactorId}">For: #{generalUserSetting.outputDetailParent.transactor.transactorNames}</h:outputLabel>
+                    </h:panelGrid>
+                    <h:panelGrid columns="1" style="width: 100%; margin: 0px;text-align: right;">
+                        <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: bold;text-decoration: none;">(#{generalUserSetting.outputDetailParent.trans.currencyCode})</h:outputLabel>
+                    </h:panelGrid>
+                    <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                        <tr style="background-color:#3B4E87;">
+                            <td style="text-align: left;width: 2%;font-family:'Montserrat', sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
+                                #
+                            </td>
+                            <td style="text-align: left;width: 33%;font-family:'Montserrat', sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
+                                #{langout['DESCRIPTION']}
+                            </td>
+                            <td style="text-align: right;width: 6%;font-family:'Montserrat', sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
+                                #{langout['QTY']}
+                            </td>
+                            <td style="text-align: right;width: 14%;font-family:'Montserrat', sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
+                                #{langout['UNIT']} #{langout['PRICE']}
+                            </td>
+                            <td style="text-align: right;width: 14%;font-family:'Montserrat', sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
+                                #{langout['UNIT']} VAT
+                            </td>
+                            <td style="text-align: right;width: 14%;font-family:'Montserrat', sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
+                                #{langout['UNIT']} #{langout['AMOUNT']}
+                            </td>
+                            <td style="text-align: right;width: 16%;font-family:'Montserrat', sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">
+                                #{langout['AMOUNT']}
+                            </td>
+                        </tr>
+                        <ui:repeat var="ti" value="#{generalUserSetting.outputDetailParent.trans_items}">
+                            <tr style="background-color:#{(ti.item_no%2) eq 0 ? '#D2D2D2' : 'white'};">
+                                <td style="text-align: left;font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                                    <h:outputLabel  style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{ti.item_no}" escape="false"/>
+                                </td>
+                                <td style="text-align: left;font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                                    <h:outputLabel  style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{transItemBean.showItemDescriptionCEC(ti)} (#{ti.unitSymbol})" escape="false"/>
+                                </td>
+                                <td style="text-align: right;font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                                    #{utilityBean.formatDoubleToString(ti.itemQty)}
+                                    #{transItemBean.getSpecificSizeQtyFromQtyAndSizeStr(ti)}
+                                </td>
+                                <td style="text-align: right;font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                                    #{utilityBean.formatDoubleToStringHide(ti.unitPriceExcVat,itemBean.getItem(ti.itemId).hide_unit_price_invoice)}
+                                </td>
+                                <td style="text-align: right;font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                                    #{utilityBean.formatDoubleToStringHide(ti.unitVat,itemBean.getItem(ti.itemId).hide_unit_price_invoice)}
+                                </td>
+                                <td style="text-align: right;font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                                    #{utilityBean.formatDoubleToStringHide(ti.unitPriceIncVat,itemBean.getItem(ti.itemId).hide_unit_price_invoice)}
+                                </td>
+                                <td style="text-align: right;font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                                    #{utilityBean.formatDoubleToString(ti.amountIncVat)}
+                                </td>
+                            </tr>
+                        </ui:repeat>
+                        <ui:repeat var="itn" value="#{generalUserSetting.outputDetailParent.total_items_list}">
+                            <tr>
+                                <td style="text-align: left;font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                                    &#160;
+                                </td>
+                                <td style="text-align: left;font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                                    &#160;
+                                </td>
+                                <td style="text-align: right;font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                                    &#160;
+                                </td>
+                                <td style="text-align: right;font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                                    &#160;
+                                </td>
+                                <td style="text-align: right;font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                                    &#160;
+                                </td>
+                                <td style="text-align: right;font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                                    &#160;
+                                </td>
+                                <td style="text-align: right;font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">
+                                    &#160;
+                                </td>
+                            </tr>
+                        </ui:repeat>
+                    </table>
+                    <h:panelGrid columns="4" style="width: 100%; margin: 0px;">
+                        <h:panelGrid columns="1" style="float: left;text-align: left;">
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: bold;text-decoration: none;">#{langout['Make']} #{langout['all']} #{langout['checks']} #{langout['payable']} #{langout['to']}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: bold;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','PAYEE_NAME').parameter_value}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','ACC_DETAIL1').parameter_value}</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','ACC_DETAIL2').parameter_value}</h:outputLabel>
+                        </h:panelGrid>
+                        <h:panelGrid>
+                        </h:panelGrid>
+                        <h:panelGrid>
+                            <h:panelGrid rendered="#{companySetting.EShowVatAnalysisInvoice.equals('Yes')}" columns="3" style="margin: 0px;text-align: right;">
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;" value="VAT #{langout['Rate']}(%)"/>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{langout['Amount']}"/>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;" value="VAT"/>
+
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{langout['Standard']}(#{utilityBean.formatDoubleToString(generalUserSetting.outputDetailParent.trans.vatPerc)})">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.totalStdVatableAmount}">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.totalVat}">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
+
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{langout['Zero']}(0)"/>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.totalZeroVatableAmount}">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;" value="0"/>
+
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{langout['Exempt']}(-)"/>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.totalExemptVatableAmount}">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;" value="0"/>
+
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{langout['Deemed']}(#{utilityBean.formatDoubleToString(generalUserSetting.outputDetailParent.trans.vatPerc)})">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.totalDeemedVatableAmount}">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 8pt;color:#000000;font-weight: normal;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.totalDeemedVat}">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputLabel>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                        <h:panelGrid columns="3" style="float:right;text-align: right;">
+                            <h:outputLabel value=""/>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;">#{langout['Subtotal']}:</h:outputLabel>
+                            <h:outputText style="font-family:'Montserrat', sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.subTotal}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 9pt;color:#000000;font-weight: normal;text-decoration: none;" rendered="#{generalUserSetting.outputDetailParent.trans.cashDiscount>0}">#{utilityBean.formatDoubleToString(generalUserSetting.outputDetailParent.trans.cash_dicsount_perc)}%</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;" rendered="#{generalUserSetting.outputDetailParent.trans.cashDiscount>0}">#{langout['Discount']}:</h:outputLabel>
+                            <h:outputText style="font-family:'Montserrat', sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.cashDiscount}" rendered="#{generalUserSetting.outputDetailParent.trans.cashDiscount>0}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 9pt;color:#000000;font-weight: normal;text-decoration: none;">#{utilityBean.formatDoubleToString(generalUserSetting.outputDetailParent.trans.vatPerc)}%</h:outputLabel>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;">VAT:</h:outputLabel>
+                            <h:outputText style="font-family:'Montserrat', sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.totalVat}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+
+                            <h:outputLabel value=""/>
+                            <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 14pt;color:#000000;font-weight: bold;text-decoration: none;">#{langout['TOTAL']} (#{generalUserSetting.outputDetailParent.trans.currencyCode}):</h:outputLabel>
+                            <h:outputLabel style="border-bottom-style: groove;font-family:'Montserrat', sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;" value="#{generalUserSetting.outputDetailParent.trans.grandTotal}">
+                                <f:convertNumber pattern="#{accCurrencyBean.getNumberFormatByCurrency(generalUserSetting.outputDetailParent.trans.currencyCode)}" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputLabel>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <h:panelGrid columns="1" style="float:right;text-align: right;" rendered="#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','OUTPUT_SHOW_AMOUNT_IN_WORDS').parameter_value.equals('1')}">
+                        <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 12pt;color:#000000;font-weight: bold;text-decoration: none;float:right;text-align: right;">#{generalUserSetting.outputDetailParent.transAmountInWords}</h:outputLabel>
+                    </h:panelGrid>
+                    <h:panelGrid columns="1" style="width: 100%; margin: 0px;text-align: left;" bgcolor="#3B4E87">
+                        <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 11pt;color:#FFFFFF;font-weight: bold;text-decoration: none;">#{langout['NOTED']} #{langout['BY']}</h:outputLabel>
+                    </h:panelGrid>
+                    <h:panelGrid columns="3" style="width: 100%; margin: 0px;text-align: left;">
+                        <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: bold;text-decoration: none;">#{generalUserSetting.outputDetailParent.trans_user_detail.firstName} #{generalUserSetting.outputDetailParent.trans_user_detail.secondName}</h:outputLabel>
+                        <h:panelGrid id="pnlgBarCode" columns="1" style="margin: 0px;border:none;" rendered="#{generalUserSetting.outputDetailParent.trans.qr_code_tax.length() gt 0}">  
+                            <p:barcode id="barCODEqr" value="#{generalUserSetting.outputDetailParent.trans.qr_code_tax}" type="qr" style="width: 176px;height: 128px;"/>
+                        </h:panelGrid>
+                        <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 11pt;color:#000000;font-weight: bold;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','FOOTER_MESSAGE').parameter_value}</h:outputLabel>
+                    </h:panelGrid>
+                </h:panelGrid>
+            </ui:composition>
+        </h:form>
+    </h:body>
+</html>
+

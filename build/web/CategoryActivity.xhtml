@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Category Activity</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{navigationBean.checkAccessDenied(utilityBean.convertIntAsString(88), 'View')}"/>
+    </f:metadata> 
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="form" styleClass="clsMainFrom">
+
+            <h:panelGrid styleClass="clsGridMainHeader" columns="2">
+                <h:outputLabel styleClass="clsLabelTop" id="olblUnitHeader" value="#{langsys['Activity']} #{langsys['Category']}"/>
+                <p:commandButton icon="fa fa-fw fa-arrow-left" style="width: 120px;height: 40px;color: white;background-color: black;" id="cmdbNew" value="#{langsys['BACK']}"  action="#{navigationBean.redirectToSourceXhtmlFile()}" />
+            </h:panelGrid>
+
+            <h:panelGrid id="pnlInput" styleClass="clsGridMainInput" columns="6">
+                <h:outputLabel  value="#{langsys['Activity']} #{langsys['Category']}:"/>
+                <h:inputText styleClass="clsInput" id="itxtUnitName" value="#{category_activity.category_name}" autocomplete="off" style="width: 250px;"> 
+                </h:inputText>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainCommands" columns="1">
+                <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
+                    <h:commandButton styleClass="clsButton" id="cmdbSave" value="#{langsys['Save']}">
+                        <f:ajax listener="#{category_activityBean.saveCategoryActivity(category_activity)}" execute="pnlInput" render="growl1 pnlInput dtblDetail" />
+                    </h:commandButton>
+                    <h:commandButton styleClass="clsButton" id="cmdbClear" value="#{langsys['Clear']}">
+                        <f:ajax listener="#{category_activityBean.clearCategory_activity(category_activity)}" execute="pnlInput" render="pnlInput" />
+                    </h:commandButton>
+                    <h:commandButton styleClass="clsButton" id="cmdbDelete" value="#{langsys['Delete']}" onclick="return confirmDelete();">
+                        <f:ajax listener="#{category_activityBean.deleteCategory_activity(category_activity)}" execute="@form" render="@form" />
+                    </h:commandButton>
+                </h:panelGrid>
+            </h:panelGrid>
+            <p:growl id="growl1"/>
+            <h:panelGrid styleClass="clsGridMainSearch" columns="1">
+                <h:outputLabel id="olblMainSearch" value="#{langsys['Search']} #{langsys['Category']} #{langsys['Activity']}"/>
+                <h:inputText id="itxtMainSearch" value="#{category_activityBean.searchCategoryActivityName}" autocomplete="false">
+                    <f:ajax event="keyup" render="dtblDetail"/>
+                </h:inputText>
+            </h:panelGrid>
+
+            <p:dataTable id="dtblDetail" value="#{category_activityBean.getCategory_activityByCategory_activityName(category_activityBean.searchCategoryActivityName)}" var="sc" 
+                         > 
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Category']} #{langsys['Activity']} #{langsys['Name']}</f:facet>
+                    <!-- row record -->
+                    #{sc.category_name}
+                </p:column>
+
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Action']}</f:facet>
+                    <!-- row record -->
+                    <h:commandLink value="#{langsys['Edit']}">
+                        <f:ajax listener="#{category_activityBean.displayCategory_activity(sc, category_activity)}" execute="@form" render="@form"/>
+                    </h:commandLink>
+                    &nbsp;
+                </p:column>
+
+            </p:dataTable>
+
+        </h:form>
+    </h:body>
+</html>
+

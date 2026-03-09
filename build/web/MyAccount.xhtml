@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>My Account</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:event listener="#{navigationBean.checkAccessDeniedHome()}" type="preRenderView" />
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="form" styleClass="clsMainFrom">
+
+            <h:panelGrid styleClass="clsGridMainHeader" columns="1">
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="#{langsys['My']} #{langsys['Account']} #{langsys['Details']}"/>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainInput" columns="2">
+                <h:outputLabel  value="#{langsys['Username']}:"/>
+                <h:inputText styleClass="clsInput" id="itxtUserName" value="#{generalUserSetting.getCurrentUser().userName}" disabled="true">
+                </h:inputText>
+
+                <h:outputLabel  value="#{langsys['User']} #{langsys['Account']} #{langsys['Names']}:"/>
+                <h:inputText styleClass="clsInput" id="itxtNames" value="#{generalUserSetting.getCurrentUserNames()}" disabled="true">
+                </h:inputText>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainInput" columns="2" style="background-color: bisque">
+                <h:outputLabel  value="#{langsys['Old']} #{langsys['Password']}:"/>
+                <h:inputSecret styleClass="clsInput" id="isecOldUserPassword" value="#{userDetail.oldUserPassword}" redisplay="true">
+                </h:inputSecret>
+
+                <h:outputLabel  value="#{langsys['New']} #{langsys['Password']}:" title="#{langsys['New']} #{langsys['password']} #{langsys['MUST']} #{langsys['be']} #{langsys['between']} 5-to-20 #{langsys['characters']}"/>
+                <h:inputSecret styleClass="clsInput" id="isecNewUserPassword" value="#{userDetail.newUserPassword}" redisplay="true">
+                </h:inputSecret>
+
+                <h:outputLabel  value="#{langsys['Confirm']} #{langsys['New']} #{langsys['Password']}:" title="#{langsys['Re-enter']} #{langsys['new']} #{langsys['password']} #{langsys['to']} #{langsys['confirm']}"/>
+                <h:inputSecret styleClass="clsInput" id="isecNewUserPasswordConfirm" value="#{userDetail.newUserPasswordConfirm}" redisplay="true">
+                </h:inputSecret>
+                
+                <p:commandButton styleClass="clsButtonBig" id="cmdbChangePassword" value="#{langsys['Change']} #{langsys['Password']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{userDetailBean.changePassword(userDetail)}" process="@form" update="pgrdMsgs growl1"/>
+                </p:commandButton>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainInput" columns="2" style="background-color: bisque">
+                <h:outputLabel  value="#{langsys['New']} #{langsys['User']} #{langsys['Code']}:"/>
+                <h:inputSecret styleClass="clsInput" id="isecTrans_code" value="#{userDetail.new_trans_code}" redisplay="true" autocomplete="off">
+                </h:inputSecret>
+                <p:commandButton styleClass="clsButtonBig" id="cmdbChangeUserCode" value="#{langsys['Change']} #{langsys['User']} #{langsys['Code']}" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{userDetailBean.changeTransCode(userDetail)}" process="@form" update="pgrdMsgs growl1"/>
+                </p:commandButton>
+            </h:panelGrid>
+
+            <h:panelGrid id="pgrdMsgs" styleClass="clsGridMainMessages" columns="1">
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{userDetailBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
+            <p:growl id="growl1"/>
+
+        </h:form>
+    </h:body>
+</html>
+

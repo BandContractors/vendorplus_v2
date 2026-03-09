@@ -1,0 +1,140 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>VendorPlus</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <style>
+            :root {
+                --vp-green: #7BC043;
+                --vp-blue: #1F3A5F;
+                --vp-ink: #132033;
+                --vp-mist: #EEF5FB;
+            }
+
+            .home-hero {
+                margin: 2.5rem auto 0;
+                width: min(1200px, 96%);
+                background: linear-gradient(140deg, #F7FAFD 0%, #E9F3FF 45%, #F3FFF7 100%);
+                border: 1px solid #D7E5F2;
+                border-radius: 18px;
+                display: grid;
+                grid-template-columns: minmax(320px, 1.1fr) minmax(280px, 0.9fr);
+                gap: 1.75rem;
+                padding: 2rem;
+                box-shadow: 0 18px 40px rgba(19, 32, 51, 0.08);
+            }
+
+            .home-hero__content h1 {
+                margin: 0 0 0.5rem 0;
+                color: var(--vp-blue);
+                font-size: 2.2rem;
+                letter-spacing: 1px;
+            }
+
+            .home-hero__content p {
+                margin: 0 0 1.5rem 0;
+                color: var(--vp-ink);
+                font-size: 1rem;
+                max-width: 520px;
+            }
+
+            .home-actions {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+                gap: 0.85rem;
+            }
+
+            .home-action {
+                background: #ffffff;
+                border: 1px solid #CFE0EE;
+                color: var(--vp-ink);
+                border-radius: 12px;
+                padding: 0.85rem 1rem;
+                font-weight: bold;
+                cursor: pointer;
+                transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+            }
+
+            .home-action:hover {
+                transform: translateY(-2px);
+                border-color: var(--vp-blue);
+                box-shadow: 0 10px 18px rgba(31, 58, 95, 0.12);
+            }
+
+            .home-action.primary {
+                background: var(--vp-green);
+                border-color: var(--vp-green);
+                color: #ffffff;
+            }
+
+            .home-action.primary:hover {
+                box-shadow: 0 12px 20px rgba(123, 192, 67, 0.25);
+            }
+
+            .home-hero__media {
+                min-height: 280px;
+                border-radius: 16px;
+                background-image: url('resources/images/vendorplus.jpeg');
+                background-size: cover;
+                background-position: center;
+                position: relative;
+                overflow: hidden;
+                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+            }
+
+            .home-hero__media::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(145deg, rgba(31, 58, 95, 0.5), rgba(31, 58, 95, 0.1));
+            }
+
+            .home-note {
+                width: min(1200px, 96%);
+                margin: 1.5rem auto 0;
+                color: #B00020;
+                text-align: center;
+                font-weight: bold;
+            }
+
+            @media (max-width: 900px) {
+                .home-hero {
+                    grid-template-columns: 1fr;
+                }
+
+                .home-hero__media {
+                    min-height: 220px;
+                }
+            }
+        </style>
+    </h:head>
+    <f:event listener="#{navigationBean.checkAccessDeniedHome()}" type="preRenderView" />
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <div class="home-hero">
+            <div class="home-hero__content">
+                <h1>VendorPlus</h1>
+                <p>Jump straight into your most used workflows with quick actions below.</p>
+                <h:form styleClass="home-actions">
+                    <h:commandButton styleClass="home-action primary" value="Wholesale Invoice" action="#{navigationBean.redirectToWholeSaleInvoice()}" />
+                    <h:commandButton styleClass="home-action primary" value="Retail Sale Invoice" action="#{navigationBean.redirectToRetailSaleInvoice()}" />
+                    <h:commandButton styleClass="home-action primary" value="Purchase Invoice" action="#{navigationBean.redirectToPurchaseInvoiceGoods()}" />
+                    <h:commandButton styleClass="home-action primary" value="Record Expense" action="#{navigationBean.redirectToExpenseEntry()}" />
+                    <h:commandButton styleClass="home-action primary" value="Stock Valuation" action="#{navigationBean.redirectToReportStock()}" />
+                    <h:commandButton styleClass="home-action primary" value="Activity Report" action="DashboardDayClose?faces-redirect=true" />
+                </h:form>
+            </div>
+            <div class="home-hero__media" aria-label="VendorPlus" role="img"></div>
+        </div>
+        <div class="home-note">
+            <h:outputLabel id="outlNavMsg" value="#{navigationBean.navMsg}" />
+        </div>
+    </h:body>
+</html>
+

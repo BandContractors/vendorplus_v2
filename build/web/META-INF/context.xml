@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context antiJARLocking="true" path="/TillMaster">
+  <Resource auth="Container" driverClassName="com.mysql.jdbc.Driver" initialSize="5" jdbcInterceptors="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer" jmxEnabled="true" logAbandoned="false" maxActive="100" maxIdle="30" maxWait="10000" minEvictableIdleTimeMillis="60000" minIdle="5" name="jdbc/BranchPool" password="" poolPreparedStatements="true" removeAbandoned="true" removeAbandonedTimeout="300" testOnBorrow="true" testOnReturn="false" testWhileIdle="true" timeBetweenEvictionRunsMillis="30000" type="javax.sql.DataSource" url="jdbc:mysql://localhost:3307/vendorplus?autoReconnect=true" username="root" validationQuery="SELECT 1" validationQueryTimeout="5"/>
+</Context>

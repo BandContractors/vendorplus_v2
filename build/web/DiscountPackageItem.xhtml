@@ -1,0 +1,194 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Trade Discount Package Items</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:event listener="#{navigationBean.checkAccessDenied('8', 'View')}" type="preRenderView" />
+    <f:event listener="#{discountPackageItemBean.initClearDiscountPackageItem(discountPackageItem,itemBean.selectedItem)}" type="preRenderView" />
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="TransactionFormDiscountPackageItem" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
+                    return false;">
+
+            <h:panelGrid styleClass="clsGridMainHeader" columns="1">
+                <h:outputLabel styleClass="clsLabelTop" id="olblTransactionHeader" value="Trade Discount Package Items"/>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainInput" columns="2">
+
+                <h:outputLabel  value="#{companySetting.getStoreEquivName()}:"/>
+                <h:selectOneMenu styleClass="clsMenu" id="menuStore" value="#{discountPackageItem.storeId}" >
+                    <f:selectItem itemLabel="" itemValue="0"/>
+                    <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
+                    <f:ajax event="change" execute="@this" render="dtblDiscountPackageItem"/>
+                </h:selectOneMenu>
+
+                <h:outputLabel  value="Discount Package:"/>
+                <h:selectOneMenu styleClass="clsMenu" id="menuDiscountPackage" value="#{discountPackageItem.discountPackageId}" >
+                    <f:selectItem itemLabel="" itemValue="0"/>
+                    <f:selectItems value="#{discountPackageBean.discountPackages}" var="dp" itemLabel="#{dp.packageName}" itemValue="#{dp.discountPackageId}"/>
+                    <f:ajax event="change" execute="@this" render="dtblDiscountPackageItem olblStartDate olblEndDate"/>
+                </h:selectOneMenu>
+
+                <h:outputLabel  value="Start Date:"/>
+                <h:outputLabel id="olblStartDate" value="#{utilityBean.formatDateTime(discountPackageBean.getDiscountPackage(discountPackageItem.discountPackageId).startDate)}" style="color: #{generalSetting.getStyleColorByDaysFromNow('DISCOUNT-EXPIRY-DATE',discountPackageBean.getDiscountPackage(discountPackageItem.discountPackageId).endDate)};"/>
+
+                <h:outputLabel  value="End Date:"/>
+                <h:outputLabel id="olblEndDate" value="#{utilityBean.formatDateTime(discountPackageBean.getDiscountPackage(discountPackageItem.discountPackageId).endDate)}" style="color: #{generalSetting.getStyleColorByDaysFromNow('DISCOUNT-EXPIRY-DATE',discountPackageBean.getDiscountPackage(discountPackageItem.discountPackageId).endDate)};"/>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainInput" columns="6">
+                <h:outputLabel  value="Item Description"/>
+                <h:outputLabel  style="width: 50px" value="Unit"/>
+                <h:outputLabel  style="width: 50px" value="Qty:"/>
+                <h:outputLabel  style="width: 200px" value="Retailsale Discount (%)"/>
+                <h:outputLabel  style="width: 200px" value="Wholesale Discount (%)"/>
+                <h:outputLabel  style="width: 200px" value="HirePrice Discount (%)"/>
+                <p:autoComplete id="autcItem" widgetVar="WautcItem" value="#{itemBean.selectedItem}"  
+                                completeMethod="#{itemBean.getItemObjectList}" 
+                                var="itm" 
+                                itemLabel="#{itm.description}" 
+                                itemValue="#{itm}" 
+                                converter="ItemConverter" style="text-align: left" 
+                                forceSelection="true" queryDelay="0" 
+                                >
+                    <p:column headerText="Item Description" style="text-align: left" >  
+                        #{itm.description} 
+                    </p:column>
+                    <p:column headerText="Alias" style="text-align: left" >  
+                        #{itm.alias_name} 
+                    </p:column>
+                    <p:column headerText="Unit Retailsale Price" style="text-align: left">  
+                        <h:outputLabel value="#{itm.unitRetailsalePrice}">
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputLabel>
+                    </p:column>
+                    <p:column headerText="Unit Wholesale Price" style="text-align: left">  
+                        <h:outputLabel value="#{itm.unitWholesalePrice}">
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputLabel>
+                    </p:column>
+                    <p:column headerText="Unit Hire Price" style="text-align: left">  
+                        <h:outputLabel value="#{itm.unit_hire_price}">
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputLabel>
+                    </p:column>
+                    <p:column headerText="Currency" style="text-align: left">
+                        <h:outputText value="#{itm.currencyCode}">
+                        </h:outputText>
+                    </p:column>
+                    <p:ajax event="itemSelect" listener="#{discountPackageItem.setItemId(itemBean.selectedItem.itemId)}" process="@this" update="itxtUnit dtblDiscountPackageItem"/>
+                    <p:ajax event="change" listener="#{discountPackageItem.setItemId(itemBean.selectedItem.itemId)}" rendered="#{itemBean.selectedItem!=null}" process="@this" update="itxtUnit dtblDiscountPackageItem"/>
+                </p:autoComplete>
+                <h:inputText id="itxtUnit" styleClass="clsInputTransItem" value="#{unitBean.getUnit(itemBean.getItem(discountPackageItem.itemId).getUnitId()).unitSymbol}" style="width: 50px" disabled="true"/>
+                <h:inputText id="itxtQty" styleClass="clsInputTransItem" style="width: 50px" value="#{discountPackageItem.itemQty}" autocomplete="off" disabled="true">
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                </h:inputText>
+                <h:inputText id="itxtRetailsaleDiscount" styleClass="clsInputTransItem" style="width: 200px" value="#{discountPackageItem.retailsaleDiscountAmt}" autocomplete="off">
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                </h:inputText>
+                <h:inputText id="itxtWholesaleDiscount" styleClass="clsInputTransItem" style="width: 200px" value="#{discountPackageItem.wholesaleDiscountAmt}" autocomplete="off">
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                </h:inputText>
+                <h:inputText id="itxtHirePriceDiscount" styleClass="clsInputTransItem" style="width: 200px" value="#{discountPackageItem.hire_price_discount_amt}" autocomplete="off">
+                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                </h:inputText>
+            </h:panelGrid>
+            <h:panelGrid styleClass="clsGridMainCommands" columns="1">
+                <h:panelGrid styleClass="clsGridMainCommands1" columns="2">
+                    <p:commandButton styleClass="clsButton" id="cmdbSave" value="Save">
+                        <p:ajax listener="#{discountPackageItemBean.saveDiscountPackageItem(discountPackageItem,itemBean.selectedItem)}" process="@form" update="@form" />
+                    </p:commandButton>
+                    <p:commandButton styleClass="clsButton" id="cmdbClear" value="Clear">
+                        <p:ajax listener="#{discountPackageItemBean.clearDiscountPackageItem(discountPackageItem,itemBean.selectedItem)}" process="@form" update="@form"/>
+                    </p:commandButton>
+                </h:panelGrid>
+            </h:panelGrid>
+            
+            <p:dataTable rowIndexVar="rowIndex" id="dtblDiscountPackageItem" value="#{discountPackageItemBean.getDiscountPackageItems(discountPackageItem.discountPackageId, discountPackageItem.storeId, discountPackageItem.itemId)}" var="dpi" 
+                         styleClass="cls-table" tableStyle="width:auto;" 
+                         >  
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Discount Package</f:facet>
+                    <!-- row record -->
+                    <h:outputLabel style="color: #{generalSetting.getStyleColorByDaysFromNow('DISCOUNT-EXPIRY-DATE',discountPackageBean.getDiscountPackage(dpi.discountPackageId).endDate)};" value="#{discountPackageBean.getDiscountPackage(dpi.discountPackageId).packageName}"/>
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{companySetting.getStoreEquivName()}</f:facet>
+                    <!-- row record -->
+                    <h:outputLabel style="color: #{generalSetting.getStyleColorByDaysFromNow('DISCOUNT-EXPIRY-DATE',discountPackageBean.getDiscountPackage(dpi.discountPackageId).endDate)};" value="#{storeBean.getStore(dpi.storeId).storeName}"/>
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Item Description</f:facet>
+                    <!-- row record -->
+                    <h:outputLabel style="color: #{generalSetting.getStyleColorByDaysFromNow('DISCOUNT-EXPIRY-DATE',discountPackageBean.getDiscountPackage(dpi.discountPackageId).endDate)};" value="#{itemBean.getItem(dpi.itemId).description}"/>
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Qty</f:facet>
+                    <!-- row record -->
+                    <h:outputLabel style="color: #{generalSetting.getStyleColorByDaysFromNow('DISCOUNT-EXPIRY-DATE',discountPackageBean.getDiscountPackage(dpi.discountPackageId).endDate)};" value="#{dpi.itemQty}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputLabel>
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Retailsale Discount (%)</f:facet>
+                    <!-- row record -->
+                    <h:outputLabel style="color: #{generalSetting.getStyleColorByDaysFromNow('DISCOUNT-EXPIRY-DATE',discountPackageBean.getDiscountPackage(dpi.discountPackageId).endDate)};" value="#{dpi.retailsaleDiscountAmt}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputLabel>
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Wholesale Discount (%)</f:facet>
+                    <!-- row record -->
+                    <h:outputLabel style="color: #{generalSetting.getStyleColorByDaysFromNow('DISCOUNT-EXPIRY-DATE',discountPackageBean.getDiscountPackage(dpi.discountPackageId).endDate)};" value="#{dpi.wholesaleDiscountAmt}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputLabel>
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">HirePrice Discount (%)</f:facet>
+                    <!-- row record -->
+                    <h:outputLabel style="color: #{generalSetting.getStyleColorByDaysFromNow('DISCOUNT-EXPIRY-DATE',discountPackageBean.getDiscountPackage(dpi.discountPackageId).endDate)};" value="#{dpi.hire_price_discount_amt}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputLabel>
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">Action</f:facet>
+                    <!-- row record -->
+                    <p:commandButton styleClass="clsButtonMedium" value="Delete">
+                        <p:ajax listener="#{discountPackageItemBean.deleteDiscountPackageItem(dpi)}" process="@form" update="@form"/>
+                    </p:commandButton>
+                </p:column> 
+            </p:dataTable>
+            <h:panelGrid styleClass="clsGridMainMessages" columns="1">
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{discountPackageItemBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
+        </h:form>
+    </h:body>
+</html>
+

@@ -1,0 +1,169 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Item Combination</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:event listener="#{navigationBean.checkAccessDenied('8', 'View')}" type="preRenderView" />
+    <f:metadata>
+        <f:viewAction action="#{itemBean.clearItem(itemBean.selectedItem)}"/>
+        <f:viewAction action="#{itemBean.clearItem(itemBean.selectedItemX)}"/>
+    </f:metadata>
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="ItemMapForm" styleClass="clsMainFrom" onkeypress="if (event.keyCode == 13)
+                    return false;">
+            <h:panelGrid styleClass="clsGridMainHeader" columns="1">
+                <h:outputLabel styleClass="clsLabelTop" id="olblItemMapHeader" value="#{langsys['Product']} #{langsys['Inputs']}"/>
+            </h:panelGrid>
+
+            <h:panelGrid id="gridParentItem" styleClass="clsGridMainInput" columns="3">
+                <p:outputLabel value="#{langsys['Product']} (#{langsys['Output']})"/>
+                <p:autoComplete id="autcItem1" widgetVar="WautcItem1" value="#{itemBean.selectedItem}"  
+                                completeMethod="#{itemBean.getItemObjectListForProduction}" 
+                                var="itm" 
+                                itemLabel="#{itm.description}" 
+                                itemValue="#{itm}" 
+                                converter="ItemConverter" style="text-align: left" 
+                                forceSelection="true" queryDelay="0" 
+                                >
+                    <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="text-align: left" >  
+                        #{itm.description} 
+                    </p:column>
+                    <p:column headerText="#{langsys['Alias']}" style="text-align: left" >  
+                        #{itm.alias_name} 
+                    </p:column>
+                    <p:ajax event="blur" listener="#{itemProductionMap.setOutputItemId(itemBean.selectedItem.itemId)}" process="@this" update="menuUnit1"/>
+                    <p:ajax event="blur" listener="#{itemProductionMapBean.refreshChildList(itemProductionMap.outputItemId, itemProductionMapBean.itemProductionMapsList)}" process="@this" update="dtblList"/>
+                </p:autoComplete>
+                <p:selectOneMenu id="menuUnit1" styleClass="clsMenu" value="#{itemProductionMap.output_unit_id}">
+                    <f:selectItems value="#{itemBean.getItemUnitList(itemProductionMap.outputItemId, null, 1)}" var="iu" itemLabel="#{iu.unit_symbol}" itemValue="#{iu.unit_id}"/>
+                </p:selectOneMenu>
+            </h:panelGrid>
+            <p:fieldset legend="#{langsys['Raw Material']} (#{langsys['Input']})">
+                <h:panelGrid id="gridChildItems" columns="4">
+                    <p:outputLabel value="#{langsys['Item']} #{langsys['Description']}"/>
+                    <p:outputLabel value="#{langsys['Unit']}"/>
+                    <p:outputLabel value="#{langsys['Qty']}"/>
+                    <p:outputLabel value=""/>
+                    <p:autoComplete id="proItem" widgetVar="WproItem" value="#{itemBean.selectedItemX}"  
+                                    completeMethod="#{itemBean.getItemObjectListForRawMaterial}" 
+                                    var="pro_itm" 
+                                    itemLabel="#{pro_itm.description}" 
+                                    itemValue="#{pro_itm}" 
+                                    converter="ItemConverter" style="text-align: left" 
+                                    forceSelection="true" queryDelay="0" 
+                                    >
+                        <p:column headerText="#{langsys['Item']} #{langsys['Description']}" style="text-align: left" >  
+                            #{pro_itm.description} 
+                        </p:column> 
+                        <p:column headerText="#{langsys['Item']} #{langsys['Code']}" style="text-align: left" >  
+                            #{pro_itm.itemCode} 
+                        </p:column> 
+                        <p:column headerText="#{langsys['Currency']}" style="text-align: left">
+                            <h:outputText value="#{pro_itm.currencyCode}">
+                            </h:outputText>
+                        </p:column>
+                        <p:ajax event="itemSelect" listener="#{itemProductionMap.setInputItemId(itemBean.selectedItemX.itemId)}" process="@this" update="menuUnit2"/>
+                        <p:ajax event="change" listener="#{itemProductionMap.setInputItemId(itemBean.selectedItemX.itemId)}" rendered="#{itemBean.selectedItemX!=null}" process="@this" update="menuUnit2"/>
+                    </p:autoComplete>
+                    <p:selectOneMenu id="menuUnit2" styleClass="clsMenu" value="#{itemProductionMap.input_unit_id}">
+                        <f:selectItems value="#{itemBean.getItemUnitList(itemProductionMap.inputItemId, null, 1)}" var="iu" itemLabel="#{iu.unit_symbol}" itemValue="#{iu.unit_id}"/>
+                    </p:selectOneMenu>
+                    <p:inputText value="#{itemProductionMap.inputQty}"/>                    
+                    <p:commandButton id="cmdbAddItem" value="#{langsys['Add']} #{langsys['Item']}" >
+                        <p:ajax listener="#{itemProductionMapBean.addItem(itemProductionMap,itemProductionMapBean.itemProductionMapsListEdit,itemBean.selectedItemX)}" process="@form" update="gridChildItems dtblListEdit growl1"/>
+                    </p:commandButton>
+                </h:panelGrid>
+                <p:growl id="growl1" sticky="true"/>
+                <p:dataTable rowIndexVar="rowIndex" style="table-layout: auto;" id="dtblListEdit" value="#{itemProductionMapBean.itemProductionMapsListEdit}" var="itm1" 
+                             styleClass="cls-table" 
+                             >
+                    <p:column>
+                        <!-- column header -->
+                        <f:facet name="header">#{langsys['Raw Material']}(#{langsys['Input']})</f:facet>
+                        <!-- row record -->
+                        #{itm1.inputItemName}
+                    </p:column>
+                    <p:column style="width: 100px;">
+                        <!-- column header -->
+                        <f:facet name="header">#{langsys['Qty']}(#{langsys['Input']})</f:facet>
+                        <!-- row record -->
+                        #{utilityBean.formatDoubleToString(itm1.inputQty)} #{itm1.inputItemUnit}
+                    </p:column>
+                    <p:column style="width: 100px;">
+                        <!-- column header -->
+                        <f:facet name="header"></f:facet>
+                        <!-- row record -->
+                        <h:commandLink value="Remove" action="#{itemProductionMapBean.itemProductionMapsListEdit.remove(itm1)}">
+                            <f:ajax execute="@form" render="dtblListEdit"/>
+                        </h:commandLink>
+                    </p:column> 
+                </p:dataTable>
+                <h:commandButton styleClass="clsButtonBig" value="#{langsys['Save']}" >
+                    <f:ajax listener="#{itemProductionMapBean.saveItemProductionMap(itemProductionMap,itemProductionMapBean.itemProductionMapsListEdit,itemProductionMapBean.itemProductionMapsList)}" execute="gridParentItem gridChildItems" render="dtblList growl2"/>
+                </h:commandButton>
+            </p:fieldset>
+            <p:growl id="growl2" sticky="true"/>
+            <p:dataTable rowIndexVar="rowIndex" style="table-layout: auto;" id="dtblList" value="#{itemProductionMapBean.itemProductionMapsList}" var="itm2" 
+                         styleClass="cls-table" 
+                         >  
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Product']} (#{langsys['Output']})</f:facet>
+                    <!-- row record -->
+                    #{itm2.outputItemName}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Qty']} (#{langsys['Output']})</f:facet>
+                    <!-- row record -->
+                    1 #{itm2.outputItemUnit}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Raw Material']} (#{langsys['Input']})</f:facet>
+                    <!-- row record -->
+                    #{itm2.inputItemName}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Qty']} (#{langsys['Input']})</f:facet>
+                    <!-- row record -->
+                    #{utilityBean.formatDoubleToString(itm2.inputQty)} #{itm2.inputItemUnit}
+                </p:column>
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header"></f:facet>
+                    <!-- row record -->
+                    <h:commandLink value="#{langsys['Delete']}" action="#{itemProductionMapBean.deleteItemProductionMap(itm2,itemProductionMap,itemProductionMapBean.itemProductionMapsList)}" onclick="return confirmDelete();">
+                        <f:ajax execute="@form" render="ItemMapForm:dtblList ItemMapForm:growl2"/>
+                    </h:commandLink>
+                </p:column> 
+            </p:dataTable>
+
+            <h:panelGrid id="grdMainMessages" styleClass="clsGridMainMessages" columns="1">
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{itemProductionMapBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
+
+        </h:form>
+    </h:body>
+</html>
+

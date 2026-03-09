@@ -1,0 +1,315 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+
+*{
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 16px;
+}
+
+body, input, button, select, textarea, label, .ui-widget, .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
+    font-family: 'Montserrat', sans-serif !important;
+}
+tr {
+    display: table-row;
+    vertical-align:top;
+    border-color: inherit;
+}
+.cls-table{   
+    border-collapse:collapse;
+    margin-left: 5px;
+    margin-bottom: 10px;
+    padding-right: 5px;
+}
+
+.cls-table-header{
+    text-align:left;
+    background:none repeat scroll 0 0 #E5E5E5;
+    border:1px solid black;
+    color:black;
+    font-weight: bold;
+    padding-right: 5px;
+}
+
+.cls-table-odd-row{
+    text-align:left;
+    background:none repeat scroll 0 0 #FFFFFF;
+    border:1px solid #BBBBBB;
+    padding-right: 5px;
+}
+
+.cls-table-even-row{
+    text-align:left;
+    background:none repeat scroll 0 0 #F9F9F9;
+    border:1px solid #BBBBBB;
+    padding-right: 5px;
+}
+.cls-table-col1{
+    border: 1px solid;
+    padding-right: 5px;
+}
+.cls-table-col2{
+    border: 1px solid;
+    padding-right: 5px;
+}
+.cls-table-col3{
+    border: 1px solid;
+    padding-right: 5px;
+}
+.cls-table-col4{
+    border: 1px solid;
+    padding-right: 5px;
+}
+.cls-table-col5{
+    border: 1px solid;
+    padding-right: 5px;
+}
+.cls-table-col6{
+    border: 1px solid;
+    padding-right: 5px;
+}
+.cls-table-col7{
+    border: 1px solid;
+    padding-right: 5px;
+}
+.cls-table-col8{
+    border: 1px solid;
+    padding-right: 5px;
+}
+.cls-table-col9{
+    border: 1px solid;
+    padding-right: 5px;
+}
+.cls-table-col10{
+    border: 1px solid;
+    padding-right: 5px;
+}
+.clsActionMessage{
+    color: green;
+}
+.clsMainFrom{
+    border: 5px solid;
+    width: 1100px;
+    border-color: #1F3A5F;
+}
+.clsMainFromNew{
+    border: 5px solid;
+    width: 1170px;
+}
+.clsLikeMainFromWidth{
+    width: 1100px;
+}
+#TransactionForm{
+    width: 1100px;
+}
+.clsGridApprove{
+    width: 1100px;
+}
+.clsGridMainHeader{
+    /* width: 1100px; */
+    width: 1100px;
+    background-color: #1F3A5F;
+}
+.clsGridMainHeaderChild{
+    width: 1060px;
+    background-color: black;
+}
+.clsLabelTop{
+    color: white;
+    font-weight: bold;
+}
+.clsGridMainCommands{
+    width: 1100px;
+    background-color: #1F3A5F;
+}
+.clsGridMainCommandsChild{
+    width: 1060px;
+    background-color: #1F3A5F;
+}
+.clsGridMainCommands1{
+    width: 395px;
+    background-color: #1F3A5F;
+}
+.clsGridMainCommands2{
+    width: 395px;
+    background-color: black;
+}
+.clsButton{
+    width: 100px;
+}
+.clsButtonBigLonger{
+    width: 400px;
+    height:60px;
+    font-size: 20px; 
+}
+.clsButtonBig{
+    width: 200px;
+    height:60px;
+    font-size: 20px; 
+}
+.clsButtonBigSave{
+    width: 200px;
+    height:60px;
+    font-size: 20px; 
+    background-color: #7BC043;
+    color:  white;
+}
+.clsButtonBigClear{
+    width: 200px;
+    height:60px;
+    font-size: 20px;
+    background-color: #FF0000;
+    color:  white;
+}
+.clsButtonVeryBig{
+    width: 400px;
+    height:50px;
+    font-size: 20px; 
+}
+.clsButtonMedium{
+    width: 210px;
+    height:40px;
+    font-size: 20px; 
+}
+#dtblTransactorA{
+    position:fixed;
+    left: 0px;
+    top: 0px;
+    z-index: -100;
+}
+.clsSuccessStatus{
+    color: green;
+}
+.clsFailStatus{
+    color: red;
+}
+
+.cls-table-SalesInvoice{   
+    border-collapse: collapse;
+    margin-left: 0px;
+    margin-bottom: 0px;
+    padding-right: 0px;
+    border-style:solid;
+    border-width:1px;
+    width: 350px;
+}
+.cls-table-SalesInvoice-very-small{   
+    border-collapse: collapse;
+    margin-left: 0px;
+    margin-bottom: 0px;
+    padding-right: 0px;
+    border-style:solid;
+    border-width:1px;
+    width: 290px;
+}
+
+.cls-table-header-SalesInvoice{
+    text-align:left;
+    border:1px solid black;
+    color:black;
+    font-weight: bold;
+    padding-right: 0px;
+    border-style: dotted;
+}
+
+.cls-table-odd-row-SalesInvoice{
+    text-align:left;
+    border:1px solid #BBBBBB;
+    padding-right: 0px;
+    border-style: dotted;
+}
+
+.cls-table-even-row-SalesInvoice{
+    text-align:left;
+    border:1px solid #BBBBBB;
+    padding-right: 0px;
+    border-style: dotted;
+}
+.cls-table-col1-SalesInvoice{
+    border: 1px solid;
+    padding-right: 0px;
+    border-style: dotted;
+    font-size: 12px;
+}
+.cls-table-col2-SalesInvoice{
+    border: 1px solid;
+    padding-right: 0px;
+    border-style: dotted;
+    font-size: 10px;
+}
+.cls-table-col3-SalesInvoice{
+    border: 1px solid;
+    padding-right: 0px;
+    border-style: dotted;
+}
+.cls-table-col4-SalesInvoice{
+    border: 1px solid;
+    padding-right: 0px;
+    border-style: dotted;
+}
+.cls-table-col5-SalesInvoice{
+    border: 1px solid;
+    padding-right: 0px;
+    border-style: dotted;
+}
+.clsPanelReportFilter{
+    width: 100%;
+    background-color: #ECEFF7;
+}
+.clsPanelReportFilterTitle{
+    width: 100%;
+    text-align: center;
+    background-color: #7BC043;
+}
+.clsPanelSummary{
+    width: 100%;
+    text-align: center;
+    background-color: #7BC043;
+}
+.clsLabelReportFilter{
+    float: right;
+}
+.clsLabelReportFilterTitle{
+    color: white;
+}
+.clsInputReportFilter{
+    float: left;
+}
+.clsButtonReportFilter{
+    text-align: center;
+}
+figure {
+    width: 150px;
+    text-align: center;
+    font-style: italic;
+    font-size: smaller;
+    text-indent: 0;
+    border: thin silver solid;
+    margin: 0.5em;
+    padding: 0.5em;
+}
+.green{
+    background-color: #238823 !important;
+    background-image: none !important;
+    color: #000000 !important;
+}
+.blue{
+    background-color: #007fff !important;
+    background-image: none !important;
+    color: #000000 !important;
+}
+.amber{
+    background-color: #ffbf00 !important;
+    background-image: none !important;
+    color: #000000 !important;
+}
+ .lightgreenrow{
+    background-color: #b6fcb6 !important;
+    color: #222;
+}
+    background-image: none !important;
+    color: #000000 !important;
+}
+.white{
+    background-color: white !important;
+    background-image: none !important;
+    color: #000000 !important;
+}

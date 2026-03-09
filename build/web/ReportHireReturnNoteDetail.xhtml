@@ -1,0 +1,198 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Report Hire Return Note Detail</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{navigationBean.checkAccessDenied('102', 'View')}"/>
+        <f:viewAction action="#{transBean.initResetSalesInvoiceDetail(trans,transBean,transactorBean.selectedBillTransactor,transactorBean.selectedTransactor)}"/>
+    </f:metadata>
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="formReport">
+            <h:panelGrid id="pnlgHeader" columns="3" styleClass="clsPanelReportFilterTitle">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="Hire Return Note Detail Report"/>
+                <p:commandLink id="cmdbToday" value="Today's Date" style="color: white;">
+                    <p:ajax listener="#{transBean.setDateToToday()}" process="@this" update="pnlgFilter"/>
+                </p:commandLink>
+                <p:commandLink id="cmdbYesturday" value="Yesterday's Date" style="color: white;">
+                    <p:ajax listener="#{transBean.setDateToYesturday()}" process="@this" update="pnlgFilter"/>
+                </p:commandLink>
+            </h:panelGrid>
+            <div class="ui-fluid">
+                <h:panelGrid id="pnlgFilter" columns="5" styleClass="clsPanelReportFilter">
+                    <p:outputLabel value="#{companySetting.getStoreEquivName()}"/>
+                    <p:outputLabel value="Date Type"/>
+                    <p:outputLabel value="From #{transBean.dateType}" id="lblDate1"/>
+                    <p:outputLabel value="To #{transBean.dateType}" id="lblDate2"/>
+                    <p:outputLabel value="#{transactionTypeBean.getTransactionType(67).transactionNumberLabel}"/>
+                    <p:selectOneMenu id="menuFromStore" value="#{trans.storeId}" >
+                        <f:selectItem itemLabel="Select" itemValue="0"/>
+                        <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
+                    </p:selectOneMenu>
+                    <p:selectOneMenu id="menuDateType" value="#{transBean.dateType}">
+                        <f:selectItem itemLabel="Select" itemValue=""/>
+                        <f:selectItem itemValue="Add Date" itemLabel="Add Date"/>
+                        <f:selectItem itemValue="Return Date" itemLabel="Return Date"/>
+                        <f:ajax event="change" execute="@this" render="lblDate1 lblDate2"/>
+                    </p:selectOneMenu>
+                    <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{transBean.date1}" size="12"/>
+                    <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{transBean.date2}" size="12"/>
+                    <p:inputText id="itxtInvoiceNo" value="#{trans.transactionNumber}"/>
+
+                    <p:outputLabel value="Added By"/>
+                    <h:outputLabel value="#{transactionTypeBean.getTransactionType(67).transactionUserLabel}"/>
+                    <p:outputLabel value="Bill For"/>
+                    <p:outputLabel value="#{menuItemBean.menuItemObj.CUSTOMER_NAME}"/>                
+                    <h:outputLabel value="SUMMARIZE RESULTS BY:"/>
+                    <p:selectOneMenu id="menuAddUser" value="#{trans.addUserDetailId}">
+                        <f:selectItem itemLabel="Select"/>
+                        <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ua" itemLabel="#{ua.firstName} #{ua.secondName} #{ua.thirdName}" itemValue="#{ua.userDetailId}"/>
+                    </p:selectOneMenu>
+                    <p:selectOneMenu id="menuTransUser" value="#{trans.transactionUserDetailId}">
+                        <f:selectItem itemLabel="Select" itemValue="0"/>
+                        <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ut" itemLabel="#{ut.firstName} #{ut.secondName} #{ut.thirdName}" itemValue="#{ut.userDetailId}"/>
+                    </p:selectOneMenu>
+                    <p:autoComplete id="autcBillTransactor" value="#{transactorBean.selectedBillTransactor}" 
+                                    completeMethod="#{transactorBean.getTransactorObjectList}" 
+                                    var="trct2" 
+                                    itemLabel="#{trct2.transactorNames}" 
+                                    itemValue="#{trct2}" 
+                                    converter="TransactorConverter" style="text-align: left" 
+                                    forceSelection="true" 
+                                    >
+                        <p:column headerText="Names" style="text-align: left" >  
+                            #{trct2.transactorNames} 
+                        </p:column> 
+                        <p:column headerText="Contact Person" style="text-align: left">  
+                            #{trct2.cpName} 
+                        </p:column> 
+                        <p:ajax event="itemSelect" listener="#{trans.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}"/>
+                        <p:ajax event="change" listener="#{trans.setBillTransactorId(transactorBean.selectedBillTransactor.transactorId)}" rendered="#{transactorBean.selectedBillTransactor!=null} "/>
+                    </p:autoComplete>
+                    <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}" 
+                                    completeMethod="#{transactorBean.getTransactorObjectList}" 
+                                    var="trct" 
+                                    itemLabel="#{trct.transactorNames}" 
+                                    itemValue="#{trct}" 
+                                    converter="TransactorConverter" style="text-align: left" 
+                                    forceSelection="true" queryDelay="0" 
+                                    >
+                        <p:column headerText="Names" style="text-align: left" >  
+                            #{trct.transactorNames} 
+                        </p:column>
+                        <p:column headerText="Reference No" style="text-align: left" >  
+                        #{trct.transactorRef} 
+                    </p:column>
+                        <p:column headerText="Type" style="text-align: left" >  
+                            #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
+                        </p:column> 
+                        <p:column headerText="Contact Person" style="text-align: left">  
+                            #{trct.cpName} 
+                        </p:column> 
+                        <p:ajax event="itemSelect" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}"/>
+                        <p:ajax event="change" listener="#{trans.setTransactorId(transactorBean.selectedTransactor.transactorId)}" rendered="#{transactorBean.selectedTransactor!=null}"/>
+                    </p:autoComplete>
+                    <p:selectOneMenu id="menuSummariseBy" value="#{transBean.fieldName}">
+                        <f:selectItem itemLabel="Select" itemValue=""/>
+                        <f:selectItem itemLabel="Added By" itemValue="add_user_detail_id"/>
+                        <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(67).transactionUserLabel}" itemValue="transaction_user_detail_id"/>
+                        <f:selectItem itemLabel="Bill For" itemValue="bill_transactor_id"/>
+                        <f:selectItem itemLabel="#{menuItemBean.menuItemObj.CUSTOMER_NAME}" itemValue="transactor_id"/>
+                        <f:selectItem itemLabel="#{transactionTypeBean.getTransactionType(67).transactionDateLabel}" itemValue="transaction_date"/>
+                    </p:selectOneMenu>
+                    <p:commandButton id="cmdbSearch" value="SEARCH (ALT+S)" accesskey="s" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{transBean.reportHireReturnNoteDetail(trans,transBean)}" process="pnlgFilter" update="menuDateType pnlgFilter pnlgMessage tblDetail"/>
+                    </p:commandButton>
+                    <p:commandButton id="cmdbReset" value="RESET (ALT+R)" accesskey="r">
+                        <p:ajax listener="#{transBean.resetSalesInvoiceDetail(trans,transBean,transactorBean.selectedBillTransactor,transactorBean.selectedTransactor)}" process="pnlgFilter" update="pnlgFilter pnlgMessage tblDetail"/>
+                    </p:commandButton>
+                </h:panelGrid>
+            </div>
+            <h:panelGrid id="pnlgMessage">
+                <p:outputLabel value="#{transBean.actionMessage}" style="color: red;"/>
+            </h:panelGrid>
+            <p:dataTable id="tblDetail" tableStyle="width:auto;" var="itm" value="#{transBean.transList}" 
+                         paginator="true" rows="50" 
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
+                         rowsPerPageTemplate="50,100,200,400">
+                <f:facet name="header">
+                    #{transBean.transList.size()} Records Found
+                    <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
+                    <p:columnToggler datasource="tblDetail" trigger="toggler" />
+                </f:facet>
+                <f:facet name="{Exporters}">
+                    <h:commandLink>
+                        <p:graphicImage name="images/excel.png" width="24"/>
+                        <p:dataExporter type="xls" target="tblDetail" fileName="Hire_Return_Note_Detail" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/pdf.png" width="24"/>
+                        <p:dataExporter type="pdf" target="tblDetail" fileName="Hire_Return_Note_Detail"/>
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/csv.png" width="24"/>
+                        <p:dataExporter type="csv" target="tblDetail" fileName="Hire_Return_Note_Detail" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/xml.png" width="24"/>
+                        <p:dataExporter type="xml" target="tblDetail" fileName="Hire_Return_Note_Detail" />
+                    </h:commandLink>
+                </f:facet>
+                <p:column headerText="View/Edit" exportable="false">
+                    <p:commandButton id="cmdbView" icon="ui-icon-search" actionListener="#{transBean.openView('PARENT',itm,'View')}" update="@form"/>
+                    <p:commandButton id="cmdbEdit" icon="ui-icon-pencil" actionListener="#{transBean.openView('PARENT',itm,'Edit')}" update="@form"/>
+                </p:column>
+                <p:column headerText="Return Note">
+                    <h:outputLabel value="#{transactionReasonBean.getTransactionReason(itm.transactionReasonId).transactionReasonName} "/>
+                    <h:outputLabel value="#{itm.transactionNumber}"/>
+                </p:column>
+                <p:column headerText="#{transactionTypeBean.getTransactionType(65).transactionNumberLabel}">
+                    <h:outputLabel value="#{itm.transactionRef}"/>
+                </p:column>
+                <p:column headerText="#{transactionTypeBean.getTransactionType(67).transactionDateLabel}" rendered="#{transBean.dateType.equals('Return Date')}">
+                    <h:outputText value="#{utilityBean.formatDate(itm.transactionDate)}"/>
+                </p:column>
+                <p:column headerText="#{transBean.transObj.duration_type}s Passed">
+                    <h:outputText value="#{itm.duration_value}">
+                        <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Add Date" rendered="#{transBean.dateType.equals('Add Date')}">
+                    <h:outputText value="#{utilityBean.formatDate(itm.addDate)}"/>
+                </p:column>
+                <p:column headerText="Bill For">
+                    <h:outputText value="#{transactorBean.getTransactor(itm.billTransactorId).transactorNames}"/>
+                </p:column>
+                <p:column headerText="#{transactionTypeBean.getTransactionType(67).transactionUserLabel}">
+                    <h:outputText value="#{userDetailBean.getUserDetail(itm.transactionUserDetailId).userName}"/>
+                </p:column>
+                <p:column headerText="#{menuItemBean.menuItemObj.CUSTOMER_NAME} Rep">
+                    <h:outputText value="#{itm.transactor_rep}"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </h:body>
+
+</html>
+

@@ -1,0 +1,300 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Report Cash Payment</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{navigationBean.checkAccessDenied('84', 'View')}"/>
+        <f:viewAction action="#{payBean.initResetPayReportDetail(trans,pay,payBean,transactorBean.selectedTransactor)}"/>
+        <f:viewAction action="#{payMethodBean.refreshPayMethodsPayReport()}"/>
+    </f:metadata>
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="formReport">
+            <h:panelGrid id="pnlgHeader" columns="3" styleClass="clsPanelReportFilterTitle">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys['Cash']} #{langsys['Payments']} #{langsys['Detail']} #{langsys['Report']}"/>
+                <p:commandLink id="cmdbToday" value="#{langsys['Today']}" style="color: white;">
+                    <p:ajax listener="#{payBean.setDateToToday()}" process="@this" update="pnlgFilter1"/>
+                </p:commandLink>
+                <p:commandLink id="cmdbYesturday" value="#{langsys['Yesterday']}" style="color: white;">
+                    <p:ajax listener="#{payBean.setDateToYesturday()}" process="@this" update="pnlgFilter1"/>
+                </p:commandLink>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgFilter1" columns="7" styleClass="clsPanelReportFilter">
+                <p:outputLabel value="#{companySetting.getStoreEquivName()}"/>
+                <p:outputLabel value="#{langsys['Date']} #{langsys['Type']}"/>
+                <p:outputLabel value="#{langsys['From']} #{payBean.dateType}" id="lblDate1"/>
+                <p:outputLabel value="#{langsys['To']} #{payBean.dateType}" id="lblDate2"/>
+                <p:outputLabel value="#{langsys['Pay']} #{langsys['No.']}"/>
+                <p:outputLabel value="#{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]}"/>
+                <p:outputLabel value="#{utilityBean.translateWordsInText(menuItemBean.menuItemObj.LANG_BASE_NAME_SYS,transactionTypeBean.getTransactionType(1).transactionNumberLabel)}"/>
+                <p:selectOneMenu id="menuFromStore" value="#{pay.storeId}" style="width: 120px;">
+                    <f:selectItem itemLabel="#{langsys['Select']}" itemValue="0"/>
+                    <f:selectItems value="#{storeBean.stores}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
+                </p:selectOneMenu>
+                <p:selectOneMenu id="menuDateType" value="#{payBean.dateType}" style="width: 120px;">
+                    <f:selectItem itemLabel="#{langsys['Select']}" itemValue=""/>
+                    <f:selectItem itemValue="Add Date" itemLabel="#{langsys['Add']} #{langsys['Date']}"/>
+                    <f:selectItem itemValue="Pay Date" itemLabel="#{langsys['Pay']} #{langsys['Date']}"/>
+                    <f:ajax event="change" execute="@this" render="lblDate1 lblDate2"/>
+                </p:selectOneMenu>
+                <p:calendar id="calDate1"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{payBean.date1}" size="12"/>
+                <p:calendar id="calDate2"  pattern="#{companySetting.getDateFormat()} HH:mm" navigator="true" showButtonPanel="true" readonlyInput="false" autocomplete="off" value="#{payBean.date2}" size="12"/>
+                <p:inputText id="itxtPayNo" value="#{pay.pay_number}" style="width: 180px;"/>
+                <p:autoComplete id="autcTransactor" value="#{transactorBean.selectedTransactor}"  
+                                completeMethod="#{transactorBean.getTransactorObjectList}" 
+                                var="trct" 
+                                itemLabel="#{trct.transactorNames}" 
+                                itemValue="#{trct}" 
+                                converter="TransactorConverter" style="text-align: left" 
+                                forceSelection="true" queryDelay="0" 
+                                >
+                    <p:column headerText="#{langsys['Names']}" style="text-align: left" >  
+                        #{trct.transactorNames} 
+                    </p:column>
+                    <p:column headerText="#{langsys['Reference']} #{langsys['No.']}" style="text-align: left" >  
+                        #{trct.transactorRef} 
+                    </p:column>
+                    <p:column headerText="#{langsys['Type']}" style="text-align: left" >  
+                        #{transactorBean.getDisplayName(menuItemBean.menuItemObj,trct)} 
+                    </p:column> 
+                    <p:column headerText="#{langsys['Contact']} #{langsys['Person']}" style="text-align: left">  
+                        #{trct.cpName} 
+                    </p:column> 
+                    <p:ajax event="itemSelect" listener="#{pay.setBillTransactorId(transactorBean.selectedTransactor.transactorId)}"/>
+                    <p:ajax event="change" listener="#{pay.setBillTransactorId(transactorBean.selectedTransactor.transactorId)}" rendered="#{transactorBean.selectedTransactor!=null}"/>
+                </p:autoComplete>
+                <p:inputText id="itxtInvoiceNo" value="#{trans.transactionNumber}" style="width: 240px;"/>
+
+                <h:outputLabel value="#{langsys['Pay']} #{langsys['Method']}"/>
+                <p:outputLabel value="#{langsys['Added']} #{langsys['By']}"/>
+                <h:outputLabel value="#{langsys['Paid']} #{langsys['By']}"/>
+                <p:outputLabel value="#{langsys['Cash']} #{langsys['Payment']} #{langsys['Type']}"/>
+                <p:outputLabel value="#{langsys['Shareholder']}/#{langsys['Loan']} #{langsys['Account']}"/>
+                <h:outputLabel value="#{langsys['Payment']} #{langsys['Account']}"/>  
+                <h:outputLabel value="#{langsys['SUMMARIZE']} #{langsys['RESULTS']} #{langsys['BY']}"/>
+
+                <p:selectOneMenu id="menuPayMethod" value="#{pay.payMethodId}" style="width: 120px;">
+                    <f:selectItem itemLabel="#{langsys['Select']}" itemValue="0"/>
+                    <f:selectItems value="#{payMethodBean.payMethodsList}" var="pm" itemLabel="#{pm.payMethodName}" itemValue="#{pm.payMethodId}"/>
+                </p:selectOneMenu>
+                <p:selectOneMenu id="menuAddUser" value="#{pay.addUserDetailId}" style="width: 120px;">
+                    <f:selectItem itemLabel="#{langsys['Select']}" itemValue="0"/>
+                    <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ut" itemLabel="#{ut.firstName} #{ut.secondName} #{ut.thirdName}" itemValue="#{ut.userDetailId}"/>
+                </p:selectOneMenu>
+                <p:selectOneMenu id="menuTransUser" value="#{pay.addUserDetailId}" style="width: 140px;">
+                    <f:selectItem itemLabel="#{langsys['Select']}"/>
+                    <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ua" itemLabel="#{ua.firstName} #{ua.secondName} #{ua.thirdName}" itemValue="#{ua.userDetailId}"/>
+                </p:selectOneMenu>
+                <p:selectOneMenu id="menuTransType" value="#{pay.payReasonId}" style="width: 140px;">
+                    <f:selectItem itemLabel="#{langsys['Select']}" itemValue="0"/>
+                    <f:selectItems value="#{transactionReasonBean.getTransactionReasonsByTypes('15')}" var="tr" itemLabel="#{tr.transactionReasonName}" itemValue="#{tr.transactionReasonId}"/>
+                    <p:ajax event="change" process="@this" update="menuAccount2CapitalLoan"/>
+                </p:selectOneMenu>
+                <p:selectOneMenu id="menuAccount2CapitalLoan" value="#{pay.accChildAccountId2}" style="width: 165px;">
+                    <f:selectItem itemValue="" itemLabel=""/>
+                    <f:selectItems value="#{accChildAccountBean.getChildAccountsByPayReason('3-10-000-010','2-00-000-050','2-10-000-010',pay.payReasonId)}" var="ca" itemLabel="#{ca.childAccountCode} (#{ca.childAccountName})" itemValue="#{ca.accChildAccountId}"/>
+                </p:selectOneMenu>
+                <p:selectOneMenu id="menuFromAccount" value="#{pay.accChildAccountId}">
+                    <f:selectItem itemLabel="#{langsys['Select']}" itemValue="0"/>
+                    <f:selectItems value="#{accChildAccountBean.getAccChildAccounts()}" var="aca" itemLabel="#{aca.childAccountName}" itemValue="#{aca.accChildAccountId}"/>
+                </p:selectOneMenu>
+                <p:selectOneMenu id="menuSummariseBy" value="#{payBean.fieldName}" style="width: 226px;">
+                    <f:selectItem itemLabel="#{langsys['Select']}" itemValue=""/>
+                    <f:selectItem itemLabel="#{langsys['Paid']} #{langsys['By']}" itemValue="add_user_detail_id"/>
+                    <f:selectItem itemLabel="#{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]}" itemValue="bill_transactor_id"/>
+                    <f:selectItem itemLabel="#{langsys['Shareholder']}/#{langsys['Loan']}#{langsys['Account']}" itemValue="acc_child_account_id2"/>
+                    <f:selectItem itemLabel="#{langsys['Pay']} #{langsys['Date']}" itemValue="pay_date"/>
+                    <f:selectItem itemLabel="#{langsys['Cash']} #{langsys['Payment']} #{langsys['Type']}" itemValue="pay_reason_id"/>
+                    <f:selectItem itemLabel="#{langsys['Pay']} #{langsys['Method']}" itemValue="pay_method_id"/>
+                </p:selectOneMenu>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgFilterButton" columns="6" styleClass="clsPanelReportFilter">
+                <h:outputLabel value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                <h:outputLabel value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                <p:commandButton id="cmdbSearch" value="#{langsys['SEARCH']} (ALT+S)" accesskey="s" style="width: 200px;" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                    <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="/images/ajax-loader.gif"/>
+                    </p:dialog>
+                    <p:ajax listener="#{payBean.reportCashPaymentDetail(trans,pay,payBean)}" process="@this pnlgFilter1" update="pnlgFilter1 pnlgMessage tblDetail cmdbPrint tblSummary pnlHeaderForSummary"/>
+                </p:commandButton>
+                <p:commandButton id="cmdbReset" value="#{langsys['RESET']} (ALT+R)" accesskey="r" style="width: 200px;">
+                    <p:ajax listener="#{payBean.resetPayReportDetail(trans,pay,payBean,transactorBean.selectedBillTransactor)}" process="@this pnlgFilter1" update="pnlgFilter1 pnlgMessage tblDetail cmdbPrint tblSummary pnlHeaderForSummary"/>
+                </p:commandButton>
+                <h:outputLabel value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                <h:outputLabel value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+            </h:panelGrid>
+            <h:panelGrid id="pnlgMessage">
+                <p:outputLabel value="#{payBean.actionMessage}" style="color: red;"/>
+            </h:panelGrid>
+            <p:commandButton id="cmdbPrint" value="#{langsys['Print']} (ALT+P)" icon="ui-icon-print" type="button" accesskey="p">
+                <p:printer target="pnlPrint" rendered="false"/>
+            </p:commandButton>
+            <p:panel style="border: none;">
+                <h:panelGrid id="pnlPrint" columns="1" style="border-style: none;-webkit-print-color-adjust: exact;width: 100%; margin: 0px;">
+                    <h:panelGrid id="pnlHeaderForSummary" columns="1" style="border-style: none;-webkit-print-color-adjust: exact;width: 100%; margin: 0px;"> 
+                        <h:panelGrid>
+                            <h:panelGrid columns="1">
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 18pt;color:red;font-weight: bold;text-decoration: none;">#{companySetting.getLICENSE_CLIENT_NAME()}</h:outputLabel>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 9pt;color:blue;font-weight: bold;text-decoration: none;">#{companySetting.getSloghan()}</h:outputLabel>
+                            </h:panelGrid>
+                            <h:panelGrid columns="2">
+                                <p:graphicImage value="#{companySetting.getLogoUrl()}" rendered="#{generalSetting.isTwoStringsEqual(companySetting.getShowLogoInvoice(),'Yes')}" />
+                                <h:panelGrid columns="1" style="text-align: left;">
+                                    <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','BOX_ADDRESS').parameter_value}</h:outputLabel>
+                                    <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{companySetting.getPhysicalAddress()}</h:outputLabel>
+                                    <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Telephone']}:#{companySetting.getPhone()}</h:outputLabel>
+                                    <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Mobile']}:#{parameter_listBean.getParameter_listByContextNameMemory('COMPANY_SETTING','MOBILE_NUMBER').parameter_value}</h:outputLabel>
+                                    <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 10pt;color:#000000;font-weight: normal;text-decoration: none;">TIN:#{companySetting.getTaxIdentity()}</h:outputLabel>
+                                </h:panelGrid>
+                            </h:panelGrid>
+                            <h:panelGrid columns="1">
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 9pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Email']}:#{companySetting.getEmail()} #{langsys['Website']}:#{companySetting.getWebsite()}</h:outputLabel>
+                                <h:outputLabel style="font-family:'Montserrat', sans-serif; font-size: 14pt;color:#000000;font-weight: normal;text-decoration: none;">#{langsys['Cash']} #{langsys['Payments']} #{langsys['From']} #{utilityBean.formatDateTime(payBean.date1)} #{langsys['To']} #{utilityBean.formatDateTime(payBean.date2)}</h:outputLabel>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <p:dataTable  sortBy="#{sm.currencyCode}" expandableRowGroups="true" id="tblSummary" tableStyle="table-layout: auto;" var="sm" value="#{payBean.payListSummary}">
+                        <p:column headerText="#{langsys['Pay']} #{langsys['Method']}" style="text-align: left;" rendered="#{payBean.fieldName.equals('pay_method_id')}">
+                            <h:outputText value="#{payMethodBean.getPayMethod(sm.payMethodId).payMethodName}" rendered="#{sm.payMethodId>0}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Paid']} #{langsys['By']}" style="text-align: left;" rendered="#{payBean.fieldName.equals('add_user_detail_id')}">
+                            <h:outputText value="#{userDetailBean.getUserDetail(sm.addUserDetailId).userName}" rendered="#{sm.addUserDetailId>0}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys[menuItemBean.menuItemObj.SUPPLIER_NAME]}" style="text-align: left;" rendered="#{payBean.fieldName.equals('bill_transactor_id')}">
+                            <h:outputText value="#{transactorBean.getTransactor(sm.billTransactorId).transactorNames}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Cash']} #{langsys['Payment']} #{langsys['Type']}" style="text-align: left;" rendered="#{payBean.fieldName.equals('pay_reason_id')}">
+                            <h:outputText value="#{transactionReasonBean.getTransactionReason(sm.payReasonId).transactionReasonName}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Pay']} #{langsys['Date']}" style="text-align: left;" rendered="#{payBean.fieldName.equals('pay_date')}">
+                            <h:outputText value="#{utilityBean.formatDate(sm.payDate)}"/>
+                        </p:column> 
+                        <p:column headerText="#{langsys['ShareHolder']}" style="text-align: left;" rendered="#{payBean.fieldName.equals('acc_child_account_id2') and pay.payReasonId==23}">
+                            <h:outputText value="#{accChildAccountBean.getAccChildAccById(sm.accChildAccountId2).childAccountName}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Loan']} #{langsys['Account']}" style="text-align: left;" rendered="#{payBean.fieldName.equals('acc_child_account_id2') and pay.payReasonId==24}">
+                            <h:outputText value="#{accChildAccountBean.getAccChildAccById(sm.accChildAccountId2).childAccountName}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Payment']} #{langsys['Account']}" style="text-align: left;">
+                            <h:outputText value="#{accChildAccountBean.getAccChildAccById(sm.accChildAccountId).childAccountName}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Currency']}" style="text-align: left;">
+                            <h:outputText value="#{sm.currencyCode}"/>
+                        </p:column>
+                        <p:column headerText="#{langsys['Total']} #{langsys['Amount']} #{langsys['Paid']}" style="text-align: right;">
+                            <h:outputText value="#{sm.paidAmount}">
+                                <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:summaryRow>
+                            <p:column colspan="2" style="text-align:right">
+                                <h:outputText value="#{langsys['Total']} #{langsys['Amount']} #{langsys['Paid']} #{sm.currencyCode}" />
+                            </p:column>
+                            <p:column style="text-align:right">
+                                <h:outputText value="#{payBean.getTotalAmountRecieved(payBean.payListSummary,sm.currencyCode)}">
+                                    <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                                </h:outputText>
+                            </p:column>
+                        </p:summaryRow>
+                    </p:dataTable>
+                </h:panelGrid>
+                <p:dataTable id="tblDetail" tableStyle="table-layout: auto;" var="itm" value="#{payBean.payList}" 
+                             paginator="true" rows="50" 
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
+                             rowsPerPageTemplate="50,100,200,400">
+                    <f:facet name="header">
+                        #{payBean.payList.size()} #{langsys['Records']} #{langsys['Found']}
+                        <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
+                        <p:columnToggler datasource="tblDetail" trigger="toggler" />
+                    </f:facet>
+                    <f:facet name="{Exporters}">
+                        <h:commandLink>
+                            <p:graphicImage name="images/excel.png" width="24"/>
+                            <p:dataExporter type="xls" target="tblDetail" fileName="Cash_Payment_Detail" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <p:graphicImage name="images/pdf.png" width="24"/>
+                            <p:dataExporter type="pdf" target="tblDetail" fileName="Cash_Payment_Detail"/>
+                        </h:commandLink>
+                        <h:commandLink>
+                            <p:graphicImage name="images/csv.png" width="24"/>
+                            <p:dataExporter type="csv" target="tblDetail" fileName="Cash_Payment_Detail" />
+                        </h:commandLink>
+                        <h:commandLink>
+                            <p:graphicImage name="images/xml.png" width="24"/>
+                            <p:dataExporter type="xml" target="tblDetail" fileName="Cash_Payment_Detail" />
+                        </h:commandLink>
+                    </f:facet>
+                    <p:column headerText="#{langsys['View']}/#{langsys['Cancel']}"  exportable="false">
+                        <p:commandButton id="cmdbViewCPPurchases" icon="ui-icon-search" oncomplete="PF('dlgCPPurchases').show();" actionListener="#{payBean.initPaySession(itm.payId,'View')}" update=":formTransactionCPPurchases" rendered="#{itm.payReasonId==25 or itm.payReasonId==26}"/>
+                        <p:commandButton id="cmdbcancelCPPurchases" icon="ui-icon-closethick" oncomplete="PF('dlgCPPurchases').show();" actionListener="#{payBean.initPaySession(itm.payId,'Cancel')}" update=":formTransactionCPPurchases" rendered="#{itm.payReasonId==25}"/>
+                        <p:commandButton id="cmdbViewCPDrawings" icon="ui-icon-search" oncomplete="PF('dlgCPDrawings').show();" actionListener="#{payBean.initPaySession(itm.payId,'View')}" update=":formTransactionCPDrawings" rendered="#{itm.payReasonId==34}"/>
+                        <p:commandButton id="cmdbcancelCPDrawings" icon="ui-icon-closethick" oncomplete="PF('dlgCPDrawings').show();" actionListener="#{payBean.initPaySession(itm.payId,'Cancel')}" update=":formTransactionCPDrawings" rendered="#{itm.payReasonId==34}"/>
+                        <p:commandButton id="cmdbViewCPLoan" icon="ui-icon-search" oncomplete="PF('dlgCPLoan').show();" actionListener="#{payBean.initPaySession(itm.payId,'View')}" update=":formTransactionCPLoan" rendered="#{itm.payReasonId==33}"/>
+                        <p:commandButton id="cmdbcancelCPLoan" icon="ui-icon-closethick" oncomplete="PF('dlgCPLoan').show();" actionListener="#{payBean.initPaySession(itm.payId,'Cancel')}" update=":formTransactionCPLoan" rendered="#{itm.payReasonId==33}"/>
+                        <p:commandButton id="cmdbViewCPPrepaidExpense" icon="ui-icon-search" oncomplete="PF('dlgCPPrepaidExpense').show();" actionListener="#{payBean.initPaySession(itm.payId,'View')}" update=":formTransactionCPPrepaidExpense" rendered="#{itm.payReasonId==91}"/>
+                        <p:commandButton id="cmdbcancelCPPrepaidExpense" icon="ui-icon-closethick" oncomplete="PF('dlgCPPrepaidExpense').show();" actionListener="#{payBean.initPaySession(itm.payId,'Cancel')}" update=":formTransactionCPPrepaidExpense" rendered="#{itm.payReasonId==91}"/>
+                        <p:commandButton id="cmdbViewCPLiab" icon="ui-icon-search" oncomplete="PF('dlgCPLiab').show();" actionListener="#{payBean.initPaySession(itm.payId,'View')}" update=":formTransactionCPLiab" rendered="#{itm.payReasonId==105}"/>
+                        <p:commandButton id="cmdbcancelCPLiab" icon="ui-icon-closethick" oncomplete="PF('dlgCPLiab').show();" actionListener="#{payBean.initPaySession(itm.payId,'Cancel')}" update=":formTransactionCPLiab" rendered="#{itm.payReasonId==105}"/>
+                    </p:column>
+                    <p:column headerText="#{langsys['Cash']} #{langsys['Payment']} #{langsys['Type']}">
+                        <h:outputLabel value="#{transactionReasonBean.getTransactionReason(itm.payReasonId).transactionReasonName}"/><br/>
+                        <h:outputLabel value="#{itm.paidForSummary}"/>
+                    </p:column>
+                    <p:column headerText="#{langsys['Pay']} #{langsys['No.']}">
+                        <h:outputLabel value="#{itm.pay_number}"/>
+                    </p:column>
+                    <p:column headerText="#{langsys['Pay']} #{langsys['Date']}" rendered="#{payBean.dateType.equals('Pay Date')}">
+                        <h:outputText value="#{utilityBean.formatDate(itm.payDate)}"/>
+                    </p:column>
+                    <p:column headerText="#{langsys['Add']} #{langsys['Date']}" rendered="#{payBean.dateType.equals('Add Date')}">
+                        <h:outputText value="#{utilityBean.formatDate(itm.addDate)}"/>
+                    </p:column>
+                    <p:column headerText="#{langsys['Paid']} #{langsys['To']}">
+                        <h:outputText value="#{transactorBean.getTransactor(itm.billTransactorId).transactorNames}"  rendered="#{itm.billTransactorId>0}"/>
+                        <h:outputText value="#{accChildAccountBean.getAccChildAccById(itm.accChildAccountId2).childAccountName}"  rendered="#{itm.accChildAccountId2>0 and itm.payReasonId==34}"/>
+                        <h:outputText value="#{accChildAccountBean.getAccChildAccById(itm.accChildAccountId2).childAccountName}"  rendered="#{itm.accChildAccountId2>0 and itm.payReasonId==33}"/>
+                    </p:column>
+                    <p:column headerText="#{langsys['Payment']} #{langsys['Account']}">
+                        <h:outputText value="#{accChildAccountBean.getAccChildAccById(itm.accChildAccountId).childAccountName}"/>
+                    </p:column>
+                    <p:column headerText="#{langsys['Currency']}">
+                        <h:outputText value="#{itm.currencyCode}"/>
+                    </p:column>
+                    <p:column headerText="#{langsys['Amount']} #{langsys['Paid']}" style="text-align: right;">
+                        <h:outputText value="#{itm.paidAmount}">
+                            <f:convertNumber pattern="###,###,###.########" locale="#{utilityBean.convertLocaleToString()}"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="#{langsys['Paid']} #{langsys['By']}">
+                        <h:outputText value="#{userDetailBean.getUserDetail(itm.addUserDetailId).userName}"/>
+                    </p:column>
+                </p:dataTable>                
+            </p:panel>
+        </h:form>
+        <ui:include src="ViewCashPaymentPurchaseTrans.xhtml"/>
+        <ui:include src="ViewCashPaymentDrawTrans.xhtml"/>
+        <ui:include src="ViewCashPaymentLoanTrans.xhtml"/>
+        <ui:include src="ViewCashPaymentAdvanceTrans.xhtml"/>
+        <ui:include src="ViewCashPaymentLiabTrans.xhtml"/>
+    </h:body>
+</html>
+

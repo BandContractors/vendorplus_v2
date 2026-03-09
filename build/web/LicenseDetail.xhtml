@@ -1,0 +1,112 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>License Details</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:event listener="#{navigationBean.checkAccessDenied('88', 'View')}" type="preRenderView" />
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="form" styleClass="clsMainFrom">
+
+            <h:panelGrid styleClass="clsGridMainHeader" columns="1">
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="#{langsys['License']} #{langsys['Details']}"/>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainInput" columns="2">
+                <h:outputLabel  value="#{langsys['LICENSE']} #{langsys['CLIENT']} #{langsys['ID']}:"/>
+                <h:inputText styleClass="clsInput" value="#{companySetting.getLICENSE_CLIENT_ID()}" disabled="true" style="width: 400px;"/>
+
+                <h:outputLabel  value="#{langsys['LICENSE']} #{langsys['CLIENT']} #{langsys['NAMES']}:"/>
+                <h:inputText styleClass="clsInput" value="#{companySetting.getLICENSE_CLIENT_NAME()}" disabled="true" style="width: 400px;"/>
+
+                <h:outputLabel  value="#{langsys['PACKAGE']} #{langsys['NAME']}:"/>
+                <h:inputText styleClass="clsInput" value="#{companySetting.getPACKAGE_NAME()}" disabled="true" style="width: 400px;"/>
+
+                <h:outputLabel  value="#{langsys['PACKAGE']} #{langsys['DETAILS']}:"/>
+                <h:inputText value="#{companySetting.displayPackageUsers(companySetting.getPackageUsers(companySetting.getPACKAGE_NAME()))}" disabled="true" style="width: 400px;"/> 
+
+                <h:outputLabel  value="#{langsys['LICENSE']} #{langsys['EXPIRY']} #{langsys['DATE']}:"/>
+                <h:inputText value="#{utilityBean.formatDate(companySetting.getLICENSE_EXPIRY_DATE())}" disabled="true" rendered="#{companySetting.getLicenseType() ne 9}" style="width: 400px;"/>
+                <h:inputText value="N/A" disabled="true" rendered="#{companySetting.getLicenseType() eq 9}" style="width: 400px;"/>
+                
+                <h:outputLabel  value="#{langsys['LICENSE']} #{langsys['DAYS']} #{langsys['LEFT']}:"/>
+                <h:inputText value="#{companySetting.getLicenseDaysLeft()}" rendered="#{companySetting.getLicenseType() ne 9}" disabled="true"  style="width: 400px;"/>
+                <h:inputText value="N/A" rendered="#{companySetting.getLicenseType() eq 9}" disabled="true" style="width: 400px;"/>
+                
+                <h:outputLabel  value="#{langsys['BRANCH']} #{langsys['PASSWORD']} #{langsys['CODE']}:"/>
+                <h:inputText value="#{dBConnection.getBRANCH_PASSWORD_CODE()}" disabled="true" style="width: 400px;"/> 
+               
+            </h:panelGrid>  
+
+            <h:outputLabel  value="#{langsys['New']} #{langsys['Sessions']}" style="font-weight: bold;"/>
+            <p:dataTable id="dtblLoginSession" value="#{loginSessionBean.getLoginSessions()}" var="ls">
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Username']}</f:facet>
+                    <!-- row record -->
+                    #{userDetailBean.getUserDetail(ls.userDetailId).userName}
+                </p:column>
+
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{companySetting.getStoreEquivName()}</f:facet>
+                    <!-- row record -->
+                    #{storeBean.getStore(ls.storeId).storeName}
+                </p:column>
+
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Session']} #{langsys['Creation']} #{langsys['Date']}</f:facet>
+                    <!-- row record -->
+                    <h:outputLabel value="#{utilityBean.formatDateTime(ls.addDate)}"/>
+                </p:column>
+
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Session']} Id</f:facet>
+                    <!-- row record -->
+                    #{ls.sessionId}
+                </p:column>
+
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Remote']} IP</f:facet>
+                    <!-- row record -->
+                    #{ls.remoteIp}
+                </p:column>
+
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Remote']} #{langsys['Host']}</f:facet>
+                    <!-- row record -->
+                    #{ls.remoteHost}
+                </p:column>
+
+                <p:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Remote']} #{langsys['User']}</f:facet>
+                    <!-- row record -->
+                    #{ls.remoteUser}
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </h:body>
+</html>
+

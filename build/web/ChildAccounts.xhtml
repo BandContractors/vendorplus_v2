@@ -1,0 +1,146 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Child Accounts</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:metadata>
+        <f:viewAction action="#{accCurrencyBean.refreshCurrencyListActive()}"/>
+        <f:viewAction action="#{navigationBean.checkAccessDenied('85', 'View')}"/>
+        <f:viewAction action="#{accChildAccountBean.refreshAccChildAccounts()}"/>
+        <f:viewAction action="#{accChildAccountBean.initClearChildAccount(accChildAccountBean.accChildAccountObj)}"/>
+    </f:metadata>
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="formReport">
+            <h:panelGrid id="pnlgHeader" columns="1" styleClass="clsPanelReportFilterTitle">
+                <h:outputLabel styleClass="clsLabelReportFilterTitle" value="#{langsys['Child']} #{langsys['Accounts']} (#{langsys['Cash']} #{langsys['Registers']}, #{langsys['Bank']} #{langsys['Accounts']}, #{langsys['Petty']} #{langsys['Cash']}, #{langsys['Shareholders']}, #{langsys['Loan']} #{langsys['Accounts']})"/>
+            </h:panelGrid>
+            <div class="ui-fluid">
+                <h:panelGrid id="pnlgFilter1" columns="6" styleClass="clsPanelReportFilter">
+                    <p:outputLabel value="#{langsys['Account']} #{langsys['Parent']}:"/>
+                    <h:selectOneMenu id="menuParentAccount" value="#{accChildAccountBean.accChildAccountObj.accCoaId}" style="width: 200px;">
+                        <f:selectItem itemValue="" itemLabel=""/>
+                        <f:selectItems value="#{accCoaBean.getNonChildAccounts()}" var="pa" itemLabel="#{pa.accountName}" itemValue="#{pa.accCoaId}"/>
+                    </h:selectOneMenu>
+                    <p:outputLabel value="#{langsys['Child']} #{langsys['Account']} #{langsys['Name']}:"/>
+                    <p:inputText value="#{accChildAccountBean.accChildAccountObj.childAccountName}" style="width: 250px;"/>
+                    <p:outputLabel value="#{langsys['Child']} #{langsys['Account']} #{langsys['Code']}:"/>
+                    <p:inputText value="#{accChildAccountBean.accChildAccountObj.childAccountCode}" style="width: 250px;"/>
+                    <h:outputLabel value="#{langsys['Account']} #{langsys['Currency']}:"/>
+                    <h:selectOneMenu id="menuCurrency" value="#{accChildAccountBean.accChildAccountObj.currencyId}" style="width: 200px;">
+                        <f:selectItem itemValue="" itemLabel="#{langsys['Any']} #{langsys['Currency']}"/>
+                        <f:selectItems value="#{accCurrencyBean.currencyList}" var="cur" itemLabel="#{cur.currencyCode}" itemValue="#{cur.accCurrencyId}"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="#{langsys['Account']} #{langsys['for']} #{langsys['User']}:"/>
+                    <h:selectOneMenu id="menuUser" value="#{accChildAccountBean.accChildAccountObj.userDetailId}" style="width: 250px;">
+                        <f:selectItem itemLabel="#{langsys['Any']} #{langsys['User']}" itemValue="0"/>
+                        <f:selectItems value="#{userDetailBean.getUserDetails()}" var="ut" itemLabel="#{ut.firstName} #{ut.secondName} #{ut.thirdName}" itemValue="#{ut.userDetailId}"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="#{langsys['Account']} #{langsys['for']} #{companySetting.getStoreEquivName()}:"/>
+                    <h:selectOneMenu id="menuStore" value="#{accChildAccountBean.accChildAccountObj.storeId}" style="width: 250px;">
+                        <f:selectItem itemLabel="#{langsys['Any']} #{companySetting.getStoreEquivName()}" itemValue=""/>
+                        <f:selectItems value="#{storeBean.stores}" var="st" itemLabel="#{st.storeName}" itemValue="#{st.storeId}"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="#{langsys['Active']}:"/>
+                    <h:selectOneMenu id="menuIsActive" value="#{accChildAccountBean.accChildAccountObj.isActive}" style="width: 200px;">
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="#{langsys['Check']} #{langsys['Balance']} #{langsys['before']} #{langsys['Pay']}:"/>
+                    <h:selectOneMenu id="menuBalanceChecker" value="#{accChildAccountBean.accChildAccountObj.balance_checker_on}" style="width: 250px;">
+                        <f:selectItem itemLabel="#{langsys['No']}" itemValue="0"/>
+                        <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="1"/>
+                    </h:selectOneMenu>
+                    <p:commandButton id="cmdbSearch" value="#{langsys['SAVE']} (ALT+S)" accesskey="s" style="width: 200px;" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{accChildAccountBean.saveAccChildAccount(accChildAccountBean.accChildAccountObj)}" process="@form" update="@form"/>
+                    </p:commandButton>
+                    <p:commandButton id="cmdbClear" value="#{langsys['CLEAR']} (ALT+C)" accesskey="c" style="width: 200px;" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
+                        <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                            <p:graphicImage name="/images/ajax-loader.gif"/>
+                        </p:dialog>
+                        <p:ajax listener="#{accChildAccountBean.clearAccChildAccount(accChildAccountBean.accChildAccountObj)}" process="@form" update="@form"/>
+                    </p:commandButton>
+                </h:panelGrid>
+            </div>
+            <h:panelGrid id="pnlgMessage">
+                <p:outputLabel value="#{accChildAccountBean.actionMessage}" style="color: red;"/>
+            </h:panelGrid>
+            <p:dataTable id="tblDetail" tableStyle="width:auto;" var="itm" value="#{accChildAccountBean.accChildAccountList}" 
+                         paginator="true" rows="50" 
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink} {Exporters}" 
+                         rowsPerPageTemplate="50,100,200,400">
+                <f:facet name="header">
+                    #{accChildAccountBean.accChildAccountList.size()} #{langsys['Records']} #{langsys['Found']}
+                    <p:commandButton id="toggler" type="button" value="Columns" icon="ui-icon-calculator" />
+                    <p:columnToggler datasource="tblDetail" trigger="toggler" />
+                </f:facet>
+                <f:facet name="{Exporters}">
+                    <h:commandLink>
+                        <p:graphicImage name="images/excel.png" width="24"/>
+                        <p:dataExporter type="xls" target="tblDetail" fileName="Child_Accounts" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/pdf.png" width="24"/>
+                        <p:dataExporter type="pdf" target="tblDetail" fileName="Child_Accounts"/>
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/csv.png" width="24"/>
+                        <p:dataExporter type="csv" target="tblDetail" fileName="Child_Accounts" />
+                    </h:commandLink>
+                    <h:commandLink>
+                        <p:graphicImage name="images/xml.png" width="24"/>
+                        <p:dataExporter type="xml" target="tblDetail" fileName="Child_Accounts" />
+                    </h:commandLink>
+                </f:facet>
+                <p:column headerText="#{langsys['ID']}">
+                    <h:outputLabel value="#{itm.accChildAccountId}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Parent']} #{langsys['Account']} #{langsys['Name']}">
+                    <h:outputLabel value="#{accCoaBean.getAccCoaByCodeOrId('',itm.accCoaId).accountName}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Child']} #{langsys['Account']} #{langsys['Code']}">
+                    <h:outputLabel value="#{itm.childAccountCode}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Child']} #{langsys['Account']} #{langsys['Name']}">
+                    <h:outputLabel value="#{itm.childAccountName}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Currency']}">
+                    <h:outputLabel value="#{itm.currencyCode}"/>
+                </p:column>
+                <p:column headerText="#{langsys['User']}">
+                    <h:outputLabel value="#{userDetailBean.getUserDetail(itm.userDetailId).userName}"/>
+                </p:column>
+                <p:column headerText="#{companySetting.getStoreEquivName()}">
+                    <h:outputLabel value="#{storeBean.getStore(itm.storeId).storeName}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Balance']} #{langsys['Checker']}">
+                    <h:outputLabel value="#{utilityBean.returnYesNoString(itm.balance_checker_on)}"/>
+                </p:column>
+                <p:column headerText="#{langsys['Action']}" exportable="false">
+                    <p:commandButton id="cmdbEdit" icon="ui-icon-pencil" actionListener="#{accChildAccountBean.initAccChildAccountSession(itm.accChildAccountId)}" process="tblDetail" update="@form"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </h:body>
+</html>
+

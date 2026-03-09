@@ -1,0 +1,207 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>User Details</title>
+        <link href="resources/images/arrow.png" rel="shortcut icon" type="image/x-icon" />         
+        <link rel="stylesheet" type="text/css" href="style.css?ln=css"/>
+        <script  language="javascript">
+            function confirmDelete()
+            {
+                return confirm('Are you sure you want to delete this current record?');
+            }
+            function alertSave()
+            {
+                return alert('Record saved successfully!');
+            }
+        </script> 
+    </h:head>
+    <f:event listener="#{navigationBean.checkAccessDenied('88', 'View')}" type="preRenderView" />
+    <h:body>
+        <ui:include src="Menu.xhtml"/>
+        <h:form id="form" styleClass="clsMainFrom">
+
+            <h:panelGrid styleClass="clsGridMainHeader" columns="1">
+                <h:outputLabel styleClass="clsLabelTop" id="olblcategoryHeader" value="#{langsys['User']} #{langsys['Details']}"/>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainInput" columns="6">
+
+                <h:outputLabel  value="#{langsys['Username']}:"/>
+                <h:inputText styleClass="clsInput" id="itxtUserName" value="#{userDetail.userName}" title="Username MUST be between 5-to-20 characters" autocomplete="off" disabled="#{userDetail.userName=='system'}">
+                </h:inputText>
+
+                <h:outputLabel  value="#{langsys['Password']}:" title="Password MUST be between 5-to-20 characters"/>
+                <h:inputSecret styleClass="clsInput" id="isecUserPassword" value="#{userDetail.userPassword}" redisplay="true" autocomplete="off">
+                </h:inputSecret>
+
+                <h:outputLabel  value="#{langsys['Confirm']} #{langsys['Password']}:" title="Re-enter password to confirm"/>
+                <h:inputSecret styleClass="clsInput" id="isecUserPasswordConfirm" value="#{userDetail.userPasswordConfirm}" redisplay="true" autocomplete="off">
+                </h:inputSecret>
+
+                <h:outputLabel  value="#{langsys['First']} #{langsys['Name']}:"/>
+                <h:inputText styleClass="clsInput" id="itxtFirstName" value="#{userDetail.firstName}" autocomplete="off" disabled="#{userDetail.userName=='system'}">
+                </h:inputText>
+
+                <h:outputLabel  value="#{langsys['Second']} #{langsys['Name']}:"/>
+                <h:inputText styleClass="clsInput" id="itxtSecondName" value="#{userDetail.secondName}" autocomplete="off" disabled="#{userDetail.userName=='system'}">
+                </h:inputText>
+
+                <h:outputLabel  value="#{langsys['Third']} #{langsys['Name']}:"/>
+                <h:inputText styleClass="clsInput" id="itxtThirdName" value="#{userDetail.thirdName}" autocomplete="off" disabled="#{userDetail.userName=='system'}">
+                </h:inputText>
+
+                <h:outputLabel  value="#{langsys['Lock']} #{langsys['User']}?:"/>
+                <h:selectOneMenu styleClass="clsMenu" id="menuIsUserLocked" value="#{userDetail.isUserLocked}" disabled="#{userDetail.userName=='system'}" style="width: 225px;">
+                    <f:selectItem itemLabel="" itemValue=""/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="Yes"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="No"/>
+                </h:selectOneMenu>
+
+                <h:outputLabel  value="#{langsys['General']} #{langsys['Admin']}?:"/>
+                <h:selectOneMenu styleClass="clsMenu" id="menuIsUserGenAdmin" value="#{userDetail.isUserGenAdmin}" disabled="#{userDetail.userName=='system'}" style="width: 225px;">
+                    <f:selectItem itemLabel="" itemValue=""/>
+                    <f:selectItem itemLabel="#{langsys['Yes']}" itemValue="Yes"/>
+                    <f:selectItem itemLabel="#{langsys['No']}" itemValue="No"/>
+                </h:selectOneMenu>
+
+                <h:outputLabel  value="#{langsys['User']} #{langsys['Category']}:"/>
+                <h:selectOneMenu styleClass="clsMenu" id="menuUserCategory" value="#{userDetail.userCategoryId}" style="width: 225px;">
+                    <f:selectItem itemLabel="" itemValue="0"/>
+                    <f:selectItems value="#{userCategoryBean.userCategories}" var="u" itemLabel="#{u.userCategoryName}" itemValue="#{u.userCategoryId}"/>
+                </h:selectOneMenu>
+
+                <h:outputLabel  value="#{langsys['Phone']} #{langsys['No.']}:"/>
+                <h:inputText styleClass="clsInput" id="itxtPhone_no" value="#{userDetail.phone_no}" autocomplete="off" disabled="#{userDetail.userName=='system'}">
+                </h:inputText>
+
+                <h:outputLabel  value="#{langsys['Email']} #{langsys['Address']}:"/>
+                <h:inputText styleClass="clsInput" id="itxtEmail_address" value="#{userDetail.email_address}" autocomplete="off" disabled="#{userDetail.userName=='system'}">
+                </h:inputText>
+
+                <h:outputLabel  value="#{langsys['User']} #{langsys['Code']}:"/>
+                <h:inputSecret styleClass="clsInput" id="isecTrans_code" value="#{userDetail.trans_code}" redisplay="true" autocomplete="off">
+                </h:inputSecret>
+
+                <h:outputLabel  value="#{langsys['User']} #{langsys['Image']}:"/>
+                <h:inputText styleClass="clsInput" id="isecUserImgUrl" value="#{userDetail.userImgUrl}" autocomplete="off"  disabled="#{userDetail.userName=='system'}">
+                </h:inputText>
+
+                <h:outputLabel  value="#{langsys['System']} #{langsys['Language']}:"/>
+                <h:selectOneMenu id="menuLanguageSystem" value="#{userDetail.language_system}" style="width: 225px;">
+                    <f:selectItem itemLabel="ENGLISH" itemValue="ENGLISH"/>
+                    <f:selectItem itemLabel="CHINESE" itemValue="SIMPLIFIED_CHINESE"/>
+                    <!--
+                    <f:selectItem itemLabel="FRENCH" itemValue="FRENCH"/>
+                    -->
+                </h:selectOneMenu>
+
+                <h:outputLabel  value="#{langsys['Output']} #{langsys['Language']}:"/>
+                <h:selectOneMenu id="menuLanguageOutput" value="#{userDetail.language_output}" style="width: 225px;">
+                    <f:selectItem itemLabel="ENGLISH" itemValue="ENGLISH"/>
+                    <f:selectItem itemLabel="CHINESE" itemValue="SIMPLIFIED_CHINESE"/>
+                    <!--
+                    <f:selectItem itemLabel="FRENCH" itemValue="FRENCH"/>
+                    -->
+                </h:selectOneMenu>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainCommands" columns="2">
+                <h:panelGrid styleClass="clsGridMainCommands1" columns="4">
+                    <h:commandButton styleClass="clsButton" id="cmdbSave" value="#{langsys['Save']}">
+                        <f:actionListener binding="#{userDetailBean.saveUserDetail(userDetail)}" />
+                    </h:commandButton>
+                    <h:commandButton styleClass="clsButton" id="cmdbClear" value="#{langsys['Clear']}">
+                        <f:actionListener binding="#{userDetailBean.clearUserDetail(userDetail)}" />
+                    </h:commandButton>
+                    <h:commandButton styleClass="clsButton" id="cmdbDelete" value="#{langsys['Delete']}" onclick="return confirmDelete();">
+                        <f:actionListener binding="#{userDetailBean.deleteUserDetail(userDetail)}" />
+                    </h:commandButton>
+                </h:panelGrid>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainMessages" columns="1">
+                <h:outputLabel styleClass="clsActionMessage" id="olblActionMessage" value="#{userDetailBean.actionMessage}"/>
+                <h:messages id="msgsMainMessage" style="color: red"/><br/>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="clsGridMainSearch" columns="1">
+                <h:outputLabel id="olblMainSearch" value="#{langsys['Search']} #{langsys['Users']}"/>
+                <h:outputLabel id="olblMainSearchDesc" value="(#{langsys['Search']} #{langsys['by']} #{langsys['username']} #{langsys['or']} #{langsys['any']} #{langsys['of']} #{langsys['the']} #{langsys['names']}(#{langsys['First']},#{langsys['Second']},#{langsys['Third']})!)"/>
+                <h:inputText id="itxtMainSearch" value="#{userDetailBean.searchUserName}" autocomplete="off">
+                    <f:ajax event="keyup" render="dtblUserDetail"/>
+                </h:inputText>
+            </h:panelGrid>
+
+            <h:dataTable id="dtblUserDetail" value="#{userDetailBean.getUserDetailsByNames(userDetailBean.searchUserName)}" var="u" 
+                         styleClass="cls-table" 
+                         headerClass="cls-table-header" 
+                         rowClasses="cls-table-odd-row,cls-table-even-row" 
+                         columnClasses="cls-table-col1,cls-table-col2,cls-table-col3,cls-table-col4,cls-table-col5,cls-table-col6,cls-table-col7"
+                         > 
+                <h:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Username']}</f:facet>
+                    <!-- row record -->
+                    #{u.userName}
+                </h:column>
+
+                <h:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['First']} #{langsys['Name']}</f:facet>
+                    <!-- row record -->
+                    #{u.firstName}
+                </h:column>
+
+                <h:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Second']} #{langsys['Name']}</f:facet>
+                    <!-- row record -->
+                    #{u.secondName}
+                </h:column>
+
+                <h:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Third']} #{langsys['Name']}</f:facet>
+                    <!-- row record -->
+                    #{u.thirdName}
+                </h:column>
+
+                <h:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Locked']}?</f:facet>
+                    <!-- row record -->
+                    #{u.isUserLocked}
+                </h:column>
+
+                <h:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Admin']}</f:facet>
+                    <!-- row record -->
+                    #{u.isUserGenAdmin}
+                </h:column>
+
+                <h:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['User']} #{langsys['Category']}</f:facet>
+                    <!-- row record -->
+                    #{userCategoryBean.getUserCategory(u.userCategoryId).userCategoryName}
+                </h:column>
+
+                <h:column>
+                    <!-- column header -->
+                    <f:facet name="header">#{langsys['Action']}</f:facet>
+                    <!-- row record -->
+                    <h:commandLink value="#{langsys['Edit']}" action="#{userDetailBean.displayUserDetail(u,userDetail)}" />
+                    &nbsp;
+                </h:column>
+
+            </h:dataTable>
+
+        </h:form>
+    </h:body>
+</html>
+
