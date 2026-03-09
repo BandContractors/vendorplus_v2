@@ -10,6 +10,7 @@ public class Category implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private int CategoryId;
+    private int CompanyId;
     private String CategoryName;
     private int display_quick_order;
     private int list_rank;
@@ -27,6 +28,20 @@ public class Category implements Serializable {
      */
     public void setCategoryId(int CategoryId) {
         this.CategoryId = CategoryId;
+    }
+
+    /**
+     * @return the CompanyId
+     */
+    public int getCompanyId() {
+        return CompanyId;
+    }
+
+    /**
+     * @param CompanyId the CompanyId to set
+     */
+    public void setCompanyId(int CompanyId) {
+        this.CompanyId = CompanyId;
     }
 
     /**

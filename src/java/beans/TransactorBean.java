@@ -532,6 +532,11 @@ public class TransactorBean implements Serializable {
                 transactor.setTransactorId(0);
             }
             try {
+                transactor.setCompanyId(rs.getInt("company_id"));
+            } catch (Exception e) {
+                transactor.setCompanyId(1);  // Default company
+            }
+            try {
                 if (null == rs.getString("transactor_type")) {
                     transactor.setTransactorType("");
                 } else {
@@ -1980,14 +1985,14 @@ public class TransactorBean implements Serializable {
      * @return the TransactorObjectList
      */
     public List<Transactor> getTransactorObjectList(String Query) {
+        int companyId = new GeneralUserSetting().getCurrentUser().getCompanyId();
         String sql;
-        sql = "{call sp_search_transactor_by_name(?)}";
+        sql = "SELECT * FROM transactor WHERE company_id=" + companyId + " AND transactor_name LIKE '%" + Query + "%' ORDER BY transactor_name LIMIT 50";
         ResultSet rs = null;
         TransactorObjectList = new ArrayList<Transactor>();
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setString(1, Query);
             rs = ps.executeQuery();
             while (rs.next()) {
                 TransactorObjectList.add(this.getTransactorFromResultSet(rs));
@@ -2003,14 +2008,14 @@ public class TransactorBean implements Serializable {
      * @return the TransactorObjectList
      */
     public List<Transactor> getTransactorActiveObjectList(String Query) {
+        int companyId = new GeneralUserSetting().getCurrentUser().getCompanyId();
         String sql;
-        sql = "{call sp_search_transactor_active_by_name(?)}";
+        sql = "SELECT * FROM transactor WHERE company_id=" + companyId + " AND transactor_name LIKE '%" + Query + "%' AND is_suspended='No' ORDER BY transactor_name LIMIT 50";
         ResultSet rs = null;
         TransactorObjectList = new ArrayList<Transactor>();
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setString(1, Query);
             rs = ps.executeQuery();
             while (rs.next()) {
                 TransactorObjectList.add(this.getTransactorFromResultSet(rs));

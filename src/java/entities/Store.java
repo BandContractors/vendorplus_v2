@@ -18,6 +18,7 @@ public class Store implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private int StoreId;
+    private int CompanyId;
     private String StoreName;
     private String store_code;
     private int shift_mode;
@@ -34,6 +35,20 @@ public class Store implements Serializable {
      */
     public void setStoreId(int StoreId) {
         this.StoreId = StoreId;
+    }
+
+    /**
+     * @return the CompanyId
+     */
+    public int getCompanyId() {
+        return CompanyId;
+    }
+
+    /**
+     * @param CompanyId the CompanyId to set
+     */
+    public void setCompanyId(int CompanyId) {
+        this.CompanyId = CompanyId;
     }
 
     /**

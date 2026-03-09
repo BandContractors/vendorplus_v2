@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="VendorPlus-Custom-Build" default="dist" basedir=".">
+    
+    <property name="src.dir" value="src/java"/>
+    <property name="web.dir" value="web"/>
+    <property name="build.dir" value="build"/>
+    <property name="build.classes.dir" value="${build.dir}/web/WEB-INF/classes"/>
+    <property name="build.web.dir" value="${build.dir}/web"/>
+    <property name="dist.dir" value="dist"/>
+    <property name="lib.dir" value="lib"/>
+    <property name="war.name" value="vendorplus2.war"/>
+    <property name="tomcat.lib" value="C:/ApacheSoftwareFoundation/Tomcat8.0/lib"/>
+    
+    <path id="compile.classpath">
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="${tomcat.lib}">
+            <include name="servlet-api.jar"/>
+            <include name="jsp-api.jar"/>
+        </fileset>
+    </path>
+    
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+    </target>
+    
+    <target name="init">
+        <mkdir dir="${build.classes.dir}"/>
+        <mkdir dir="${build.web.dir}"/>
+        <mkdir dir="${dist.dir}"/>
+    </target>
+    
+    <target name="compile" depends="init">
+        <javac srcdir="${src.dir}" 
+               destdir="${build.classes.dir}"
+               includeantruntime="false"
+               encoding="UTF-8"
+               debug="true"
+               deprecation="false"
+               optimize="false">
+            <classpath refid="compile.classpath"/>
+        </javac>
+    </target>
+    
+    <target name="copy-resources" depends="compile">
+        <!-- Copy web content -->
+        <copy todir="${build.web.dir}">
+            <fileset dir="${web.dir}"/>
+        </copy>
+        
+        <!-- Copy configuration files -->
+        <copy todir="${build.classes.dir}">
+            <fileset dir="src/conf"/>
+        </copy>
+        
+        <!-- Copy libraries to WEB-INF/lib -->
+        <copy todir="${build.web.dir}/WEB-INF/lib">
+            <fileset dir="${lib.dir}">
+                <include name="**/*.jar"/>
+            </fileset>
+        </copy>
+    </target>
+    
+    <target name="dist" depends="copy-resources">
+        <war destfile="${dist.dir}/${war.name}" 
+             webxml="${build.web.dir}/WEB-INF/web.xml">
+            <fileset dir="${build.web.dir}">
+                <exclude name="WEB-INF/web.xml"/>
+            </fileset>
+        </war>
+        <echo message="WAR file created: ${dist.dir}/${war.name}"/>
+    </target>
+    
+</project>

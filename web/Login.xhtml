@@ -73,13 +73,17 @@
                                 <f:selectItems value="#{login.storesList}" var="tst" itemLabel="#{tst.storeName}" itemValue="#{tst.storeId}"/>
                             </h:selectOneMenu>
                         </h:panelGrid>
-                        <h:panelGrid columns="1">
+                        <h:panelGrid columns="1" style="text-align: center;">
                             <p:commandButton styleClass="clsButtonMedium" style="color: white;width: 225px;background-color: #7BC043; border-radius: 20px" id="cmdbLogin" value="LOGIN" accesskey="l" rendered="true" onclick="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()">
                                 <p:dialog widgetVar="statusDialog" height="100" position="center" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
                                     <p:graphicImage name="/images/ajax-loader.gif"/>
                                 </p:dialog>
                                 <p:ajax listener="#{login.userLogin(1)}" process="pnlgInput @this" update="pnlgLoginHeader pnlgMessage"/>
                             </p:commandButton>
+                            <p:spacer height="10"/>
+                            <h:outputLabel value="Don't have an account?" style="font-size: 14px;"/>
+                            <p:button value="Register Now" outcome="Registration.xhtml" 
+                                      style="color: #7BC043;background-color: white; border: 2px solid #7BC043; border-radius: 20px; width: 225px; margin-top: 10px;"/>
                         </h:panelGrid>
                     </h:panelGrid>
                     <h:panelGrid>

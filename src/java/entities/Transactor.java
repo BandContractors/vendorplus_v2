@@ -18,8 +18,7 @@ import javax.faces.bean.SessionScoped;
 public class Transactor implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private long TransactorId;
-    private String TransactorType;
+    private long TransactorId;    private int CompanyId;    private String TransactorType;
     private String TransactorNames;
     private String Phone;
     private String Email;
@@ -70,6 +69,20 @@ public class Transactor implements Serializable {
      */
     public void setTransactorId(long TransactorId) {
         this.TransactorId = TransactorId;
+    }
+
+    /**
+     * @return the CompanyId
+     */
+    public int getCompanyId() {
+        return CompanyId;
+    }
+
+    /**
+     * @param CompanyId the CompanyId to set
+     */
+    public void setCompanyId(int CompanyId) {
+        this.CompanyId = CompanyId;
     }
 
     /**

@@ -100,6 +100,11 @@ public class CategoryBean implements Serializable {
                 aCategory.setCategoryId(0);
             }
             try {
+                aCategory.setCompanyId(aResultSet.getInt("company_id"));
+            } catch (Exception e) {
+                aCategory.setCompanyId(1);  // Default company
+            }
+            try {
                 aCategory.setCategoryName(aResultSet.getString("category_name"));
             } catch (NullPointerException npe) {
                 aCategory.setCategoryName("");
@@ -206,8 +211,9 @@ public class CategoryBean implements Serializable {
     }
 
     public List<Category> getCategories() {
+        int companyId = new GeneralUserSetting().getCurrentUser().getCompanyId();
         String sql;
-        sql = "{call sp_search_category_by_none()}";
+        sql = "SELECT * FROM category WHERE company_id=" + companyId + " ORDER BY category_name";
         ResultSet rs = null;
         Categories = new ArrayList<Category>();
         try (
@@ -226,8 +232,9 @@ public class CategoryBean implements Serializable {
     }
     
     public List<Category> getCategoriesStockTake() {
+        int companyId = new GeneralUserSetting().getCurrentUser().getCompanyId();
         String sql;
-        sql = "SELECT c.* FROM category c WHERE c.category_id IN(SELECT distinct i.category_id from item i WHERE i.is_track=1 AND i.is_asset=0) ORDER BY c.category_name ASC";
+        sql = "SELECT c.* FROM category c WHERE c.company_id=" + companyId + " AND c.category_id IN(SELECT distinct i.category_id from item i WHERE i.company_id=" + companyId + " AND i.is_track=1 AND i.is_asset=0) ORDER BY c.category_name ASC";
         ResultSet rs = null;
         Categories = new ArrayList<Category>();
         try (
@@ -246,9 +253,10 @@ public class CategoryBean implements Serializable {
     }
 
     public List<Category> getCategoriesQuickOrder() {
+        int companyId = new GeneralUserSetting().getCurrentUser().getCompanyId();
         String sql;
         int CurStoreId = new GeneralUserSetting().getCurrentStore().getStoreId();
-        sql = "SELECT * FROM category where display_quick_order=1 and (store_quick_order=0 or store_quick_order=" + CurStoreId + ") ORDER BY list_rank DESC,category_name ASC";
+        sql = "SELECT * FROM category WHERE company_id=" + companyId + " AND display_quick_order=1 and (store_quick_order=0 or store_quick_order=" + CurStoreId + ") ORDER BY list_rank DESC,category_name ASC";
         ResultSet rs = null;
         Categories = new ArrayList<Category>();
         try (
@@ -271,14 +279,14 @@ public class CategoryBean implements Serializable {
      * @return the Categories
      */
     public List<Category> getCategoriesByCategoryName(String aCategoryName) {
+        int companyId = new GeneralUserSetting().getCurrentUser().getCompanyId();
         String sql;
-        sql = "{call sp_search_category_by_name(?)}";
+        sql = "SELECT * FROM category WHERE company_id=" + companyId + " AND category_name LIKE '%" + aCategoryName + "%' ORDER BY category_name";
         ResultSet rs = null;
         Categories = new ArrayList<Category>();
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setString(1, aCategoryName);
             rs = ps.executeQuery();
             while (rs.next()) {
                 Category cat = new Category();

@@ -20,6 +20,7 @@ public class UserDetail implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private int UserDetailId;
+    private int CompanyId;
     private String UserName;
     private String UserPassword;
     private String UserPasswordConfirm;
@@ -319,8 +320,19 @@ public class UserDetail implements Serializable {
     public void setLanguage_output(String language_output) {
         this.language_output = language_output;
     }
-    
-    
-    
+
+    /**
+     * @return the CompanyId
+     */
+    public int getCompanyId() {
+        return CompanyId;
+    }
+
+    /**
+     * @param CompanyId the CompanyId to set
+     */
+    public void setCompanyId(int CompanyId) {
+        this.CompanyId = CompanyId;
+    }
     
 }

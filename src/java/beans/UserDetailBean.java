@@ -55,6 +55,11 @@ public class UserDetailBean implements Serializable {
             } catch (NullPointerException npe) {
                 aUserDetail.setUserDetailId(0);
             }
+            try {
+                aUserDetail.setCompanyId(aResultSet.getInt("company_id"));
+            } catch (NullPointerException | java.sql.SQLException npe) {
+                aUserDetail.setCompanyId(1);  // Default company
+            }
             if (null == aResultSet.getString("user_name")) {
                 aUserDetail.setUserName("");
             } else {

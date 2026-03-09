@@ -297,6 +297,9 @@
                         <p:separator />
                         <p:menuitem value="#{langsys['User']} #{langsys['Details']}" action="#{navigationBean.redirectToUserDetail()}" /> 
                         <p:separator />
+                        <p:menuitem value="User Management CRM" action="#{navigationBean.redirectToUserManagementCRM()}" 
+                                    icon="fa fa-users" style="color: #7BC043; font-weight: bold;" /> 
+                        <p:separator />
                         <p:menuitem value="#{langsys['Group']} #{langsys['Users']}" action="#{navigationBean.redirectToGroupUser()}" /> 
                         <p:separator />
                         <p:menuitem value="#{langsys['User']} #{langsys['Category']}" action="#{navigationBean.redirectToUserCategory()}" /> 

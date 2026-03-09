@@ -53,6 +53,11 @@ public class StoreBean implements Serializable {
                 aStore.setStoreId(0);
             }
             try {
+                aStore.setCompanyId(aResultSet.getInt("company_id"));
+            } catch (Exception e) {
+                aStore.setCompanyId(1);  // Default company
+            }
+            try {
                 String store_name = aResultSet.getString("store_name");
                 if (null == store_name) {
                     aStore.setStoreName("");
@@ -280,8 +285,9 @@ public class StoreBean implements Serializable {
      * @return the Stores
      */
     public List<Store> getStores() {
+        int companyId = new GeneralUserSetting().getCurrentUser().getCompanyId();
         String sql;
-        sql = "{call sp_search_store_by_none()}";
+        sql = "SELECT * FROM store WHERE company_id=" + companyId + " ORDER BY store_name";
         ResultSet rs = null;
         Stores = new ArrayList<>();
         try (
@@ -300,14 +306,14 @@ public class StoreBean implements Serializable {
     }
 
     public List<Store> getStoresByName(String aStoreName) {
+        int companyId = new GeneralUserSetting().getCurrentUser().getCompanyId();
         String sql;
-        sql = "{call sp_search_store_by_name(?)}";
+        sql = "SELECT * FROM store WHERE company_id=" + companyId + " AND store_name LIKE '%" + aStoreName + "%' ORDER BY store_name";
         ResultSet rs = null;
         Stores = new ArrayList<>();
         try (
                 Connection conn = DBConnection.getMySQLConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);) {
-            ps.setString(1, aStoreName);
             rs = ps.executeQuery();
             while (rs.next()) {
                 Store store = new Store();
@@ -349,8 +355,9 @@ public class StoreBean implements Serializable {
     }
 
     public List<Store> getStoresAll() {
+        int companyId = new GeneralUserSetting().getCurrentUser().getCompanyId();
         String sql;
-        sql = "{call sp_search_store_by_none()}";
+        sql = "SELECT * FROM store WHERE company_id=" + companyId + " ORDER BY store_name";
         ResultSet rs = null;
         Stores = new ArrayList<>();
         try (

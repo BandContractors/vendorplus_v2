@@ -18,6 +18,7 @@ public class Item implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private long ItemId;
+    private int CompanyId;
     private String ItemCode;
     private String Description;
     private int CategoryId;
@@ -86,6 +87,20 @@ public class Item implements Serializable {
      */
     public void setItemId(long ItemId) {
         this.ItemId = ItemId;
+    }
+
+    /**
+     * @return the CompanyId
+     */
+    public int getCompanyId() {
+        return CompanyId;
+    }
+
+    /**
+     * @param CompanyId the CompanyId to set
+     */
+    public void setCompanyId(int CompanyId) {
+        this.CompanyId = CompanyId;
     }
 
     /**

@@ -1166,6 +1166,10 @@ public class NavigationBean implements Serializable {
         return "UserDetail?faces-redirect=true";
     }
 
+    public String redirectToUserManagementCRM() {
+        return "UserManagementCRM?faces-redirect=true";
+    }
+
     public String redirectToUserRight() {
         return "UserRight?faces-redirect=true";
     }

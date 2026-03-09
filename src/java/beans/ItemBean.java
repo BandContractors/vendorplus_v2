@@ -689,6 +689,11 @@ public class ItemBean implements Serializable {
                 aItem.setItemId(0);
             }
             try {
+                aItem.setCompanyId(aResultSet.getInt("company_id"));
+            } catch (NullPointerException | java.sql.SQLException npe) {
+                aItem.setCompanyId(1);  // Default company
+            }
+            try {
                 aItem.setItemCode(aResultSet.getString("item_code"));
             } catch (NullPointerException npe) {
                 aItem.setItemCode("");
@@ -2167,6 +2172,7 @@ public class ItemBean implements Serializable {
 
     public List<Item> getItemObjectList(String Query) {
         this.setTypedItemCode(Query);
+        int companyId = new GeneralUserSetting().getCurrentUser().getCompanyId();
         String sql, sqlDesc = "", sqlCode = "", sqlCodeOther = "";
         Item_code_other ico = this.getItem_code_otherByCode(Query);
         //desc
@@ -2199,7 +2205,7 @@ public class ItemBean implements Serializable {
         } else {
             sqlCodeOther = "";
         }
-        sql = "SELECT * FROM view_item i WHERE 1=1 AND ("
+        sql = "SELECT * FROM view_item i WHERE i.company_id=" + companyId + " AND ("
                 + "(" + sqlDesc + ") "
                 + "OR "
                 + "(" + sqlCode + ") "
@@ -2251,6 +2257,7 @@ public class ItemBean implements Serializable {
 
     public List<Item> getItemObjectListActive(String Query) {
         this.setTypedItemCode(Query);
+        int companyId = new GeneralUserSetting().getCurrentUser().getCompanyId();
         String sql, sqlDesc = "", sqlCode = "", sqlCodeOther = "";
         Item_code_other ico = this.getItem_code_otherByCode(Query);
         //desc
@@ -2283,7 +2290,7 @@ public class ItemBean implements Serializable {
         } else {
             sqlCodeOther = "";
         }
-        sql = "SELECT * FROM item i WHERE i.is_suspended='No' AND ("
+        sql = "SELECT * FROM item i WHERE i.company_id=" + companyId + " AND i.is_suspended='No' AND ("
                 + "(" + sqlDesc + ") "
                 + "OR "
                 + "(" + sqlCode + ") "
@@ -2411,6 +2418,7 @@ public class ItemBean implements Serializable {
 
     public List<Item> getItemObjectListForSale(String Query) {
         this.setTypedItemCode(Query);
+        int companyId = new GeneralUserSetting().getCurrentUser().getCompanyId();
         String sql, sqlDesc = "", sqlCode = "", sqlCodeOther = "";
         Item_code_other ico = this.getItem_code_otherByCode(Query);
         //desc
@@ -2443,7 +2451,7 @@ public class ItemBean implements Serializable {
         } else {
             sqlCodeOther = "";
         }
-        sql = "SELECT * FROM item i WHERE i.is_suspended='No' AND i.is_sale=1 AND i.is_asset=0 AND ("
+        sql = "SELECT * FROM item i WHERE i.company_id=" + companyId + " AND i.is_suspended='No' AND i.is_sale=1 AND i.is_asset=0 AND ("
                 + "(" + sqlDesc + ") "
                 + "OR "
                 + "(" + sqlCode + ") "
@@ -2772,6 +2780,7 @@ public class ItemBean implements Serializable {
 
     public List<Item> getItemObjectListForPurchase(String Query) {
         this.setTypedItemCode(Query);
+        int companyId = new GeneralUserSetting().getCurrentUser().getCompanyId();
         String sql, sqlDesc = "", sqlCode = "", sqlCodeOther = "";
         Item_code_other ico = this.getItem_code_otherByCode(Query);
         //desc
@@ -2804,7 +2813,7 @@ public class ItemBean implements Serializable {
         } else {
             sqlCodeOther = "";
         }
-        sql = "SELECT * FROM item i WHERE i.is_suspended='No' AND i.is_buy=1 AND ("
+        sql = "SELECT * FROM item i WHERE i.company_id=" + companyId + " AND i.is_suspended='No' AND i.is_buy=1 AND ("
                 + "(" + sqlDesc + ") "
                 + "OR "
                 + "(" + sqlCode + ") "
